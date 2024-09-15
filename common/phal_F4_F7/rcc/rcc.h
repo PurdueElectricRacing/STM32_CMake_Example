@@ -29,6 +29,12 @@
 #define HSE_CLOCK_RATE_HZ HSE_CLOCK_RATE_HZ_INVALID /* Define this in order to configure clocks to use the HSE clock */
 #endif  // HSE_CLOCK_RATE_HZ
 
+#define LSE_CLOCK_RATE_HZ_INVALID (1) /* High Speed External oscilator value */
+#ifndef LSE_CLOCK_RATE_HZ
+#define LSE_CLOCK_RATE_HZ LSE_CLOCK_RATE_HZ_INVALID /* Define this in order to configure clocks to use the HSE clock */
+#endif  // HSE_CLOCK_RATE_HZ
+
+
 #define HSI_CLOCK_RATE_HZ (16000000)
 
 
@@ -68,6 +74,12 @@ typedef enum {
     SYSTEM_CLOCK_SRC_HSE,
 } SystemClockSrc_t;
 
+typedef enum {
+    RTC_CLOCK_SRC_LSI,
+    RTC_CLOCK_SRC_LSE,
+} RTCClockSrc_t;
+
+
 typedef struct {
     SystemClockSrc_t system_source;     /* System Core Clock source */
     uint32_t  system_clock_target_hz;   /* System Core Clock rate */
@@ -79,6 +91,8 @@ typedef struct {
     PLLSrc_t pll_src;                   /* Input source for PLL VCO */
     uint32_t vco_output_rate_target_hz; /* VCO output target rate */
     uint32_t msi_output_rate_target_hz; /* Use if pll_src == MSI */
+
+    RTCClockSrc_t rtc_source;           /* RTC clock source */
 } ClockRateConfig_t;
 
 
@@ -121,6 +135,10 @@ bool PHAL_configurePLLSystemClock(uint32_t system_clock_target_hz);
  * @return false
  */
 bool PHAL_configureHSISystemClock();
+
+bool PHAL_configureHSESystemClock();
+
+bool PHAL_configureLSESystemClock();
 
 /**
  * @brief Configure AHB Clock rate by modifying the AHB prescaler value.

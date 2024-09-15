@@ -32,7 +32,9 @@ uint8_t PHAL_configureClockRates(ClockRateConfig_t* config)
             break;
         // Configure System Clock from High Speed External Oscillator (not supported currently in F4 HAL)
         case SYSTEM_CLOCK_SRC_HSE:
-            return 0xFF;
+            ret_code |= (!PHAL_configureHSESystemClock()) << 3;                                   // Call HSE configure subroutine
+            config->system_clock_target_hz = HSE_CLOCK_RATE_HZ;                                         // Set System Clock Target in Clock Config
+            break;
         // Configure System Clock from the High Speed Internal Oscillator
         case SYSTEM_CLOCK_SRC_HSI:
             ret_code |= (!PHAL_configureHSISystemClock()) << 3;                                // Call HSI configure subroutine
@@ -40,6 +42,17 @@ uint8_t PHAL_configureClockRates(ClockRateConfig_t* config)
             break;
         default:
             return 0xFF;                                                                       // Invalid System Source
+    }
+
+    switch (config->rtc_source)
+    {
+        case RTC_CLOCK_SRC_LSI:
+            // TODO: lsi config? 
+            ret_code |= 1 << 4;
+            break;
+        case RTC_CLOCK_SRC_LSE:
+            ret_code |= (!PHAL_configureLSESystemClock()) << 4;
+            break;
     }
 
     ret_code |= (!PHAL_configureAHBClock(config->ahb_clock_target_hz))     << 0;               // Configure AHB Clock
@@ -221,6 +234,51 @@ bool PHAL_configurePLLSystemClock(uint32_t system_clock_target_hz)
     return true;
 }
 
+bool PHAL_configureHSESystemClock()
+{
+    if (HSE_CLOCK_RATE_HZ == HSE_CLOCK_RATE_HZ_INVALID)
+    {
+        return false;
+    }
+    
+    RCC->CR |= RCC_CR_HSEBYP;
+    RCC->CR |= RCC_CR_HSEON;
+
+    while (!(RCC->CR & RCC_CR_HSERDY))
+        ;
+    
+    // TODO: need? 
+    //Flash latency adjustment, see ST RM 0090 Pg. 80
+    // uint32_t flash_acr_temp = FLASH->ACR;
+    // flash_acr_temp &= ~(FLASH_ACR_LATENCY_Msk);
+    // flash_acr_temp |= FLASH_ACR_LATENCY_0WS << FLASH_ACR_LATENCY_Pos;
+    // FLASH->ACR = flash_acr_temp;
+
+    __DSB();                                                        // Wait for explicit memory accesses to finish
+    RCC->CFGR |= RCC_CFGR_SW_HSE;                                   // Set system clock switch register to HSI
+    while((RCC->CFGR & RCC_CFGR_SWS_HSE) != RCC_CFGR_SWS_HSE)       // Wait until the system clock switch register indicates that HSI is selected
+        ;
+    __DSB();                                                        // Wait for explicit memory accesses to finish
+
+    SystemCoreClockUpdate();                                        // Must be called each time the core clock HCLK changes
+    return true;                                                    // Return true upon completion
+}
+
+bool PHAL_configureLSESystemClock() {
+    if (LSE_CLOCK_RATE_HZ == LSE_CLOCK_RATE_HZ_INVALID)
+    {
+        return false;
+    }
+
+    RCC->BDCR |= RCC_BDCR_LSEBYP;
+    RCC->BDCR |= RCC_BDCR_LSEON;
+
+    while (!(RCC->BDCR & RCC_BDCR_LSERDY))
+        ;
+    
+    return true;
+}
+
 bool PHAL_configureHSISystemClock()
 {
     // Turn on and wait for HSI to enable
@@ -234,7 +292,7 @@ bool PHAL_configureHSISystemClock()
     flash_acr_temp |= FLASH_ACR_LATENCY_0WS << FLASH_ACR_LATENCY_Pos;
     FLASH->ACR = flash_acr_temp;
 
-
+    
     __DSB();                                                        // Wait for explicit memory accesses to finish
     RCC->CFGR |= RCC_CFGR_SW_HSI;                                   // Set system clock switch register to HSI
     while((RCC->CFGR & RCC_CFGR_SWS_HSI) != RCC_CFGR_SWS_HSI)       // Wait until the system clock switch register indicates that HSI is selected
