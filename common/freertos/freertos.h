@@ -1,15 +1,26 @@
 #ifndef __COMMON_FREERTOS_H__
 #define __COMMON_FREERTOS_H__
 
-#include "FreeRTOS.h"
-#include "cmsis_os2.h"
-
-#include "atomic.h"
-#include "list.h"
-#include "queue.h"
-#include "semphr.h"
-#include "task.h"
-#include "timers.h"
+#define myIDENT(x) x
+#define myXSTR(x) #x
+#define mySTR(x) myXSTR(x)
+#define __FREERTOS_PATH(x,y) mySTR(myIDENT(x)y)
+#define _FREERTOS_PATH(y) __FREERTOS_PATH(_FREERTOS_DIR, y)
+#if defined(STM32F407xx)
+#define _FREERTOS_DIR common/STM32CubeF4/Middlewares/Third_Party/FreeRTOS/Source/
+#elif defined(STM32F732xx)
+#define _FREERTOS_DIR common/STM32CubeF7/Middlewares/Third_Party/FreeRTOS/Source/
+#else
+#error "Unsupported MCU arch"
+#endif
+#include _FREERTOS_PATH(include/FreeRTOS.h)
+#include _FREERTOS_PATH(CMSIS_RTOS_V2/cmsis_os2.h)
+#include _FREERTOS_PATH(include/atomic.h)
+#include _FREERTOS_PATH(include/list.h)
+#include _FREERTOS_PATH(include/queue.h)
+#include _FREERTOS_PATH(include/semphr.h)
+#include _FREERTOS_PATH(include/task.h)
+#include _FREERTOS_PATH(include/timers.h)
 
 #include <stdint.h>
 

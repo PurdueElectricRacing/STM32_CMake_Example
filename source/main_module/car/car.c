@@ -4,7 +4,7 @@
 
 Car_t car;
 extern q_handle_t q_tx_usart_l, q_tx_usart_r;
-extern usart_rx_buf_t huart_l_rx_buf, huart_r_rx_buf;
+// extern usart_rx_buf_t huart_l_rx_buf, huart_r_rx_buf;
 extern uint16_t num_failed_msgs_l, num_failed_msgs_r;
 extern WheelSpeeds_t wheel_speeds;
 // TODO: Just to remove errors for now
@@ -30,6 +30,11 @@ uint8_t prchg_start;
 
 bool validatePrecharge();
 
+void sendSetpoints()
+{
+    return;
+}
+
 bool carInit()
 {
     /* Set initial states */
@@ -46,7 +51,7 @@ bool carInit()
     daq_constant_tq = 0;
     const_tq_val = 0;
     hist_curr_idx = 0;
-
+    amkInit(&car.motor_l, &car.pchg.pchg_complete, sendSetpoints);
 
     PHAL_writeGPIO(SDC_MUX_S0_GPIO_Port, SDC_MUX_S0_Pin, 0);
     PHAL_writeGPIO(SDC_MUX_S1_GPIO_Port, SDC_MUX_S1_Pin, 0);
@@ -59,10 +64,6 @@ void carHeartbeat()
 {
     // SEND_MAIN_HB(car.state, car.pchg.pchg_complete);
     SEND_MAIN_HB_AMK(car.state, car.pchg.pchg_complete);
-    SEND_REAR_MC_STATUS(car.motor_l.motor_state,
-        car.motor_l.link_state, car.motor_l.last_link_error,
-        car.motor_r.motor_state, car.motor_r.link_state,
-        car.motor_r.last_link_error);
     static uint8_t n;
 }
 
@@ -424,8 +425,7 @@ void carPeriodic()
     PHAL_writeGPIO(SDC_CTRL_GPIO_Port, SDC_CTRL_Pin, car.sdc_close);
     PHAL_writeGPIO(BRK_LIGHT_GPIO_Port, BRK_LIGHT_Pin, car.brake_light | daq_brake);
     PHAL_writeGPIO(BUZZER_GPIO_Port, BUZZER_Pin, car.buzzer);
-    mcSetPower(car.torque_r.torque_left,  &car.motor_l);
-    mcSetPower(car.torque_r.torque_right, &car.motor_r);
+    amkSetTorque(&car.motor_l, car.torque_r.torque_left);
  }
 
 
@@ -438,9 +438,8 @@ void parseMCDataPeriodic(void)
 {
     uint16_t shock_l, shock_r;
 
-    /* Update Motor Controller Data Structures */
-    mcPeriodic(&car.motor_l);
-    mcPeriodic(&car.motor_r);
+
+    amkPeriodic(&car.motor_l);
 
     // setFault(ID_LEFT_MC_CONN_FAULT, car.pchg.pchg_complete &&
     //             car.motor_l.motor_state != MC_CONNECTED);
@@ -464,18 +463,19 @@ void parseMCDataPeriodic(void)
     // uint16_t l_speed = (wheel_speeds.l->rad_s / (2*PI));
     // uint16_t r_speed = (wheel_speeds.l->rad_s / (2*PI));
     wheelSpeedsPeriodic();
-    SEND_REAR_WHEEL_SPEEDS(car.motor_l.rpm, car.motor_r.rpm,
-                                    wheel_speeds.left_rad_s_x100,
-                                    wheel_speeds.right_rad_s_x100);
+    // 2025 TODO Setup wheel speed stuff:
+    // SEND_REAR_WHEEL_SPEEDS(car.motor_l.rpm, car.motor_r.rpm,
+    //                                 wheel_speeds.left_rad_s_x100,
+    //                                 wheel_speeds.right_rad_s_x100);
     static uint32_t last_curr_t;
-    if (sched.os_ticks - last_curr_t >= 100)
-    {
-        SEND_REAR_MOTOR_CURRENTS_VOLTS(
-                                    (uint16_t) car.motor_l.current_x10,
-                                    (uint16_t) car.motor_r.current_x10,
-                                    (uint16_t) car.motor_r.voltage_x10);
-        last_curr_t = sched.os_ticks;
-    }
+    // if (sched.os_ticks - last_curr_t >= 100)
+    // {
+    //     SEND_REAR_MOTOR_CURRENTS_VOLTS(
+    //                                 (uint16_t) car.motor_l.current_x10,
+    //                                 (uint16_t) car.motor_r.current_x10,
+    //                                 (uint16_t) car.motor_r.voltage_x10);
+    //     last_curr_t = sched.os_ticks;
+    // }
     // TODO: possibly move into cooling
     static uint32_t last_tmp_t;
     if (sched.os_ticks - last_tmp_t >= 500)
@@ -483,8 +483,10 @@ void parseMCDataPeriodic(void)
         SEND_REAR_MOTOR_TEMPS(
                                 (uint8_t) car.motor_l.motor_temp,
                                 (uint8_t) car.motor_r.motor_temp,
-                                (uint8_t) car.motor_l.controller_temp,
-                                (uint8_t) car.motor_r.controller_temp);
+                                (uint8_t) car.motor_l.inverter_temp,
+                                (uint8_t) car.motor_r.inverter_temp,
+                                (uint8_t) car.motor_l.igbt_temp,
+                                (uint8_t) car.motor_r.igbt_temp);
         SEND_NUM_MC_SKIPS(num_failed_msgs_r, num_failed_msgs_l);
         last_tmp_t = sched.os_ticks;
     }

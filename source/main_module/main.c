@@ -14,6 +14,10 @@
 #include "common/plettenberg/plettenberg.h"
 #include "common/psched/psched.h"
 #include "common/queue/queue.h"
+#include "common/amk/amk.h"
+
+/* TODO: Move CAN2 stuff here since can parse base is dumb */
+#include "common/phal_F4_F7/can/can.h"
 
 /* Module Includes */
 #include "car.h"
@@ -32,7 +36,7 @@ GPIOInitConfig_t gpio_config[] = {
     GPIO_INIT_OUTPUT(BRK_LIGHT_GPIO_Port, BRK_LIGHT_Pin, GPIO_OUTPUT_LOW_SPEED),
     GPIO_INIT_OUTPUT(BUZZER_GPIO_Port, BUZZER_Pin, GPIO_OUTPUT_LOW_SPEED),
     GPIO_INIT_INPUT(BRK_BUZZER_STAT_GPIO_Port, BRK_BUZZER_STAT_Pin, GPIO_INPUT_OPEN_DRAIN),
-    GPIO_INIT_INPUT(TSAL_LVAL_STAT_GPIO_Port, TSAL_LVAL_STAT_Pin, GPIO_INPUT_OPEN_DRAIN),
+    // GPIO_INIT_INPUT(TSAL_LVAL_STAT_GPIO_Port, TSAL_LVAL_STAT_Pin, GPIO_INPUT_OPEN_DRAIN),
 
     // CAN
     GPIO_INIT_CANRX_PA11,
@@ -82,55 +86,6 @@ GPIOInitConfig_t gpio_config[] = {
     GPIO_INIT_OUTPUT(THERM_MUX_S1_GPIO_Port, THERM_MUX_S1_Pin, GPIO_OUTPUT_LOW_SPEED),
     GPIO_INIT_OUTPUT(THERM_MUX_S2_GPIO_Port, THERM_MUX_S2_Pin, GPIO_OUTPUT_LOW_SPEED),
     GPIO_INIT_ANALOG(THERM_MUX_D_GPIO_Port, THERM_MUX_D_Pin)
-};
-
-/* USART Configuration */
-// Left Motor Controller UART
-dma_init_t usart_l_tx_dma_config = USART1_TXDMA_CONT_CONFIG(NULL, 1);
-dma_init_t usart_l_rx_dma_config = USART1_RXDMA_CONT_CONFIG(NULL, 2);
-char usart_l_rx_array[MC_MAX_RX_LENGTH] = {'\0'};
-volatile usart_rx_buf_t huart_l_rx_buf = {
-    .last_msg_time = 0, .msg_size = MC_MAX_TX_LENGTH,
-    .last_msg_loc  = 0, .last_rx_time = 0,
-    .rx_buf_size   = MC_MAX_RX_LENGTH, .rx_buf = usart_l_rx_array
-};
-usart_init_t huart_l = {
-   .baud_rate   = 115200,
-   .word_length = WORD_8,
-   .stop_bits   = SB_ONE,
-   .parity      = PT_NONE,
-   .hw_flow_ctl = HW_DISABLE,
-   .ovsample    = OV_16,
-   .obsample    = OB_DISABLE,
-   .periph      = USART1,
-   .wake_addr = false,
-   .usart_active_num = USART1_ACTIVE_IDX,
-   .tx_dma_cfg = &usart_l_tx_dma_config,
-   .rx_dma_cfg = &usart_l_rx_dma_config
-};
-
-// Right Motor Controller UART
-dma_init_t usart_r_tx_dma_config = USART2_TXDMA_CONT_CONFIG(NULL, 1);
-dma_init_t usart_r_rx_dma_config = USART2_RXDMA_CONT_CONFIG(NULL, 2);
-usart_init_t huart_r = {
-   .baud_rate   = 115200,
-   .word_length = WORD_8,
-   .stop_bits   = SB_ONE,
-   .parity      = PT_NONE,
-   .hw_flow_ctl = HW_DISABLE,
-   .ovsample    = OV_16,
-   .obsample    = OB_DISABLE,
-   .periph      = USART2,
-   .wake_addr = false,
-   .usart_active_num = USART2_ACTIVE_IDX,
-   .tx_dma_cfg = &usart_r_tx_dma_config,
-   .rx_dma_cfg = &usart_r_rx_dma_config
-};
-char usart_r_rx_array[MC_MAX_RX_LENGTH] = {'\0'};
-volatile usart_rx_buf_t huart_r_rx_buf = {
-    .last_msg_time = 0, .msg_size = MC_MAX_TX_LENGTH,
-    .last_msg_loc  = 0, .last_rx_time = 0,
-    .rx_buf_size   = MC_MAX_RX_LENGTH, .rx_buf = usart_r_rx_array
 };
 
 /* ADC Configuration */
@@ -212,23 +167,47 @@ ClockRateConfig_t clock_config = {
 void preflightAnimation(void);
 void preflightChecks(void);
 void heartBeatLED();
-void usartTxUpdate(void);
-void usartIdleIRQ(volatile usart_init_t *huart, volatile usart_rx_buf_t *rx_buf);
+// void usartTxUpdate(void);
+// void usartIdleIRQ(volatile usart_init_t *huart, volatile usart_rx_buf_t *rx_buf);
 void send_fault(uint16_t, bool);
 extern void HardFault_Handler();
 void interpretLoadSensor(void);
 float voltToForce(uint16_t load_read);
 
-q_handle_t q_tx_usart_l;
-q_handle_t q_tx_usart_r;
+// q_handle_t q_tx_usart_l;
+// q_handle_t q_tx_usart_r;
 
 uint16_t num_failed_msgs_r;
 uint16_t num_failed_msgs_l;
 
+extern q_handle_t q_tx_can2_s[CAN_TX_MAILBOX_CNT];
+extern uint32_t can2_mbx_last_send_time[CAN_TX_MAILBOX_CNT];
+
+void can2TxUpdate(void)
+{
+    CanMsgTypeDef_t tx_msg;
+    for (uint8_t i = 0; i < CAN_TX_MAILBOX_CNT; ++i)
+    {
+        if(PHAL_txMailboxFree(CAN2, i))
+        {
+            if (qReceive(&q_tx_can2_s[i], &tx_msg) == SUCCESS_G)    // Check queue for items and take if there is one
+            {
+                PHAL_txCANMessage(&tx_msg, i);
+                can2_mbx_last_send_time[i] = sched.os_ticks;
+            }
+        }
+        else if (sched.os_ticks - can2_mbx_last_send_time[i] > CAN_TX_TIMEOUT_MS)
+        {
+            PHAL_txCANAbort(CAN2, i); // aborts tx and empties the mailbox
+            can_stats.can_peripheral_stats[CAN2_IDX].tx_fail++;
+        }
+    }
+}
+
 int main(void){
     /* Data Struct Initialization */
-    qConstruct(&q_tx_usart_l, MC_MAX_TX_LENGTH);
-    qConstruct(&q_tx_usart_r, MC_MAX_TX_LENGTH);
+    // qConstruct(&q_tx_usart_l, MC_MAX_TX_LENGTH);
+    // qConstruct(&q_tx_usart_r, MC_MAX_TX_LENGTH);
 
     /* HAL Initialization */
     PHAL_trimHSI(HSI_TRIM_MAIN_MODULE);
@@ -241,7 +220,6 @@ int main(void){
         HardFault_Handler();
     }
     PHAL_writeGPIO(SDC_CTRL_GPIO_Port, SDC_CTRL_Pin, 1);
-
 
     /* Task Creation */
     schedInit(APB1ClockRateHz);
@@ -260,8 +238,9 @@ int main(void){
     taskCreate(daqPeriodic, DAQ_UPDATE_PERIOD);
     // taskCreate(memFg, MEM_FG_TIME);
     taskCreateBackground(canTxUpdate);
+    // taskCreateBackground(can2TxUpdate);
     taskCreateBackground(canRxUpdate);
-    taskCreateBackground(usartTxUpdate);
+    // taskCreateBackground(usartTxUpdate);
     // taskCreateBackground(memBg);
     // uint8_t i = 0;
     // calibrateSteeringAngle(&i);
@@ -279,10 +258,16 @@ void preflightChecks(void) {
 
     switch (state++)
     {
+        /* TODO: Change this to init AMK CAN */
         case 0:
+            if(!PHAL_initCAN(CAN1, false, VCAN_BPS))
+            {
+                HardFault_Handler();
+            }
+            NVIC_EnableIRQ(CAN1_RX0_IRQn);
             break;
         case 1:
-            if(!PHAL_initCAN(CAN1, false, VCAN_BPS))
+            if(!PHAL_initCAN(CAN2, false, VCAN_BPS))
             {
                 HardFault_Handler();
             }
@@ -312,13 +297,6 @@ void preflightChecks(void) {
             PHAL_startADC(ADC1);
            break;
         case 3:
-            // initial rx request
-            PHAL_usartRxDma(&huart_r,
-                            (uint16_t *) huart_r_rx_buf.rx_buf,
-                            huart_r_rx_buf.rx_buf_size, 1);
-            PHAL_usartRxDma(&huart_l,
-                            (uint16_t *) huart_l_rx_buf.rx_buf,
-                            huart_l_rx_buf.rx_buf_size, 1);
             break;
         case 4:
            /* Module Initialization */
@@ -384,62 +362,6 @@ void heartBeatLED(void)
     }
     trig = !trig;
 }
-
-/* USART Message Handling */
-uint8_t tmp_left[MC_MAX_TX_LENGTH] = {'\0'};
-uint8_t tmp_right[MC_MAX_TX_LENGTH] = {'\0'};
-void usartTxUpdate(void)
-{
-    if (!PHAL_usartTxBusy(&huart_l) &&
-        qReceive(&q_tx_usart_l, tmp_left) == SUCCESS_G)
-    {
-        PHAL_usartTxDma(&huart_l, (uint16_t *) tmp_left, strlen(tmp_left));
-    }
-    if (!PHAL_usartTxBusy(&huart_r) &&
-        qReceive(&q_tx_usart_r, tmp_right) == SUCCESS_G)
-    {
-        PHAL_usartTxDma(&huart_r, (uint16_t *) tmp_right, strlen(tmp_right));
-    }
-}
-
-void usart_recieve_complete_callback(usart_init_t *handle)
-{
-    if (handle == &huart_r)
-    {
-        if (handle->rx_errors.noise_detected)
-        {
-            num_failed_msgs_r++;
-            return;
-        }
-        usartIdleIRQ(&huart_r, &huart_r_rx_buf);
-    }
-    else if (handle == &huart_l)
-    {
-        if (handle->rx_errors.noise_detected)
-        {
-            num_failed_msgs_l++;
-            return;
-        }
-        usartIdleIRQ(&huart_l, &huart_l_rx_buf);
-    }
-}
-
-void usartIdleIRQ(volatile usart_init_t *huart, volatile usart_rx_buf_t *rx_buf)
-{
-    // TODO: check for overruns, framing errors, etc
-    uint16_t new_loc = 0;
-    rx_buf->last_rx_time = sched.os_ticks;
-    new_loc = rx_buf->rx_buf_size - huart->rx_dma_cfg->stream->NDTR;      // extract last location from DMA
-    if (new_loc == rx_buf->rx_buf_size) new_loc = 0;                        // should never happen
-    else if (new_loc < rx_buf->last_rx_loc) new_loc += rx_buf->rx_buf_size; // wrap around
-    if (new_loc - rx_buf->last_rx_loc > rx_buf->msg_size)                   // status msg vs just an echo
-    {
-        rx_buf->last_msg_time = sched.os_ticks;
-        rx_buf->last_msg_loc = (rx_buf->last_rx_loc + 1) % rx_buf->rx_buf_size;
-    }
-    rx_buf->last_rx_loc = new_loc % rx_buf->rx_buf_size;
-}
-
 
 #define SCALE_F = (1 + (3.4/6.6))
 float voltToForce(uint16_t load_read) {
