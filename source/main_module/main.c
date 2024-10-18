@@ -283,9 +283,9 @@ int main(void){
 }
 
 uint16_t c = 0;
-uint16_t v = 0;
-uint16_t p = 0;
-uint16_t n = 0;
+int16_t v  = 0;
+int16_t p  = 0;
+int16_t n  = 0;
 void amkCanTesting()
 {
     SEND_AMK_SETPOINTS_1(c, v, p, n);
