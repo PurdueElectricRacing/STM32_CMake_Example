@@ -224,6 +224,7 @@ void send_fault(uint16_t, bool);
 extern void HardFault_Handler();
 void interpretLoadSensor(void);
 float voltToForce(uint16_t load_read);
+void amkCanTesting();
 
 q_handle_t q_tx_usart_l;
 q_handle_t q_tx_usart_r;
@@ -263,6 +264,7 @@ int main(void){
     taskCreate(heartBeatTask, 100);
     taskCreate(send_shockpots, 15);
     taskCreate(parseMCDataPeriodic, MC_LOOP_DT);
+    taskCreate(amkCanTesting, 100);
     taskCreate(daqPeriodic, DAQ_UPDATE_PERIOD);
     // taskCreate(memFg, MEM_FG_TIME);
     taskCreateBackground(canTxUpdate);
@@ -278,6 +280,20 @@ int main(void){
     schedStart();
 
     return 0;
+}
+
+uint16_t c = 0;
+uint16_t v = 0;
+uint16_t p = 0;
+uint16_t n = 0;
+void amkCanTesting()
+{
+    SEND_AMK_SETPOINTS_1(c, v, p, n);
+    c++; v++; p++; n++;
+    if (c > 0xFF) c = 0;
+    if (v > 0xFF) v = 0;
+    if (p > 0xFF) p = 0;
+    if (n > 0xFF) n = 0;
 }
 
 void preflightChecks(void) {
