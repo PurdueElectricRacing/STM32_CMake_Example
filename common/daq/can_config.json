@@ -205,6 +205,7 @@
                                 {"sig_name": "AMK_TorqueLimitPositiv", "sig_desc": "Positive torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1},
                                 {"sig_name": "AMK_TorqueLimitNegativ", "sig_desc": "Negative torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1}
                             ],
+                            "msg_period": 5,
                             "msg_id_override": "0x184"
                         }
                     ],
@@ -1071,6 +1072,7 @@
                                 {"sig_name": "AMK_TorqueLimitPositiv", "sig_desc": "Positive torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1},
                                 {"sig_name": "AMK_TorqueLimitNegativ", "sig_desc": "Negative torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1}
                             ],
+                            "msg_period": 5,
                             "msg_id_override": "0x184"
                         }
                     ]
