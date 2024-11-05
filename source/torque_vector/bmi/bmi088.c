@@ -30,7 +30,7 @@ bool BMI088_init(BMI088_Handle_t *bmi)
 
     PHAL_SPI_writeByte(bmi->spi, BMI088_GYRO_BANDWIDTH_ADDR, bmi->gyro_datarate);
     PHAL_SPI_writeByte(bmi->spi, BMI088_GYRO_RANGE_ADDR, bmi->gyro_range);
-    PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
 
     // Perform self tests for sensor
     BMI088_gyroSelfTestStart(bmi);
@@ -84,7 +84,7 @@ bool BMI088_gyroSelfTestStart(BMI088_Handle_t *bmi)
 {
     BMI088_selectGyro(bmi);
     PHAL_SPI_writeByte(bmi->spi, BMI088_GYRO_SELFTEST_ADDR, 0x01U);
-    PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
     return true;
 }
 
@@ -92,7 +92,7 @@ bool BMI088_gyroSelfTestComplete(BMI088_Handle_t *bmi)
 {
     BMI088_selectGyro(bmi);
     uint8_t self_test_res = PHAL_SPI_readByte(bmi->spi, BMI088_GYRO_SELFTEST_ADDR, true);
-    PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
     return (self_test_res & 0b10) == 0b10;
 }
 
@@ -103,11 +103,11 @@ bool BMI088_gyroSelfTestPass(BMI088_Handle_t *bmi)
     if (test_result & 0b10)
     {
         // Self test completed
-        PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
+        PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
         return (test_result & 0b10100) == 0b10000;
     }
     // Self test was not yet run
-    PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
     return false;
 }
 
@@ -182,7 +182,7 @@ bool BMI088_readGyro(BMI088_Handle_t *bmi, vector_3d_t *v)
     v->x = raw_x / scale;
     v->y = raw_y / scale;
     v->z = raw_z / scale;
-    PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
     return true;
 }
 
@@ -211,22 +211,20 @@ bool BMI088_readAccel(BMI088_Handle_t *bmi, vector_3d_t *v)
     v->y = (float)(raw_ay << (bmi->accel_range + 1)) / 32768.0f * G_TO_M_S * 1.5f;
     v->z = (float)(raw_az << (bmi->accel_range + 1)) / 32768.0f * G_TO_M_S * 1.5f;
     // asm("nop");
-    PHAL_writeGPIO(SPI_CS_ACEL_GPIO_Port, SPI_CS_ACEL_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, 1);
     return true;
 }
 
 static inline void BMI088_selectGyro(BMI088_Handle_t *bmi)
 {
-    PHAL_writeGPIO(SPI_CS_ACEL_GPIO_Port, SPI_CS_ACEL_Pin, 1);
-    PHAL_writeGPIO(SPI_CS_MAG_GPIO_Port, SPI_CS_MAG_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, 1);
     bmi->spi->nss_gpio_port = bmi->gyro_csb_gpio_port;
     bmi->spi->nss_gpio_pin = bmi->gyro_csb_pin;
 }
 
 static inline void BMI088_selectAccel(BMI088_Handle_t *bmi)
 {
-    PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
-    PHAL_writeGPIO(SPI_CS_MAG_GPIO_Port, SPI_CS_MAG_Pin, 1);
+    PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
     bmi->spi->nss_gpio_port = bmi->accel_csb_gpio_port;
     bmi->spi->nss_gpio_pin = bmi->accel_csb_pin;
 }

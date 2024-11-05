@@ -45,29 +45,30 @@
 uint8_t collect_test[100] = {0};
 
 GPIOInitConfig_t gpio_config[] = {
-    // Status Indicators
-    GPIO_INIT_OUTPUT(ERR_LED_GPIO_Port, ERR_LED_Pin, GPIO_OUTPUT_LOW_SPEED),
-    GPIO_INIT_OUTPUT(CONN_LED_GPIO_Port, CONN_LED_Pin, GPIO_OUTPUT_LOW_SPEED),
-    GPIO_INIT_OUTPUT(HEARTBEAT_GPIO_Port, HEARTBEAT_Pin, GPIO_OUTPUT_LOW_SPEED),
 
-    // SPI
-    GPIO_INIT_AF(SPI_SCLK_GPIO_Port, SPI_SCLK_Pin, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
-    GPIO_INIT_AF(SPI_MOSI_GPIO_Port, SPI_MOSI_Pin, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
-    GPIO_INIT_AF(SPI_MISO_GPIO_Port, SPI_MISO_Pin, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_OPEN_DRAIN, GPIO_INPUT_OPEN_DRAIN),
-    GPIO_INIT_OUTPUT(SPI_CS_ACEL_GPIO_Port, SPI_CS_ACEL_Pin, GPIO_OUTPUT_HIGH_SPEED),
-    GPIO_INIT_OUTPUT(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, GPIO_OUTPUT_HIGH_SPEED),
-    GPIO_INIT_OUTPUT(SPI_CS_MAG_GPIO_Port, SPI_CS_MAG_Pin, GPIO_OUTPUT_HIGH_SPEED),
+    // LEDS
+    GPIO_INIT_OUTPUT(ERR_LED_PORT, ERR_LED_PIN, GPIO_OUTPUT_LOW_SPEED),
+    GPIO_INIT_OUTPUT(HEARTBEAT_LED_PORT, HEARTBEAT_LED_PIN, GPIO_OUTPUT_LOW_SPEED),
+    GPIO_INIT_OUTPUT(CONN_LED_PORT, CONN_LED_PIN, GPIO_OUTPUT_LOW_SPEED),
+    GPIO_INIT_OUTPUT(SD_ERR_LED_PORT, SD_ERR_LED_PIN, GPIO_OUTPUT_LOW_SPEED),
+    GPIO_INIT_OUTPUT(SD_ACT_LED_PORT, SD_ACT_LED_PIN, GPIO_OUTPUT_LOW_SPEED),
+    GPIO_INIT_OUTPUT(SD_DET_LED_PORT, SD_DET_LED_PIN, GPIO_OUTPUT_LOW_SPEED),
 
-    // GPS USART
-    GPIO_INIT_UART4RX_PA1,
-    GPIO_INIT_UART4TX_PA0,
+    // SPI1 - ACCEL & GYRO
+    // TODO why open drain here?
+    GPIO_INIT_AF(SPI1_SCLK_PORT, SPI1_SCLK_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
+    GPIO_INIT_AF(SPI1_MOSI_PORT, SPI1_MOSI_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
+    GPIO_INIT_AF(SPI1_MISO_PORT, SPI1_MISO_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_OPEN_DRAIN, GPIO_INPUT_OPEN_DRAIN),
+    GPIO_INIT_OUTPUT(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, GPIO_OUTPUT_HIGH_SPEED),
+    GPIO_INIT_OUTPUT(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, GPIO_OUTPUT_HIGH_SPEED),
+
+    // GPS SPI
+    // GPIO_INIT_AF(SPI2_CLK_GPS_PORT, SPI2_CLK_GPS_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
+    // GPIO_INIT_UART4RX_PA1,
+    // GPIO_INIT_UART4TX_PA0,
 
     // GPS Auxillary pins
-    GPIO_INIT_OUTPUT(GPS_RESET_GPIO_Port, GPS_RESET_Pin, GPIO_OUTPUT_LOW_SPEED),
-
-    // EEPROM
-    GPIO_INIT_OUTPUT(NAV_EEPROM_CS_GPIO_PORT, NAV_EEPROM_CS_PIN, GPIO_OUTPUT_HIGH_SPEED),
-    GPIO_INIT_OUTPUT(NAV_WP_GPIO_PORT, NAV_WP_PIN, GPIO_OUTPUT_HIGH_SPEED),
+    GPIO_INIT_OUTPUT(RESET_GPS_PORT, RESET_GPS_PIN, GPIO_OUTPUT_LOW_SPEED),
 
     // CAN
     GPIO_INIT_CANRX_PA11,
@@ -119,8 +120,8 @@ SPI_InitConfig_t spi_config = {
     .data_rate = TargetCoreClockrateHz / 64,
     .data_len = 8,
     .nss_sw = true,
-    .nss_gpio_port = SPI_CS_ACEL_GPIO_Port,
-    .nss_gpio_pin = SPI_CS_ACEL_Pin,
+    .nss_gpio_port = SPI1_CSB_ACCEL_PORT,
+    .nss_gpio_pin = SPI1_CSB_ACCEL_PIN,
     .rx_dma_cfg = &spi_rx_dma_config,
     .tx_dma_cfg = &spi_tx_dma_config,
     .periph = SPI1};
@@ -131,13 +132,13 @@ vector_3d_t accel_in, gyro_in, mag_in;
 
 
 BMI088_Handle_t bmi_config = {
-    .accel_csb_gpio_port = SPI_CS_ACEL_GPIO_Port,
-    .accel_csb_pin = SPI_CS_ACEL_Pin,
+    .accel_csb_gpio_port = SPI1_CSB_ACCEL_PORT,
+    .accel_csb_pin = SPI1_CSB_ACCEL_PIN,
     .accel_range = ACCEL_RANGE_3G,
     .accel_odr = ACCEL_ODR_50Hz,
     .accel_bwp = ACCEL_OS_NORMAL,
-    .gyro_csb_gpio_port = SPI_CS_GYRO_GPIO_Port,
-    .gyro_csb_pin = SPI_CS_GYRO_Pin,
+    .gyro_csb_gpio_port = SPI1_CSB_GYRO_PORT,
+    .gyro_csb_pin = SPI1_CSB_GYRO_PIN,
     .gyro_datarate = GYRO_DR_100Hz_32Hz,
     .gyro_range = GYRO_RANGE_250,
     .spi = &spi_config};
@@ -239,7 +240,7 @@ void preflightChecks(void)
     break;
     case 3:
         // GPS Initialization
-        PHAL_writeGPIO(GPS_RESET_GPIO_Port, GPS_RESET_Pin, 1);
+        PHAL_writeGPIO(RESET_GPS_PORT, RESET_GPS_PIN, 1);
         PHAL_usartRxDma(&huart_gps, (uint16_t *)GPSHandle.raw_message, 100, 1);
     break;
     case 5:
@@ -253,9 +254,8 @@ void preflightChecks(void)
         }
         spi_config.data_rate = APB2ClockRateHz / 16;
 
-        PHAL_writeGPIO(SPI_CS_ACEL_GPIO_Port, SPI_CS_ACEL_Pin, 1);
-        PHAL_writeGPIO(SPI_CS_GYRO_GPIO_Port, SPI_CS_GYRO_Pin, 1);
-        PHAL_writeGPIO(SPI_CS_MAG_GPIO_Port, SPI_CS_MAG_Pin, 1);
+        PHAL_writeGPIO(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, 1);
+        PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 1);
     break;
     case 4:
         if (!BMI088_init(&bmi_config))
@@ -302,34 +302,34 @@ void preflightAnimation(void)
 {
     static uint32_t time;
 
-    PHAL_writeGPIO(HEARTBEAT_GPIO_Port, HEARTBEAT_Pin, 0);
-    PHAL_writeGPIO(ERR_LED_GPIO_Port, ERR_LED_Pin, 0);
-    PHAL_writeGPIO(CONN_LED_GPIO_Port, CONN_LED_Pin, 0);
+    PHAL_writeGPIO(HEARTBEAT_LED_PORT, HEARTBEAT_LED_PIN, 0);
+    PHAL_writeGPIO(ERR_LED_PORT, ERR_LED_PIN, 0);
+    PHAL_writeGPIO(CONN_LED_PORT, CONN_LED_PIN, 0);
 
     switch (time++ % 6)
     {
     case 0:
     case 5:
-        PHAL_writeGPIO(HEARTBEAT_GPIO_Port, HEARTBEAT_Pin, 1);
+        PHAL_writeGPIO(HEARTBEAT_LED_PORT, HEARTBEAT_LED_PIN, 1);
         break;
     case 1:
     case 2:
     case 3:
-        PHAL_writeGPIO(ERR_LED_GPIO_Port, ERR_LED_Pin, 1);
+        PHAL_writeGPIO(ERR_LED_PORT, ERR_LED_PIN, 1);
         break;
     case 4:
-        PHAL_writeGPIO(CONN_LED_GPIO_Port, CONN_LED_Pin, 1);
+        PHAL_writeGPIO(CONN_LED_PORT, CONN_LED_PIN, 1);
         break;
     }
 }
 
 void heartBeatLED(void)
 {
-    PHAL_toggleGPIO(HEARTBEAT_GPIO_Port, HEARTBEAT_Pin);
+    PHAL_toggleGPIO(HEARTBEAT_LED_PORT, HEARTBEAT_LED_PIN);
 
-    if ((sched.os_ticks - last_can_rx_time_ms) >= CONN_LED_MS_THRESH)
-         PHAL_writeGPIO(CONN_LED_GPIO_Port, CONN_LED_Pin, 0);
-    else PHAL_writeGPIO(CONN_LED_GPIO_Port, CONN_LED_Pin, 1);
+    if ((sched.os_ticks - last_can_rx_time_ms) >= 1000)
+         PHAL_writeGPIO(CONN_LED_PORT, CONN_LED_PIN, 0);
+    else PHAL_writeGPIO(CONN_LED_PORT, CONN_LED_PIN, 1);
 
 
     static uint8_t trig;
@@ -444,7 +444,7 @@ void torquevector_bl_cmd_CALLBACK(CanParsedData_t *msg_data_a)
 
 void HardFault_Handler()
 {
-    PHAL_writeGPIO(ERR_LED_GPIO_Port, ERR_LED_Pin, 1);
+    PHAL_writeGPIO(ERR_LED_PORT, ERR_LED_PIN, 1);
     while (1)
     {
         __asm__("nop");
