@@ -32,7 +32,9 @@ uint8_t PHAL_configureClockRates(ClockRateConfig_t* config)
             break;
         // Configure System Clock from High Speed External Oscillator (not supported currently in F4 HAL)
         case SYSTEM_CLOCK_SRC_HSE:
-            return 0xFF;
+            ret_code |= (!PHAL_configureHSESystemClock()) << 3;                                // Call HSI configure subroutine
+            config->system_clock_target_hz = 16000000;                                         // Set System Clock Target in Clock Config
+            break;
         // Configure System Clock from the High Speed Internal Oscillator
         case SYSTEM_CLOCK_SRC_HSI:
             ret_code |= (!PHAL_configureHSISystemClock()) << 3;                                // Call HSI configure subroutine
@@ -219,6 +221,44 @@ bool PHAL_configurePLLSystemClock(uint32_t system_clock_target_hz)
 
     SystemCoreClockUpdate();                                                                   // Must be called each time the core clock HCLK changes
     return true;
+}
+
+bool PHAL_configureHSESystemClock()
+{
+    // 1. Turn on and wait for HSE to enable
+    // HSEBYP is used when using external clock (non crystal)
+    RCC->CR |= (RCC_CR_HSEON | RCC_CR_HSEBYP);      // Enable HSE
+    __DSB();                                        // Wait for explicit memory accesses to finish
+
+    while (!(RCC->CR & RCC_CR_HSERDY))              // Wait for HSE to be ready
+        ;
+    __DSB();                                        // Wait for explicit memory accesses to finish
+
+    // 2. Flash latency adjustment, see ST RM 0090 Pg. 80
+    uint32_t flash_acr_temp = FLASH->ACR;
+    flash_acr_temp &= ~(FLASH_ACR_LATENCY_Msk);
+    flash_acr_temp |= FLASH_ACR_LATENCY_0WS << FLASH_ACR_LATENCY_Pos; // Set appropriate latency for HSE
+    FLASH->ACR = flash_acr_temp;
+
+    __DSB();                                        // Wait for explicit memory accesses to finish
+
+    // 3. Set system clock switch register to HSE
+    RCC->CFGR |= RCC_CFGR_SW_HSE;                  // Switch system clock to HSE
+    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) // Wait until the system clock switch register indicates that HSE is selected
+        ;
+
+    __DSB();                                        // Wait for explicit memory accesses to finish
+
+    // 4. Update the SystemCoreClock variable
+    SystemCoreClockUpdate();                        // Must be called each time the core clock HCLK changes
+    
+    // Disable HSI
+    RCC->CR &= ~RCC_CR_HSION;  // Clear HSION bit to turn off HSI
+
+    // Wait for HSI to be completely turned off
+    while (RCC->CR & RCC_CR_HSIRDY)
+        ;
+    return true;                                    // Return true upon completion
 }
 
 bool PHAL_configureHSISystemClock()

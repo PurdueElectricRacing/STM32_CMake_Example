@@ -121,7 +121,7 @@ bool PHAL_configurePLLSystemClock(uint32_t system_clock_target_hz);
  * @return false
  */
 bool PHAL_configureHSISystemClock();
-
+bool PHAL_configureHSESystemClock();
 /**
  * @brief Configure AHB Clock rate by modifying the AHB prescaler value.
  *
