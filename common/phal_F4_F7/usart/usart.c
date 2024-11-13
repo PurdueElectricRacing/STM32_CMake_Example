@@ -49,6 +49,7 @@ bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck)
 
     // Enable peripheral clock in RCC
     // ADD: When adding a new peripheral, be sure to enable the clock here
+    // RM0090 213
     #ifdef STM32F407xx
     switch ((ptr_int) handle->periph) {
         case USART1_BASE:
@@ -56,6 +57,18 @@ bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck)
             break;
         case USART2_BASE:
             RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
+            break;
+        case USART3_BASE:
+            RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
+            break;
+        case UART4_BASE:
+            RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
+            break;
+        case UART5_BASE:
+            RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
+            break;
+        case USART6_BASE:
+            RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
             break;
         default:
             return false;
@@ -136,7 +149,7 @@ bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck)
 
 // TODO add F7
 #ifdef STM32F407xx
-void PHAL_usartTxBl(usart_init_t* handle, const uint16_t* data, uint32_t len)
+void PHAL_usartTxBl(usart_init_t* handle, uint8_t* data, uint32_t len)
 {
     int i;
 
@@ -146,25 +159,23 @@ void PHAL_usartTxBl(usart_init_t* handle, const uint16_t* data, uint32_t len)
 
     for (i = 0; i < len; i++) {
         while (!(handle->periph->SR & USART_SR_TXE));
-
-        handle->periph->DR = data[i] & 0x01ff;
+        handle->periph->DR = data[i] & 0xff;
     }
 
     while (!(handle->periph->SR & USART_SR_TC));
 }
 
-void PHAL_usartRxBl(usart_init_t* handle, uint16_t* data, uint32_t len)
+void PHAL_usartRxBl(usart_init_t* handle, uint8_t* data, uint32_t len)
 {
     int i;
 
-    handle->periph->CR3 &= ~USART_CR3_DMAR;
+    //handle->periph->CR3 &= ~USART_CR3_DMAR;
     handle->periph->CR1 &= ~USART_CR1_RXNEIE;
     handle->periph->CR1 |= USART_CR1_RE;
 
     for (i = 0; i < len; i++) {
         while (!(handle->periph->SR & USART_SR_RXNE));
-
-        data[i] = handle->periph->DR & 0x01ff;
+        data[i] = handle->periph->DR & 0xff;
     }
 }
 #endif
@@ -180,6 +191,8 @@ bool PHAL_usartTxDma(usart_init_t* handle, uint16_t* data, uint32_t len) {
     #endif
     // Enable All Interrupts needed to complete Tx transaction
     // ADD: Ensure you enable the TX DMA interrupt for a new UART peripheral
+    // RM0090 PG 310
+    // Read table to ensure DMA streams do not overlap
     #ifdef STM32F407xx
     switch ((ptr_int) handle->periph) {
         case USART1_BASE:
@@ -187,6 +200,18 @@ bool PHAL_usartTxDma(usart_init_t* handle, uint16_t* data, uint32_t len) {
             break;
         case USART2_BASE:
             NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+            break;
+        case USART3_BASE:
+            NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+            break;
+        case UART4_BASE:
+            NVIC_EnableIRQ(DMA1_Stream4_IRQn);
+            break;
+        case UART5_BASE:
+            NVIC_EnableIRQ(DMA1_Stream7_IRQn);
+            break;
+        case USART6_BASE:
+            NVIC_EnableIRQ(DMA2_Stream6_IRQn);
             break;
         default:
             return false;
@@ -244,6 +269,22 @@ bool PHAL_usartRxDma(usart_init_t* handle, uint16_t* data, uint32_t len, bool co
             NVIC_EnableIRQ(DMA1_Stream5_IRQn);
             NVIC_EnableIRQ(USART2_IRQn);
             break;
+        case USART3_BASE:
+            NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+            NVIC_EnableIRQ(USART3_IRQn);
+            break;
+        case UART4_BASE:
+            NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+            NVIC_EnableIRQ(UART4_IRQn);
+            break;
+        case UART5_BASE:
+            NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+            NVIC_EnableIRQ(UART5_IRQn);
+            break;
+        case USART6_BASE:
+            NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+            NVIC_EnableIRQ(USART6_IRQn);
+            break;
         default:
             return false;
     }
@@ -283,6 +324,22 @@ bool PHAL_disableContinousRxDMA(usart_init_t *handle)
         case USART2_BASE:
             NVIC_DisableIRQ(DMA1_Stream5_IRQn);
             NVIC_DisableIRQ(USART2_IRQn);
+            break;
+        case USART3_BASE:
+            NVIC_DisableIRQ(DMA1_Stream1_IRQn);
+            NVIC_DisableIRQ(USART3_IRQn);
+            break;
+        case UART4_BASE:
+            NVIC_DisableIRQ(DMA1_Stream2_IRQn);
+            NVIC_DisableIRQ(UART4_IRQn);
+            break;
+        case UART5_BASE:
+            NVIC_DisableIRQ(DMA1_Stream0_IRQn);
+            NVIC_DisableIRQ(UART5_IRQn);
+            break;
+        case USART6_BASE:
+            NVIC_DisableIRQ(DMA2_Stream1_IRQn);
+            NVIC_DisableIRQ(USART6_IRQn);
             break;
         default:
             return false;
@@ -695,56 +752,34 @@ __WEAK void usart_recieve_complete_callback(usart_init_t *handle)
 }
 
 /*
-
-USART TX and RX interrupts - need to modify when adding a usart peripheral
-
-*/
+ * USART TX and RX interrupts - need to modify when adding a usart peripheral
+ * Add new DMA interrupt handlers here, passing in new active struct index, along with
+ * the correct DMA IRQ, and corresponding transfer mode (TX or Rx)
+ */
 
 //ADD:
-
 #ifdef STM32F407xx
-// USART1:
-void DMA2_Stream7_IRQHandler() //TX
-{
-    handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream7_IRQn, USART_DMA_TX);
-}
-
-void DMA2_Stream5_IRQHandler() //RX
-{
-    handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream5_IRQn, USART_DMA_RX);
-}
-
-
-// USART2:
-
-// Add new DMA interrupt handlers here, passing in new active struct index, along with
-// the correct DMA IRQ, and corresponding transfer mode (TX or Rx)
-void DMA1_Stream6_IRQHandler() //TX
-{
-    handleDMAxComplete(USART2_ACTIVE_IDX, DMA1_Stream6_IRQn, USART_DMA_TX);
-}
-
-// Add new DMA interrupt handlers here, passing in new active struct index, along with
-// the correct DMA IRQ, and corresponding transfer mode (TX or Rx)
-void DMA1_Stream5_IRQHandler() //RX
-{
-    handleDMAxComplete(USART2_ACTIVE_IDX, DMA1_Stream5_IRQn, USART_DMA_RX);
-}
+void DMA2_Stream5_IRQHandler() { handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream5_IRQn, USART_DMA_RX); } // USART1 RX
+void DMA2_Stream7_IRQHandler() { handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream7_IRQn, USART_DMA_TX); } // USART1 TX
+void DMA1_Stream5_IRQHandler() { handleDMAxComplete(USART2_ACTIVE_IDX, DMA1_Stream5_IRQn, USART_DMA_RX); } // USART2 RX
+void DMA1_Stream6_IRQHandler() { handleDMAxComplete(USART2_ACTIVE_IDX, DMA1_Stream6_IRQn, USART_DMA_TX); } // USART2 TX
+void DMA1_Stream1_IRQHandler() { handleDMAxComplete(USART3_ACTIVE_IDX, DMA1_Stream1_IRQn, USART_DMA_RX); } // USART3 RX
+void DMA1_Stream3_IRQHandler() { handleDMAxComplete(USART3_ACTIVE_IDX, DMA1_Stream3_IRQn, USART_DMA_TX); } // USART3 TX
+void DMA1_Stream2_IRQHandler() { handleDMAxComplete(USART4_ACTIVE_IDX, DMA1_Stream2_IRQn, USART_DMA_RX); } // USART4 RX
+void DMA1_Stream4_IRQHandler() { handleDMAxComplete(USART4_ACTIVE_IDX, DMA1_Stream4_IRQn, USART_DMA_TX); } // USART4 TX
+void DMA1_Stream0_IRQHandler() { handleDMAxComplete(USART5_ACTIVE_IDX, DMA1_Stream0_IRQn, USART_DMA_RX); } // USART5 RX
+void DMA1_Stream7_IRQHandler() { handleDMAxComplete(USART5_ACTIVE_IDX, DMA1_Stream7_IRQn, USART_DMA_TX); } // USART5 TX
+void DMA2_Stream1_IRQHandler() { handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream1_IRQn, USART_DMA_RX); } // USART6 RX
+//void DMA2_Stream6_IRQHandler() { handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream6_IRQn, USART_DMA_TX); } // USART6 TX
 
 // Add new USART Interrupts as new peripherals are needed,
 // feeding in the new USART peripheral, along with active array index
-
-void USART1_IRQHandler()
-{
-    handleUsartIRQ(USART1, USART1_ACTIVE_IDX);
-}
-
-void USART2_IRQHandler()
-{
-    handleUsartIRQ(USART2, USART2_ACTIVE_IDX);
-}
-
-// USART3:
+void USART1_IRQHandler() { handleUsartIRQ(USART1, USART1_ACTIVE_IDX); }
+void USART2_IRQHandler() { handleUsartIRQ(USART2, USART2_ACTIVE_IDX); }
+void USART3_IRQHandler() { handleUsartIRQ(USART3, USART3_ACTIVE_IDX); }
+void UART4_IRQHandler() { handleUsartIRQ(UART4, USART4_ACTIVE_IDX); }
+void UART5_IRQHandler() { handleUsartIRQ(UART5, USART5_ACTIVE_IDX); }
+//void USART6_IRQHandler() { handleUsartIRQ(USART6, USART6_ACTIVE_IDX); }
 
 #endif
 

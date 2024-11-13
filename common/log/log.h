@@ -26,7 +26,7 @@ static inline void _iodev_write(usart_init_t* handle, char *buffer, int size) \
 {                                                                             \
     if (handle)                                                               \
     {                                                                         \
-        PHAL_usartTxBl(handle, (uint16_t *)buffer, size);                     \
+        PHAL_usartTxBl(handle, (uint8_t *)buffer, size);                      \
     }                                                                         \
 }                                                                             \
                                                                               \

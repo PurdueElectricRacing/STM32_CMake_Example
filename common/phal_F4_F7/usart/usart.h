@@ -153,8 +153,8 @@ typedef struct
 bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck);
 
 #ifdef STM32F407xx
-void PHAL_usartTxBl(usart_init_t* handle, const uint16_t* data, uint32_t len);
-void PHAL_usartRxBl(usart_init_t* handle, uint16_t* data, uint32_t len);
+void PHAL_usartTxBl(usart_init_t* handle, uint8_t* data, uint32_t len);
+void PHAL_usartRxBl(usart_init_t* handle, uint8_t* data, uint32_t len);
 #endif
 
 /**
@@ -212,65 +212,83 @@ bool PHAL_usartRxBusy(usart_init_t *handle);
 extern void usart_recieve_complete_callback(usart_init_t *handle);
 
 #ifdef STM32F407xx
+    // 4,5,7,8 are UART, rest are USART
+    #define PHAL_USART1_RXDMA_STREAM DMA2_Stream5
+    #define PHAL_USART1_TXDMA_STREAM DMA2_Stream7
 
-    #define USART1_RXDMA_CONT_CONFIG(rx_addr_, priority_)                               \
-        {                                                                             \
-            .periph_addr = (uint32_t) & (USART1->DR), .mem_addr = (uint32_t)(rx_addr_), \
-            .tx_size = 1, .increment = false, .circular = false,                      \
-            .dir = 0b0, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,    \
-            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,           \
-            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=5,              \
-            .periph=DMA2, .stream=DMA2_Stream5                                        \
+    #define PHAL_USART2_RXDMA_STREAM DMA1_Stream5
+    #define PHAL_USART2_TXDMA_STREAM DMA1_Stream6
+
+    #define PHAL_USART3_RXDMA_STREAM DMA1_Stream1
+    #define PHAL_USART3_TXDMA_STREAM DMA1_Stream3
+
+    #define PHAL_USART4_RXDMA_STREAM DMA1_Stream2 // UART
+    #define PHAL_USART4_TXDMA_STREAM DMA1_Stream4
+
+    #define PHAL_USART5_RXDMA_STREAM DMA1_Stream0 // UART
+    #define PHAL_USART5_TXDMA_STREAM DMA1_Stream7
+
+    #define PHAL_USART6_RXDMA_STREAM DMA2_Stream1
+    #define PHAL_USART6_TXDMA_STREAM DMA2_Stream6
+
+    #define PHAL_USART7_RXDMA_STREAM DMA1_Stream3 // UART
+    #define PHAL_USART7_TXDMA_STREAM DMA1_Stream1
+
+    #define PHAL_USART8_RXDMA_STREAM DMA1_Stream6 // UART
+    #define PHAL_USART8_TXDMA_STREAM DMA1_Stream0
+    // dm00031020 311
+    #define _DEF_USART_RXDMA_CONFIG(rx_addr_, priority_, UXART, dmanum, streamnum, channum)\
+        {                                                                                  \
+            .periph_addr = (uint32_t) & ((UXART)->DR), .mem_addr = (uint32_t)(rx_addr_),   \
+            .tx_size = 1, .increment = false, .circular = false,                           \
+            .dir = 0b0, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,         \
+            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,                \
+            .tx_isr_en = true, .dma_chan_request = channum, .stream_idx = streamnum,       \
+            .periph = DMA##dmanum , .stream = DMA##dmanum##_Stream##streamnum ,            \
         }
 
-    #define USART1_TXDMA_CONT_CONFIG(tx_addr_, priority_)                               \
-        {                                                                             \
-            .periph_addr = (uint32_t) & (USART1->DR), .mem_addr = (uint32_t)(tx_addr_), \
-            .tx_size = 1, .increment = false, .circular = false,                      \
-            .dir = 0b1, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,    \
-            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,           \
-            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=7,               \
-            .periph=DMA2, .stream=DMA2_Stream7                                       \
+    #define _DEF_USART_TXDMA_CONFIG(tx_addr_, priority_, UXART, dmanum, streamnum, channum)\
+        {                                                                                  \
+            .periph_addr = (uint32_t) & ((UXART)->DR), .mem_addr = (uint32_t)(tx_addr_),   \
+            .tx_size = 1, .increment = false, .circular = false,                           \
+            .dir = 0b1, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,         \
+            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,                \
+            .tx_isr_en = true, .dma_chan_request = channum, .stream_idx = streamnum,       \
+            .periph = DMA##dmanum , .stream = DMA##dmanum##_Stream##streamnum ,            \
         }
 
-    #define USART2_RXDMA_CONT_CONFIG(rx_addr_, priority_)                               \
-        {                                                                             \
-            .periph_addr = (uint32_t) & (USART2->DR), .mem_addr = (uint32_t)(rx_addr_), \
-            .tx_size = 1, .increment = false, .circular = false,                      \
-            .dir = 0b0, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,    \
-            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,           \
-            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=5,              \
-            .periph=DMA1, .stream=DMA1_Stream5                                        \
-        }
+    #define USART1_RXDMA_CONT_CONFIG(a, p) _DEF_USART_RXDMA_CONFIG(a, p, USART1, 2, 5, 4)
+    #define USART1_TXDMA_CONT_CONFIG(a, p) _DEF_USART_TXDMA_CONFIG(a, p, USART1, 2, 7, 4)
+    #define USART2_RXDMA_CONT_CONFIG(a, p) _DEF_USART_RXDMA_CONFIG(a, p, USART2, 1, 5, 4)
+    #define USART2_TXDMA_CONT_CONFIG(a, p) _DEF_USART_TXDMA_CONFIG(a, p, USART2, 1, 6, 4)
+    #define USART3_RXDMA_CONT_CONFIG(a, p) _DEF_USART_RXDMA_CONFIG(a, p, USART3, 1, 1, 4)
+    #define USART3_TXDMA_CONT_CONFIG(a, p) _DEF_USART_TXDMA_CONFIG(a, p, USART3, 1, 3, 4)
+    #define USART4_RXDMA_CONT_CONFIG(a, p) _DEF_USART_RXDMA_CONFIG(a, p, UART4,  1, 2, 4)
+    #define USART4_TXDMA_CONT_CONFIG(a, p) _DEF_USART_TXDMA_CONFIG(a, p, UART4,  1, 4, 4)
+    #define USART5_RXDMA_CONT_CONFIG(a, p) _DEF_USART_RXDMA_CONFIG(a, p, UART5,  1, 0, 4)
+    #define USART5_TXDMA_CONT_CONFIG(a, p) _DEF_USART_TXDMA_CONFIG(a, p, UART5,  1, 7, 4)
+    #define USART6_RXDMA_CONT_CONFIG(a, p) _DEF_USART_RXDMA_CONFIG(a, p, USART6, 2, 1, 5)
+    #define USART6_TXDMA_CONT_CONFIG(a, p) _DEF_USART_TXDMA_CONFIG(a, p, USART6, 2, 6, 5)
 
-    #define USART2_TXDMA_CONT_CONFIG(tx_addr_, priority_)                               \
-        {                                                                             \
-            .periph_addr = (uint32_t) & (USART2->DR), .mem_addr = (uint32_t)(tx_addr_), \
-            .tx_size = 1, .increment = false, .circular = false,                      \
-            .dir = 0b1, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,    \
-            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,           \
-            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=6,               \
-            .periph=DMA1, .stream=DMA1_Stream6                                        \
-        }
 #else
     #define USART4_RXDMA_CONT_CONFIG(rx_addr_, priority_)                               \
-        {                                                                             \
+        {                                                                               \
             .periph_addr = (uint32_t) & (UART4->RDR), .mem_addr = (uint32_t)(rx_addr_), \
-            .tx_size = 1, .increment = false, .circular = false,                      \
-            .dir = 0b0, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,    \
-            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,           \
-            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=2,              \
-            .periph=DMA1, .stream=DMA1_Stream2                                        \
+            .tx_size = 1, .increment = false, .circular = false,                        \
+            .dir = 0b0, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,      \
+            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,             \
+            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=2,                 \
+            .periph=DMA1, .stream=DMA1_Stream2                                          \
         }
 
     #define USART4_TXDMA_CONT_CONFIG(tx_addr_, priority_)                               \
-        {                                                                             \
+        {                                                                               \
             .periph_addr = (uint32_t) & (UART4->TDR), .mem_addr = (uint32_t)(tx_addr_), \
-            .tx_size = 1, .increment = false, .circular = false,                      \
-            .dir = 0b1, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,    \
-            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,           \
-            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=4,               \
-            .periph=DMA1, .stream=DMA1_Stream4                                        \
+            .tx_size = 1, .increment = false, .circular = false,                        \
+            .dir = 0b1, .mem_inc = true, .periph_inc = false, .mem_to_mem = false,      \
+            .priority = (priority_), .mem_size = 0b00, .periph_size = 0b00,             \
+            .tx_isr_en = true, .dma_chan_request=0b0100, .stream_idx=4,                 \
+            .periph=DMA1, .stream=DMA1_Stream4                                          \
         }
 #endif
 #endif
