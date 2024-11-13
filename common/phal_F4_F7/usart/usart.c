@@ -134,6 +134,41 @@ bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck)
     return true;
 }
 
+// TODO add F7
+#ifdef STM32F407xx
+void PHAL_usartTxBl(usart_init_t* handle, const uint16_t* data, uint32_t len)
+{
+    int i;
+
+    handle->periph->CR3 &= ~USART_CR3_DMAT;
+    handle->periph->CR1 &= ~USART_CR1_TXEIE;
+    handle->periph->CR1 |= USART_CR1_TE;
+
+    for (i = 0; i < len; i++) {
+        while (!(handle->periph->SR & USART_SR_TXE));
+
+        handle->periph->DR = data[i] & 0x01ff;
+    }
+
+    while (!(handle->periph->SR & USART_SR_TC));
+}
+
+void PHAL_usartRxBl(usart_init_t* handle, uint16_t* data, uint32_t len)
+{
+    int i;
+
+    handle->periph->CR3 &= ~USART_CR3_DMAR;
+    handle->periph->CR1 &= ~USART_CR1_RXNEIE;
+    handle->periph->CR1 |= USART_CR1_RE;
+
+    for (i = 0; i < len; i++) {
+        while (!(handle->periph->SR & USART_SR_RXNE));
+
+        data[i] = handle->periph->DR & 0x01ff;
+    }
+}
+#endif
+
 bool PHAL_usartTxDma(usart_init_t* handle, uint16_t* data, uint32_t len) {
     if (active_uarts[handle->usart_active_num].active_handle != handle)
         return false;

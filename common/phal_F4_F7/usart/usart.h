@@ -152,6 +152,10 @@ typedef struct
  */
 bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck);
 
+#ifdef STM32F407xx
+void PHAL_usartTxBl(usart_init_t* handle, const uint16_t* data, uint32_t len);
+void PHAL_usartRxBl(usart_init_t* handle, uint16_t* data, uint32_t len);
+#endif
 
 /**
  * @brief           Starts a tx using dma, use PHAL_usartTxDmaComplete
