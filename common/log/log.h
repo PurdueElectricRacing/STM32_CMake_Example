@@ -1,18 +1,53 @@
+/**
+ * @file daq_log.c
+ * @author Eileen Yoon (eyn@purdue.edu)
+ * @brief  vsprintf/snprintf + UART support
+ * @version 0.1
+ * @date 2024-10-20
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #ifndef __LOG_H__
 #define __LOG_H__
 
-#include <stdio.h>
-#include <stdbool.h>
+#include "common/common_defs/common_defs.h"
+#include "common/log/vsprintf.h"
 
-extern void _log_str(char* data);
-extern char log_buffer[];
+int snprintf(char *buffer, size_t size, const char *fmt, ...);
+int sprintf(char *buffer, const char *fmt, ...);
+int debug_printf(const char *fmt, ...);
 
-#define log_printf(...) do { \
-    sprintf(log_buffer, __VA_ARGS__); \
-    _log_str(log_buffer);             \
-} while(false)
-// #define log_printf(...) sprintf(log_buffer, __VA_ARGS__)
+// cursed macro to workaround accessing different hals
+// call DEBUG_PRINTF_USART_DEFINE(&usart_config) ONCE in *main.c* after defining uart config struct
+#define DEBUG_PRINTF_USART_DEFINE(HANDLEPTR)                                  \
+static inline void _iodev_write(usart_init_t* handle, char *buffer, int size) \
+{                                                                             \
+    if (handle)                                                               \
+    {                                                                         \
+        PHAL_usartTxBl(handle, (uint16_t *)buffer, size);                     \
+    }                                                                         \
+}                                                                             \
+                                                                              \
+int debug_printf(const char *fmt, ...)                                        \
+{                                                                             \
+    va_list args;                                                             \
+    char buffer[512];                                                         \
+    int i;                                                                    \
+                                                                              \
+    va_start(args, fmt);                                                      \
+    i = vsnprintf(buffer, sizeof(buffer), fmt, args);                         \
+    va_end(args);                                                             \
+                                                                              \
+    _iodev_write((HANDLEPTR), buffer, MIN(i, (int)(sizeof(buffer) - 1)));     \
+                                                                              \
+    return i;                                                                 \
+}
+// can add SPI etc as necessary
 
+// plog: requires \n
+#define plog(...) debug_printf(__VA_ARGS__)
 
 #define ANSI_RED     "\x1b[31m"
 #define ANSI_GREEN   "\x1b[32m"
@@ -23,39 +58,21 @@ extern char log_buffer[];
 #define ANSI_RESET   "\x1b[37m"
 
 #define __mu_log_color(color, ...) do { \
-    log_printf("%s", color);       \
-	log_printf(__VA_ARGS__);       \
-    log_printf("%s", ANSI_RESET);  \
-} while(false)
+    debug_printf("%s", color);       \
+	debug_printf(__VA_ARGS__);       \
+    debug_printf("%s", ANSI_RESET);  \
+} while (0)
 
-#ifdef DEBUG_LOG
+#define log_msg(...) debug_printf(__VA_ARGS__)
+#define log_int(n) (debug_printf("%s == %d\n", (#n), (n)))
+#define log_str(s) (debug_printf("%s == %s\n", (#s), (s)))
+#define log_char(c) (debug_printf("%s == '%c'\n", (#c), (c)))
+#define log_addr(addr) (debug_printf("%s == %p\n", (#addr), (void*)(addr)))
+#define log_red(...) __mu_log_color(ANSI_RED, __VA_ARGS__)
+#define log_green(...) __mu_log_color(ANSI_GREEN, __VA_ARGS__)
+#define log_yellow(...) __mu_log_color(ANSI_YELLOW, __VA_ARGS__)
+#define log_blue(...) __mu_log_color(ANSI_BLUE, __VA_ARGS__)
+#define log_magenta(...) __mu_log_color(ANSI_MAGENTA, __VA_ARGS__)
+#define log_cyan(...) __mu_log_color(ANSI_CYAN, __VA_ARGS__)
 
-#    define log_msg(...) log_printf(__VA_ARGS__)
-#    define log_int(n) (log_printf("%s == %d\n", (#n), (n)))
-#    define log_str(s) (log_printf("%s == %s\n", (#s), (s)))
-#    define log_char(c) (log_printf("%s == '%c'\n", (#c), (c)))
-#    define log_addr(addr) (log_printf("%s == %p\n", (#addr), (void*)(addr)))
-#    define log_red(...) __mu_log_color(ANSI_RED, __VA_ARGS__)
-#    define log_green(...) __mu_log_color(ANSI_GREEN, __VA_ARGS__)
-#    define log_yellow(...) __mu_log_color(ANSI_YELLOW, __VA_ARGS__)
-#    define log_blue(...) __mu_log_color(ANSI_BLUE, __VA_ARGS__)
-#    define log_magenta(...) __mu_log_color(ANSI_MAGENTA, __VA_ARGS__)
-#    define log_cyan(...) __mu_log_color(ANSI_CYAN, __VA_ARGS__)
-
-#else
-
-#    define log_msg(...)
-#    define log_int(n)
-#    define log_str(s)
-#    define log_char(c)
-#    define log_addr(addr)
-#    define log_red(...)
-#    define log_green(...)
-#    define log_yellow(...)
-#    define log_blue(...)
-#    define log_magenta(...)
-#    define log_cyan(...)
-
-#endif
-
-#endif
+#endif // __LOG_H__

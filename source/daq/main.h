@@ -19,15 +19,9 @@ typedef enum {
     TCP_RX_TAIL_COUNT,
 } tcp_rx_tail_t;
 
-// #define DEBUG_LOG
-#include "log.h"
 #include "common/queue/queue.h"
 #include "buffer.h"
-
-#ifdef DEBUG_LOG
-// int _write(int handle, char* data, int size);
-void _log_str(char* data);
-#endif
+#include "common/log/log.h"
 
 // #define DISCO_BOARD
 // Status LEDs

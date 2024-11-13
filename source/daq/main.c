@@ -120,43 +120,23 @@ ClockRateConfig_t clock_config = {
 
 volatile uint32_t tick_ms; // Systick 1ms counter
 
-/* UART CONFIG FOR DEBUG PRINTS */
-// dma_init_t usart_tx_dma_config = USART2_TXDMA_CONT_CONFIG(NULL, 1);
-// dma_init_t usart_rx_dma_config = USART2_RXDMA_CONT_CONFIG(NULL, 2);
-// usart_init_t uart_log_config = {
-//    .baud_rate   = 115200,
-//    .word_length = WORD_8,
-//    .stop_bits   = SB_ONE,
-//    .parity      = PT_NONE,
-//    .mode        = MODE_TX_RX,
-//    .hw_flow_ctl = HW_DISABLE,
-//    .ovsample    = OV_16,
-//    .obsample    = OB_DISABLE,
-//    .adv_feature = {
-//                    .wake_addr = false,
-//                    .tx_inv = false,
-//                    .rx_inv = false,
-//                    .dma_on_rx_err = false,
-//                   },
-//    .tx_dma_cfg = &usart_tx_dma_config,
-//    .rx_dma_cfg = &usart_rx_dma_config
-// };
-
-// For logging, requires message to have '\n'
-#ifdef DEBUG_LOG
-char log_buffer[100];
-void _log_str(char* data)
-{
-    size_t len = 0;
-    if (!data) return;
-    while (data[len]) len++;
-    if (len > 0)
-    {
-        // PHAL_usartTxDma(USART2, &uart_log_config, (uint16_t *)data, len);
-        // while (!PHAL_usartTxDmaComplete(&uart_log_config));
-    }
-}
-#endif
+dma_init_t usart_tx_dma_config = USART6_TXDMA_CONT_CONFIG(NULL, 1);
+dma_init_t usart_rx_dma_config = USART6_RXDMA_CONT_CONFIG(NULL, 2);
+usart_init_t lte_usart_config = {
+   .baud_rate   = 115200,
+   .word_length = WORD_8,
+   .stop_bits   = SB_ONE,
+   .parity      = PT_NONE,
+   .hw_flow_ctl = HW_DISABLE,
+   .ovsample    = OV_16,
+   .obsample    = OB_DISABLE,
+   .periph      = USART6,
+   .wake_addr = false,
+   .usart_active_num = USART6_ACTIVE_IDX,
+   .tx_dma_cfg = &usart_tx_dma_config,
+   .rx_dma_cfg = &usart_rx_dma_config
+};
+DEBUG_PRINTF_USART_DEFINE(&lte_usart_config) // use LTE uart lmao
 
 static void configure_exti(void);
 static void cs_sel(void);
@@ -216,12 +196,10 @@ int main()
     if (!PHAL_configureRTC(&start_time, false))
         HardFault_Handler();
 
-
-#ifdef DEBUG_LOG
-    // if(!PHAL_initUSART(USART2, &uart_log_config, APB1ClockRateHz))
-    //     HardFault_Handler();
-#endif
-
+    if(!PHAL_initUSART(&lte_usart_config, APB2ClockRateHz))
+    {
+        HardFault_Handler();
+    }
     log_yellow("PER PER PER\n");
 
     if(!PHAL_initCAN(CAN1, false, VCAN_BPS))

@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
 
-add_library(log INTERFACE)
+set(TARGET_NAME LOG)
+add_library(${TARGET_NAME})
 
-# Find directories for '#include', this directroy for the simple lib
-target_include_directories(log INTERFACE .)
+# Find all .c sources in project
+file(GLOB_RECURSE glob_sources "*.c")
+target_sources(${TARGET_NAME} PRIVATE ${glob_sources})
+
+# Find directories for '#include'
+target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
