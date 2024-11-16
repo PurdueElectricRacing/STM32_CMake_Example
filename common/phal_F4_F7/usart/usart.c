@@ -76,6 +76,9 @@ bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck)
     #endif
     #ifdef STM32F732xx
     switch ((ptr_int) handle->periph) {
+        case USART1_BASE:
+            RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+            break;
         case UART4_BASE:
             RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
             break;
@@ -215,6 +218,9 @@ bool PHAL_usartTxDma(usart_init_t* handle, uint16_t* data, uint32_t len) {
     #endif
     #ifdef STM32F732xx
     switch ((ptr_int) handle->periph) {
+        case USART1_BASE:
+            NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            break;
         case UART4_BASE:
             NVIC_EnableIRQ(DMA1_Stream4_IRQn);
             break;
@@ -287,6 +293,10 @@ bool PHAL_usartRxDma(usart_init_t* handle, uint16_t* data, uint32_t len, bool co
     #endif
     #ifdef STM32F732xx
     switch ((ptr_int) handle->periph) {
+        case USART1_BASE:
+            NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+            NVIC_EnableIRQ(USART1_IRQn);
+            break;
         case UART4_BASE:
             NVIC_EnableIRQ(DMA1_Stream2_IRQn);
             NVIC_EnableIRQ(UART4_IRQn);
@@ -343,6 +353,10 @@ bool PHAL_disableContinousRxDMA(usart_init_t *handle)
     #endif
     #ifdef STM32F732xx
     switch ((ptr_int) handle->periph) {
+        case USART1_BASE:
+            NVIC_DisableIRQ(DMA2_Stream5_IRQn);
+            NVIC_DisableIRQ(USART1_IRQn);
+            break;
         case USART2_BASE:
             NVIC_DisableIRQ(DMA1_Stream2_IRQn);
             NVIC_DisableIRQ(UART4_IRQn);
@@ -781,6 +795,15 @@ void UART5_IRQHandler() { handleUsartIRQ(UART5, USART5_ACTIVE_IDX); }
 
 #ifdef STM32F732xx
 // USART1:
+void DMA2_Stream7_IRQHandler() //TX
+{
+    handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream7_IRQn, USART_DMA_TX);
+}
+
+void DMA2_Stream5_IRQHandler() //RX
+{
+    handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream5_IRQn, USART_DMA_RX);
+}
 
 // USART2:
 
@@ -800,6 +823,11 @@ void DMA1_Stream2_IRQHandler() //RX
 
 // Add new USART Interrupts as new peripherals are needed,
 // feeding in the new USART peripheral, along with active array index
+void USART1_IRQHandler()
+{
+    handleUsartIRQ(USART1, USART1_ACTIVE_IDX);
+}
+
 void UART4_IRQHandler()
 {
     handleUsartIRQ(UART4, USART4_ACTIVE_IDX);
