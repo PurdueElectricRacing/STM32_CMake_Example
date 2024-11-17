@@ -19,6 +19,8 @@ int main()
     daq_disco_uart_main();
 #elif defined(F4_TESTING_DASH_UART_SPI_ADC)
     dash_uart_spi_adc_main();
+#elif defined(F4_TESTING_DAQ_DISCO_PDS_CAN)
+    daq_disco_pds_can_main();
 #else
     #error "No tests given"
 #endif

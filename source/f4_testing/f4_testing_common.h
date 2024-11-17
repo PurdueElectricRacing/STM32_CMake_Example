@@ -1,11 +1,14 @@
 #ifndef _F4_TESTING_COMMON_H_
 #define _F4_TESTING_COMMON_H_
 
+#if 1
+#define F4_TESTING_DAQ_DISCO_PDS_CAN
+#else
+#define F4_TESTING_DAQ_DISCO_HELLO
 #define F4_TESTING_DAQ_DISCO_UART
-
-//#define F4_TESTING_DAQ_DISCO_HELLO
-//#define F4_TESTING_DAQ_DISCO_UART
-//#define F4_TESTING_DASH_UART_SPI_ADC
+#define F4_TESTING_DASH_UART_SPI_ADC
+#define F4_TESTING_DAQ_DISCO_PDS_CAN
+#endif
 
 extern volatile uint32_t tick_ms; // Systick 1ms counter
 extern uint32_t APB1ClockRateHz;
@@ -26,6 +29,10 @@ int daq_disco_hello_main();
 
 #ifdef F4_TESTING_DASH_UART_SPI_ADC
 int dash_uart_spi_adc_main(void);
+#endif
+
+#ifdef F4_TESTING_DAQ_DISCO_PDS_CAN
+int daq_disco_pds_can_main(void);
 #endif
 
 #endif // _F4_TESTING_COMMON_H_
