@@ -23,19 +23,19 @@ ADCInitConfig_t adc_config = {
 };
 
 
-dma_init_t usart_tx_dma_config = USART2_TXDMA_CONT_CONFIG(NULL, 1);
-dma_init_t usart_rx_dma_config = USART2_RXDMA_CONT_CONFIG(NULL, 2);
+dma_init_t usart_tx_dma_config = USART6_TXDMA_CONT_CONFIG(NULL, 1);
+dma_init_t usart_rx_dma_config = USART6_RXDMA_CONT_CONFIG(NULL, 2);
 usart_init_t lcd = {
-   .baud_rate   = 250000,
+   .baud_rate   = 115200,
    .word_length = WORD_8,
    .stop_bits   = SB_ONE,
    .parity      = PT_NONE,
    .hw_flow_ctl = HW_DISABLE,
    .ovsample    = OV_16,
    .obsample    = OB_DISABLE,
-   .periph      = USART2,
+   .periph      = USART6,
    .wake_addr = false,
-   .usart_active_num = USART2_ACTIVE_IDX,
+   .usart_active_num = USART6_ACTIVE_IDX,
    .tx_dma_cfg = &usart_tx_dma_config,
    .rx_dma_cfg = &usart_rx_dma_config
 };
@@ -51,17 +51,17 @@ dma_init_t adc_dma_config = ADC1_DMA_CONT_CONFIG((uint32_t) &raw_adc_values, siz
 
 GPIOInitConfig_t gpio_config[] = {
     // GPIO_INIT_ANALOG(GPIOA, 0),
-    GPIO_INIT_OUTPUT(GPIOD, 13, GPIO_OUTPUT_LOW_SPEED),
-    GPIO_INIT_OUTPUT(GPIOD, 12, GPIO_OUTPUT_LOW_SPEED),
-    GPIO_INIT_OUTPUT(GPIOD, 14, GPIO_OUTPUT_LOW_SPEED),
-    GPIO_INIT_OUTPUT(GPIOD, 15, GPIO_OUTPUT_LOW_SPEED),
-    GPIO_INIT_USART2TX_PA2,
-    GPIO_INIT_USART2RX_PA3,
+    // GPIO_INIT_OUTPUT(GPIOD, 13, GPIO_OUTPUT_LOW_SPEED),
+    // GPIO_INIT_OUTPUT(GPIOD, 12, GPIO_OUTPUT_LOW_SPEED),
+    // GPIO_INIT_OUTPUT(GPIOD, 14, GPIO_OUTPUT_LOW_SPEED),
+    // GPIO_INIT_OUTPUT(GPIOD, 15, GPIO_OUTPUT_LOW_SPEED),
+    GPIO_INIT_USART6TX_PC6,
+    GPIO_INIT_USART6RX_PC7,
 
-    GPIO_INIT_OUTPUT(SPI_CS_PORT, SPI_CS_PIN, GPIO_OUTPUT_HIGH_SPEED),
-    GPIO_INIT_AF(SPI_SCK_PORT, SPI_SCK_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
-    GPIO_INIT_AF(SPI_MOSI_PORT, SPI_MOSI_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
-    GPIO_INIT_AF(SPI_MISO_PORT, SPI_MISO_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_OPEN_DRAIN, GPIO_INPUT_OPEN_DRAIN),
+    // GPIO_INIT_OUTPUT(SPI_CS_PORT, SPI_CS_PIN, GPIO_OUTPUT_HIGH_SPEED),
+    // GPIO_INIT_AF(SPI_SCK_PORT, SPI_SCK_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
+    // GPIO_INIT_AF(SPI_MOSI_PORT, SPI_MOSI_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
+    // GPIO_INIT_AF(SPI_MISO_PORT, SPI_MISO_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_OPEN_DRAIN, GPIO_INPUT_OPEN_DRAIN),
 
 };
 
@@ -79,7 +79,6 @@ extern uint32_t APB1ClockRateHz;
 extern uint32_t APB2ClockRateHz;
 extern uint32_t AHBClockRateHz;
 extern uint32_t PLLClockRateHz;
-
 
 dma_init_t spi_rx_dma_config = SPI1_RXDMA_CONT_CONFIG(NULL, 2);
 dma_init_t spi_tx_dma_config = SPI1_TXDMA_CONT_CONFIG(NULL, 1);
@@ -120,29 +119,31 @@ int main()
     {
         HardFault_Handler();
     }
-    if (!PHAL_SPI_init(&spi_config))
-        HardFault_Handler();
-    if(!PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
-    {
-        HardFault_Handler();
-    }
+    // if (!PHAL_SPI_init(&spi_config))
+    //     HardFault_Handler();
+    // if(!PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
+    // {
+    //     HardFault_Handler();
+    // }
     if(!PHAL_initUSART(&lcd, APB1ClockRateHz))
     {
         HardFault_Handler();
     }
-    if(!PHAL_initDMA(&adc_dma_config))
-    {
-        HardFault_Handler();
-    }
-    PHAL_writeGPIO(SPI_CS_PORT, SPI_CS_PIN, 1);
-    PHAL_startTxfer(&adc_dma_config);
-    PHAL_startADC(ADC1);
+    // if(!PHAL_initDMA(&adc_dma_config))
+    // {
+    //     HardFault_Handler();
+    // }
+    // PHAL_writeGPIO(SPI_CS_PORT, SPI_CS_PIN, 1);
+    // PHAL_startTxfer(&adc_dma_config);
+    // PHAL_startADC(ADC1);
     PHAL_usartRxDma(&lcd, (uint16_t *) msg, 5, 1);
-        /* Task Creation */
+    
+    /* Task Creation */
     schedInit(APB1ClockRateHz);
-        taskCreate(ledblink, 50);
-        taskCreate(testUsart, 100);
-        /* Schedule Periodic tasks here */
+    //taskCreate(ledblink, 50);
+    taskCreate(testUsart, 100);
+    
+    /* Schedule Periodic tasks here */
     schedStart();
     return 0;
 }
@@ -150,28 +151,28 @@ int main()
 
 void usart_recieve_complete_callback(usart_init_t *handle)
 {
-    if (handle == &lcd)
-    {
-        PHAL_toggleGPIO(GPIOD, 15);
-    }
-    else
-    {
-        PHAL_writeGPIO(GPIOD, 15, 0);
-    }
+    // if (handle == &lcd)
+    // {
+    //     PHAL_toggleGPIO(GPIOD, 15);
+    // }
+    // else
+    // {
+    //     PHAL_writeGPIO(GPIOD, 15, 0);
+    // }
 }
 
 void testUsart()
 {
     char* txmsg = "Hello World!\n";
     PHAL_usartTxDma(&lcd, (uint16_t *)txmsg, 13);
-    if (strcmp(msg, "hello") == 0)
-    {
-        PHAL_writeGPIO(GPIOD, 14, 1);
-    }
-    else
-    {
-        PHAL_writeGPIO(GPIOD, 14, 0);
-    }
+    // if (strcmp(msg, "hello") == 0)
+    // {
+    //     PHAL_writeGPIO(GPIOD, 14, 1);
+    // }
+    // else
+    // {
+    //     PHAL_writeGPIO(GPIOD, 14, 0);
+    // }
 }
 
 void ledblink()

@@ -57,6 +57,9 @@ bool PHAL_initUSART(usart_init_t* handle, const uint32_t fck)
         case USART2_BASE:
             RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
             break;
+        case USART6_BASE:
+            RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+            break;
         default:
             return false;
     }
@@ -153,6 +156,9 @@ bool PHAL_usartTxDma(usart_init_t* handle, uint16_t* data, uint32_t len) {
         case USART2_BASE:
             NVIC_EnableIRQ(DMA1_Stream6_IRQn);
             break;
+        case USART6_BASE:
+            NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+            break;
         default:
             return false;
     }
@@ -209,6 +215,10 @@ bool PHAL_usartRxDma(usart_init_t* handle, uint16_t* data, uint32_t len, bool co
             NVIC_EnableIRQ(DMA1_Stream5_IRQn);
             NVIC_EnableIRQ(USART2_IRQn);
             break;
+        case USART6_BASE:
+            NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+            NVIC_EnableIRQ(USART6_IRQn);
+            break;
         default:
             return false;
     }
@@ -248,6 +258,10 @@ bool PHAL_disableContinousRxDMA(usart_init_t *handle)
         case USART2_BASE:
             NVIC_DisableIRQ(DMA1_Stream5_IRQn);
             NVIC_DisableIRQ(USART2_IRQn);
+            break;
+        case USART6_BASE:
+            NVIC_DisableIRQ(DMA2_Stream2_IRQn);
+            NVIC_DisableIRQ(USART6_IRQn);
             break;
         default:
             return false;
@@ -671,12 +685,23 @@ USART TX and RX interrupts - need to modify when adding a usart peripheral
 // USART1:
 void DMA2_Stream7_IRQHandler() //TX
 {
-    handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream7_IRQn, USART_DMA_TX);
+    handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream7_IRQn, USART_DMA_TX);
 }
 
 void DMA2_Stream5_IRQHandler() //RX
 {
     handleDMAxComplete(USART1_ACTIVE_IDX, DMA2_Stream5_IRQn, USART_DMA_RX);
+}
+
+// USART6
+// void DMA2_Stream7_IRQHandler() //TX
+// {
+//     handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream7_IRQn, USART_DMA_TX);
+// }
+
+void DMA2_Stream2_IRQHandler() //RX
+{
+    handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream2_IRQn, USART_DMA_RX);
 }
 
 
@@ -702,6 +727,11 @@ void DMA1_Stream5_IRQHandler() //RX
 void USART1_IRQHandler()
 {
     handleUsartIRQ(USART1, USART1_ACTIVE_IDX);
+}
+
+void USART6_IRQHandler()
+{
+    handleUsartIRQ(USART6, USART6_ACTIVE_IDX);
 }
 
 void USART2_IRQHandler()
