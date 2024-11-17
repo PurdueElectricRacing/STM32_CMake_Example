@@ -153,8 +153,6 @@ void PHAL_usartTxBl(usart_init_t* handle, uint8_t* data, uint32_t len)
 {
     int i;
 
-    //handle->periph->CR3 &= ~USART_CR3_DMAT;
-    //handle->periph->CR1 &= ~USART_CR1_TXEIE;
     handle->periph->CR1 |= USART_CR1_TE;
 
     for (i = 0; i < len; i++) {
@@ -169,8 +167,6 @@ void PHAL_usartRxBl(usart_init_t* handle, uint8_t* data, uint32_t len)
 {
     int i;
 
-    //handle->periph->CR3 &= ~USART_CR3_DMAR;
-    //handle->periph->CR1 &= ~USART_CR1_RXNEIE;
     handle->periph->CR1 |= USART_CR1_RE;
 
     for (i = 0; i < len; i++) {
