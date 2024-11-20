@@ -766,7 +766,7 @@ void DMA1_Stream4_IRQHandler() { handleDMAxComplete(USART4_ACTIVE_IDX, DMA1_Stre
 void DMA1_Stream0_IRQHandler() { handleDMAxComplete(USART5_ACTIVE_IDX, DMA1_Stream0_IRQn, USART_DMA_RX); } // USART5 RX
 void DMA1_Stream7_IRQHandler() { handleDMAxComplete(USART5_ACTIVE_IDX, DMA1_Stream7_IRQn, USART_DMA_TX); } // USART5 TX
 void DMA2_Stream1_IRQHandler() { handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream1_IRQn, USART_DMA_RX); } // USART6 RX
-//void DMA2_Stream6_IRQHandler() { handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream6_IRQn, USART_DMA_TX); } // USART6 TX
+void DMA2_Stream6_IRQHandler() { handleDMAxComplete(USART6_ACTIVE_IDX, DMA2_Stream6_IRQn, USART_DMA_TX); } // USART6 TX
 
 // Add new USART Interrupts as new peripherals are needed,
 // feeding in the new USART peripheral, along with active array index
@@ -775,7 +775,7 @@ void USART2_IRQHandler() { handleUsartIRQ(USART2, USART2_ACTIVE_IDX); }
 void USART3_IRQHandler() { handleUsartIRQ(USART3, USART3_ACTIVE_IDX); }
 void UART4_IRQHandler() { handleUsartIRQ(UART4, USART4_ACTIVE_IDX); }
 void UART5_IRQHandler() { handleUsartIRQ(UART5, USART5_ACTIVE_IDX); }
-//void USART6_IRQHandler() { handleUsartIRQ(USART6, USART6_ACTIVE_IDX); }
+void USART6_IRQHandler() { handleUsartIRQ(USART6, USART6_ACTIVE_IDX); }
 
 #endif
 
