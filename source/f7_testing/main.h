@@ -1,0 +1,8 @@
+#define ERR_LED_PORT (GPIOB)
+#define ERR_LED_PIN (5)
+
+#define HEARTBEAT_LED_PORT (GPIOB)
+#define HEARTBEAT_LED_PIN (6)
+
+#define CONN_LED_PORT (GPIOB)
+#define CONN_LED_PIN (7)
