@@ -11,6 +11,15 @@
 
 volatile raw_adc_values_t raw_adc_values;
 
+#pragma pack(push, 1)
+typedef struct {
+    int id;
+    float temperature;
+    char status;
+} SensorData;
+#pragma pack(pop)
+
+
 /* ADC Configuration */
 ADCInitConfig_t adc_config = {
    .clock_prescaler = ADC_CLK_PRESC_6,
@@ -120,29 +129,30 @@ int main()
     {
         HardFault_Handler();
     }
-    if (!PHAL_SPI_init(&spi_config))
-        HardFault_Handler();
-    if(!PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
-    {
-        HardFault_Handler();
-    }
+    // if (!PHAL_SPI_init(&spi_config))
+    //     HardFault_Handler();
+    // if(!PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
+    // {
+    //     HardFault_Handler();
+    // }
     if(!PHAL_initUSART(&lcd, APB1ClockRateHz))
     {
         HardFault_Handler();
     }
-    if(!PHAL_initDMA(&adc_dma_config))
-    {
-        HardFault_Handler();
-    }
-    PHAL_writeGPIO(SPI_CS_PORT, SPI_CS_PIN, 1);
-    PHAL_startTxfer(&adc_dma_config);
-    PHAL_startADC(ADC1);
+    // if(!PHAL_initDMA(&adc_dma_config))
+    // {
+    //     HardFault_Handler();
+    // }
+    //PHAL_writeGPIO(SPI_CS_PORT, SPI_CS_PIN, 1);
+    //PHAL_startTxfer(&adc_dma_config);
+    //PHAL_startADC(ADC1);
     PHAL_usartRxDma(&lcd, (uint16_t *) msg, 5, 1);
         /* Task Creation */
     schedInit(APB1ClockRateHz);
-        taskCreate(ledblink, 50);
-        taskCreate(testUsart, 100);
-        /* Schedule Periodic tasks here */
+    //taskCreate(ledblink, 50);
+    taskCreate(testUsart, 100);
+    
+    /* Schedule Periodic tasks here */
     schedStart();
     return 0;
 }
@@ -162,16 +172,19 @@ void usart_recieve_complete_callback(usart_init_t *handle)
 
 void testUsart()
 {
-    char* txmsg = "Hello World!\n";
-    PHAL_usartTxDma(&lcd, (uint16_t *)txmsg, 13);
-    if (strcmp(msg, "hello") == 0)
-    {
-        PHAL_writeGPIO(GPIOD, 14, 1);
-    }
-    else
-    {
-        PHAL_writeGPIO(GPIOD, 14, 0);
-    }
+    SensorData sensor_data  = {1, 23.5, 'A'};
+    PHAL_usartTxDma(&lcd, (uint16_t *)&sensor_data, sizeof(SensorData));
+
+    // char* txmsg = "Hello World!\n";
+    // PHAL_usartTxDma(&lcd, (uint16_t *)txmsg, 13);
+    // if (strcmp(msg, "hello") == 0)
+    // {
+    //     PHAL_writeGPIO(GPIOD, 14, 1);
+    // }
+    // else
+    // {
+    //     PHAL_writeGPIO(GPIOD, 14, 0);
+    // }
 }
 
 void ledblink()
