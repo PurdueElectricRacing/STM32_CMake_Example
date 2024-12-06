@@ -13,9 +13,15 @@ volatile raw_adc_values_t raw_adc_values;
 
 #pragma pack(push, 1)
 typedef struct {
-    int id;
-    float temperature;
-    char status;
+    int32_t ground_speed;
+    int32_t longitude;
+    int32_t latitude;
+    int32_t height;
+    int32_t north_velocity;
+    int32_t east_velocity;
+    int32_t down_velocity;
+    int32_t heading;
+    bool has_fix;
 } SensorData;
 #pragma pack(pop)
 
@@ -169,23 +175,65 @@ void usart_recieve_complete_callback(usart_init_t *handle)
         PHAL_writeGPIO(GPIOD, 15, 0);
     }
 }
+// Global variable
+SensorData sensor_data = {
+    .ground_speed = 50,
+    .longitude = 123456789,
+    .latitude = 987654321,
+    .height = 150,
+    .north_velocity = 30,
+    .east_velocity = 20,
+    .down_velocity = 0,
+    .heading = 90,
+    .has_fix = true
+};
+
+// Counter to track iterations
+int iteration_count = 0;
 
 void testUsart()
 {
-    SensorData sensor_data  = {1, 23.5, 'A'};
-    PHAL_usartTxDma(&lcd, (uint16_t *)&sensor_data, sizeof(SensorData));
+    if (sensor_data.ground_speed > 150)
+        sensor_data.ground_speed -= 20;
+    else
+        sensor_data.ground_speed += 5;
 
-    // char* txmsg = "Hello World!\n";
-    // PHAL_usartTxDma(&lcd, (uint16_t *)txmsg, 13);
-    // if (strcmp(msg, "hello") == 0)
-    // {
-    //     PHAL_writeGPIO(GPIOD, 14, 1);
-    // }
-    // else
-    // {
-    //     PHAL_writeGPIO(GPIOD, 14, 0);
-    // }
+    sensor_data.longitude += sensor_data.east_velocity * 100;
+    sensor_data.latitude += sensor_data.north_velocity * 100;
+
+    if (sensor_data.height > 300)
+        sensor_data.height -= 20;
+    else
+        sensor_data.height += 10;
+
+    if (sensor_data.north_velocity > 50)
+        sensor_data.north_velocity -= 5;
+    else if (sensor_data.north_velocity < -50)
+        sensor_data.north_velocity += 5;
+    else
+        sensor_data.north_velocity += 2;
+
+    if (sensor_data.east_velocity > 50)
+        sensor_data.east_velocity -= 5;
+    else if (sensor_data.east_velocity < -50)
+        sensor_data.east_velocity += 5;
+    else
+        sensor_data.east_velocity += 2;
+
+    sensor_data.heading = (sensor_data.heading + 10) % 360;
+
+    iteration_count++;
+
+    if (iteration_count >= 100) {
+        sensor_data.has_fix = false;
+    } else if (iteration_count >= 200) {
+        sensor_data.has_fix = true;
+        iteration_count = 0;
+    }
+
+    PHAL_usartTxDma(&lcd, (uint16_t *)&sensor_data, sizeof(SensorData));
 }
+
 
 void ledblink()
 {
