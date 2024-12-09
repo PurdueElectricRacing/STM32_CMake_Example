@@ -276,6 +276,17 @@ typedef union {
     } while(0)
 /* END AUTO SEND MACROS */
 
+#undef SEND_AMK_TESTING
+#define SEND_AMK_TESTING(AMK_InitStage_, AMK_Control_, AMK_Status_from_motor_, precharge_) do {\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_AMK_TESTING, .DLC=DLC_AMK_TESTING, .IDE=1};\
+        CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
+        data_a->AMK_Testing.AMK_InitStage = AMK_InitStage_;\
+        data_a->AMK_Testing.AMK_Control = AMK_Control_;\
+        data_a->AMK_Testing.AMK_Status_from_motor = AMK_Status_from_motor_;\
+        data_a->AMK_Testing.precharge = precharge_;\
+        canTxSendToBack(&msg);\
+    } while(0)
+
 // Stale Checking
 #define STALE_THRESH 30 / 2 // 5 / 2 would be 250% of period
 /* BEGIN AUTO UP DEFS (Update Period)*/
