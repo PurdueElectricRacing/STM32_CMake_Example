@@ -117,14 +117,14 @@ typedef union {
 // Message sending macros
 /* BEGIN AUTO SEND MACROS */
 #define SEND_MAIN_HB(car_state_, precharge_state_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_MAIN_HB, .DLC=DLC_MAIN_HB, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_MAIN_HB, .DLC=DLC_MAIN_HB, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->main_hb.car_state = car_state_;\
         data_a->main_hb.precharge_state = precharge_state_;\
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_COOLANT_TEMPS(battery_in_temp_, battery_out_temp_, drivetrain_in_temp_, drivetrain_out_temp_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_COOLANT_TEMPS, .DLC=DLC_COOLANT_TEMPS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_COOLANT_TEMPS, .DLC=DLC_COOLANT_TEMPS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->coolant_temps.battery_in_temp = battery_in_temp_;\
         data_a->coolant_temps.battery_out_temp = battery_out_temp_;\
@@ -133,14 +133,14 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_GEARBOX(l_temp_, r_temp_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_GEARBOX, .DLC=DLC_GEARBOX, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_GEARBOX, .DLC=DLC_GEARBOX, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->gearbox.l_temp = l_temp_;\
         data_a->gearbox.r_temp = r_temp_;\
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_LWS_CONFIG(CCW_, Reserved_1_, Reserved_2_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_LWS_CONFIG, .DLC=DLC_LWS_CONFIG, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_LWS_CONFIG, .DLC=DLC_LWS_CONFIG, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->LWS_Config.CCW = CCW_;\
         data_a->LWS_Config.Reserved_1 = Reserved_1_;\
@@ -148,21 +148,21 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_LOAD_SENSOR_READINGS(left_load_sensor_, right_load_sensor_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_LOAD_SENSOR_READINGS, .DLC=DLC_LOAD_SENSOR_READINGS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_LOAD_SENSOR_READINGS, .DLC=DLC_LOAD_SENSOR_READINGS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->load_sensor_readings.left_load_sensor = FLOAT_TO_UINT32(left_load_sensor_);\
         data_a->load_sensor_readings.right_load_sensor = FLOAT_TO_UINT32(right_load_sensor_);\
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_SHOCK_REAR(left_shock_, right_shock_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_SHOCK_REAR, .DLC=DLC_SHOCK_REAR, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_SHOCK_REAR, .DLC=DLC_SHOCK_REAR, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->shock_rear.left_shock = left_shock_;\
         data_a->shock_rear.right_shock = right_shock_;\
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_MCU_STATUS(sched_skips_, foreground_use_, background_use_, sched_error_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_MCU_STATUS, .DLC=DLC_MCU_STATUS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_MCU_STATUS, .DLC=DLC_MCU_STATUS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->mcu_status.sched_skips = sched_skips_;\
         data_a->mcu_status.foreground_use = foreground_use_;\
@@ -171,7 +171,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_MAIN_MODULE_CAN_STATS(can_tx_overflow_, can_tx_fail_, can_rx_overflow_, can_rx_overrun_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_MAIN_MODULE_CAN_STATS, .DLC=DLC_MAIN_MODULE_CAN_STATS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_MAIN_MODULE_CAN_STATS, .DLC=DLC_MAIN_MODULE_CAN_STATS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->main_module_can_stats.can_tx_overflow = can_tx_overflow_;\
         data_a->main_module_can_stats.can_tx_fail = can_tx_fail_;\
@@ -180,14 +180,14 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_NUM_MC_SKIPS(noise_r_, noise_l_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_NUM_MC_SKIPS, .DLC=DLC_NUM_MC_SKIPS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_NUM_MC_SKIPS, .DLC=DLC_NUM_MC_SKIPS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->num_mc_skips.noise_r = noise_r_;\
         data_a->num_mc_skips.noise_l = noise_l_;\
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_REAR_MC_STATUS(rear_left_motor_, rear_left_motor_link_, rear_left_last_link_error_, rear_right_motor_, rear_right_motor_link_, rear_right_last_link_error_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_REAR_MC_STATUS, .DLC=DLC_REAR_MC_STATUS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_REAR_MC_STATUS, .DLC=DLC_REAR_MC_STATUS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->rear_mc_status.rear_left_motor = rear_left_motor_;\
         data_a->rear_mc_status.rear_left_motor_link = rear_left_motor_link_;\
@@ -198,7 +198,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_REAR_MOTOR_CURRENTS_VOLTS(left_current_, right_current_, right_voltage_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_REAR_MOTOR_CURRENTS_VOLTS, .DLC=DLC_REAR_MOTOR_CURRENTS_VOLTS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_REAR_MOTOR_CURRENTS_VOLTS, .DLC=DLC_REAR_MOTOR_CURRENTS_VOLTS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->rear_motor_currents_volts.left_current = left_current_;\
         data_a->rear_motor_currents_volts.right_current = right_current_;\
@@ -206,7 +206,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_SDC_STATUS(IMD_, BMS_, BSPD_, BOTS_, inertia_, c_estop_, main_, r_estop_, l_estop_, HVD_, hub_, TSMS_, pchg_out_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_SDC_STATUS, .DLC=DLC_SDC_STATUS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_SDC_STATUS, .DLC=DLC_SDC_STATUS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->sdc_status.IMD = IMD_;\
         data_a->sdc_status.BMS = BMS_;\
@@ -224,7 +224,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_REAR_MOTOR_TEMPS(left_mot_temp_, right_mot_temp_, left_inv_temp_, right_inv_temp_, left_igbt_temp_, right_igbt_temp_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_REAR_MOTOR_TEMPS, .DLC=DLC_REAR_MOTOR_TEMPS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_REAR_MOTOR_TEMPS, .DLC=DLC_REAR_MOTOR_TEMPS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->rear_motor_temps.left_mot_temp = left_mot_temp_;\
         data_a->rear_motor_temps.right_mot_temp = right_mot_temp_;\
@@ -235,7 +235,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_REAR_WHEEL_SPEEDS(left_speed_mc_, right_speed_mc_, left_speed_sensor_, right_speed_sensor_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_REAR_WHEEL_SPEEDS, .DLC=DLC_REAR_WHEEL_SPEEDS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_REAR_WHEEL_SPEEDS, .DLC=DLC_REAR_WHEEL_SPEEDS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->rear_wheel_speeds.left_speed_mc = left_speed_mc_;\
         data_a->rear_wheel_speeds.right_speed_mc = right_speed_mc_;\
@@ -244,7 +244,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_AMK_SETPOINTS(AMK_Control_, AMK_TorqueSetpoint_, AMK_PositiveTorqueLimit_, AMK_NegativeTorqueLimit_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_AMK_SETPOINTS, .DLC=DLC_AMK_SETPOINTS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_AMK_SETPOINTS, .DLC=DLC_AMK_SETPOINTS, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->AMK_Setpoints.AMK_Control = AMK_Control_;\
         data_a->AMK_Setpoints.AMK_TorqueSetpoint = AMK_TorqueSetpoint_;\
@@ -253,7 +253,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_AMK_TESTING(AMK_InitStage_, AMK_Control_, AMK_Status_from_motor_, precharge_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_AMK_TESTING, .DLC=DLC_AMK_TESTING, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_AMK_TESTING, .DLC=DLC_AMK_TESTING, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->AMK_Testing.AMK_InitStage = AMK_InitStage_;\
         data_a->AMK_Testing.AMK_Control = AMK_Control_;\
@@ -262,20 +262,21 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_FAULT_SYNC_MAIN_MODULE(idx_, latched_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_FAULT_SYNC_MAIN_MODULE, .DLC=DLC_FAULT_SYNC_MAIN_MODULE, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_FAULT_SYNC_MAIN_MODULE, .DLC=DLC_FAULT_SYNC_MAIN_MODULE, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->fault_sync_main_module.idx = idx_;\
         data_a->fault_sync_main_module.latched = latched_;\
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_DAQ_RESPONSE_MAIN_MODULE(daq_response_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_DAQ_RESPONSE_MAIN_MODULE, .DLC=DLC_DAQ_RESPONSE_MAIN_MODULE, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_DAQ_RESPONSE_MAIN_MODULE, .DLC=DLC_DAQ_RESPONSE_MAIN_MODULE, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->daq_response_MAIN_MODULE.daq_response = daq_response_;\
         canTxSendToBack(&msg);\
     } while(0)
 /* END AUTO SEND MACROS */
 
+#if 0
 #undef SEND_AMK_TESTING
 #define SEND_AMK_TESTING(AMK_InitStage_, AMK_Control_, AMK_Status_from_motor_, precharge_) do {\
         CanMsgTypeDef_t msg = {.Bus=CAN2, .ExtId=ID_AMK_TESTING, .DLC=DLC_AMK_TESTING, .IDE=1};\
@@ -286,6 +287,7 @@ typedef union {
         data_a->AMK_Testing.precharge = precharge_;\
         canTxSendToBack(&msg);\
     } while(0)
+#endif
 
 // Stale Checking
 #define STALE_THRESH 30 / 2 // 5 / 2 would be 250% of period

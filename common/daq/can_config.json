@@ -6,6 +6,7 @@
             "nodes":[
                 {
                     "node_name":"Main_Module",
+                    "can_peripheral": "CAN2",
                     "node_ssa":1,
                     "tx":[
                         {   "msg_name":"main_hb",
