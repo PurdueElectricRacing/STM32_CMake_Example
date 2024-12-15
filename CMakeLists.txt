@@ -58,7 +58,7 @@ add_subdirectory(common/common_defs)
 add_subdirectory(common/log)
 add_subdirectory(common/faults)
 add_subdirectory(common/daq)
-add_subdirectory(common/amk)
+#add_subdirectory(common/amk)
 add_subdirectory(common/modules/wheel_speeds)
 add_subdirectory(common/modules/Wiznet)
 

@@ -52,7 +52,7 @@ bool carInit()
     // mcInit(&car.motor_r, MC_R_INVERT, &q_tx_usart_r, &huart_r_rx_buf, &car.pchg.pchg_complete);
 
     // motorInit(&car.motor_r, &car.pchg.pchg_complete);
-    motorInit(&car.motor_l, &car.pchg.pchg_complete);
+    //motorInit(&car.motor_l, &car.pchg.pchg_complete);
 
     PHAL_writeGPIO(SDC_MUX_S0_GPIO_Port, SDC_MUX_S0_Pin, 0);
     PHAL_writeGPIO(SDC_MUX_S1_GPIO_Port, SDC_MUX_S1_Pin, 0);
@@ -432,7 +432,7 @@ void carPeriodic()
     // mcSetPower(car.torque_r.torque_left,  &car.motor_l);
     // mcSetPower(car.torque_r.torque_right, &car.motor_r);
     // motorSetTorque(&car.motor_r, car.torque_r.torque_right);
-    motorSetTorque(&car.motor_l, car.torque_r.torque_left);
+    //motorSetTorque(&car.motor_l, car.torque_r.torque_left);
  }
 
 
@@ -449,7 +449,7 @@ void parseMCDataPeriodic(void)
     // mcPeriodic(&car.motor_l);
     // mcPeriodic(&car.motor_r);
 
-    motorPeriodic(&car.motor_l);
+    //motorPeriodic(&car.motor_l);
     // motorPeriodic(&car.motor_r);
 
     // setFault(ID_LEFT_MC_CONN_FAULT, car.pchg.pchg_complete &&
@@ -491,13 +491,13 @@ void parseMCDataPeriodic(void)
     static uint32_t last_tmp_t;
     if (sched.os_ticks - last_tmp_t >= 500)
     {
-        SEND_REAR_MOTOR_TEMPS(
-                                (uint8_t) car.motor_l.motor_temp,
-                                (uint8_t) car.motor_r.motor_temp,
-                                (uint8_t) car.motor_l.inverter_temp,
-                                (uint8_t) car.motor_r.inverter_temp,
-                                (uint8_t) car.motor_l.igbt_temp,
-                                (uint8_t) car.motor_r.igbt_temp);
+        // SEND_REAR_MOTOR_TEMPS(
+        //                         (uint8_t) car.motor_l.motor_temp,
+        //                         (uint8_t) car.motor_r.motor_temp,
+        //                         (uint8_t) car.motor_l.inverter_temp,
+        //                         (uint8_t) car.motor_r.inverter_temp,
+        //                         (uint8_t) car.motor_l.igbt_temp,
+        //                         (uint8_t) car.motor_r.igbt_temp);
         // SEND_NUM_MC_SKIPS(num_failed_msgs_r, num_failed_msgs_l);
         last_tmp_t = sched.os_ticks;
     }

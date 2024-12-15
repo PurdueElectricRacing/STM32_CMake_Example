@@ -18,7 +18,7 @@
 #include "common/psched/psched.h"
 #include "cooling.h"
 #include "main.h"
-#include "common/amk/amk.h"
+//#include "common/amk/amk.h"
 #include <stdbool.h>
 
 #define BUZZER_DURATION_MS 2500 // EV.10.5: 1-3s
@@ -81,8 +81,8 @@ typedef struct
 typedef struct
 {
     car_state_t state;
-    amk_motor_t motor_l;
-    amk_motor_t motor_r;
+    //amk_motor_t motor_l;
+    //amk_motor_t motor_r;
 
     torqueRequest_t torque_r;
     torqueSource_t torque_src;

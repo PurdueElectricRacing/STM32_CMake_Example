@@ -202,13 +202,13 @@
                             "msg_name": "AMK_Setpoints",
                             "msg_desc": "Contains control word and setpoints",
                             "signals": [
-                                {"sig_name": "AMK_Control", "sig_desc": "Control word", "type":"uint16_t"},
-                                {"sig_name": "AMK_TorqueSetpoint", "sig_desc": "Torque setpoint", "type":"int16_t", "unit":"Nm", "scale":0.1},
-                                {"sig_name": "AMK_PositiveTorqueLimit", "sig_desc": "Positive Torque Limit", "type":"int16_t", "unit":"Nm", "scale":0.1},
-                                {"sig_name": "AMK_NegativeTorqueLimit", "sig_desc": "Negative Torque Limit", "type":"int16_t", "unit":"Nm", "scale":0.1}
+                                {"sig_name": "AMK_Control", "sig_desc": "Actual speed value", "type":"uint16_t"},
+                                {"sig_name": "AMK_TargetVelocity", "sig_desc": "Voltage of the DC bus", "type":"int16_t"},
+                                {"sig_name": "AMK_TorqueLimitPositive", "sig_desc": "System reset", "type":"int16_t"},
+                                {"sig_name": "AMK_TorqueLimitNegative", "sig_desc": "Error number", "type":"int16_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x182"
+                            "msg_id_override": "0x184"
                         },
                         {
                             "msg_name": "AMK_Testing",
@@ -255,28 +255,6 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x284"
-                        },
-                        {
-                            "msg_name": "AMK_Temperatures_1",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_MotorTemp", "sig_desc": "Motor temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_InverterTemp", "sig_desc": "Inverter cold plate temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_IGBTTemp", "sig_desc": "IGBT temperature", "type":"int16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x286"
-                        },
-                        {
-                            "msg_name": "AMK_Temperatures_2",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_InternalTemp", "sig_desc": "Internal temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_ExternalTemp", "sig_desc": "External temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_TempSensorMotor", "sig_desc": "???", "type":"int16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x288"
                         }
                     ]
                 },
@@ -1077,14 +1055,58 @@
                             "msg_desc": "Contains the status word and actual values",
                             "signals": [
                                 {"sig_name": "AMK_Status", "sig_desc": "Status word, bit field", "type":"uint16_t"},
+                                {"sig_name": "AMK_ActualVelocity", "sig_desc": "Actual torque value", "type":"int16_t", "unit":"Nm", "scale":0.1},
+                                {"sig_name": "AMK_TorqueCurrent", "sig_desc": "Torque Current", "type":"int16_t"},
+                                {"sig_name": "AMK_MagnetizingCurrent", "sig_desc": "Magnetizing Current", "type":"int16_t"}
+                            ],
+                            "msg_period": 5,
+                            "msg_id_override": "0x283"
+                        },
+                        {
+                            "msg_name": "AMK_Actual_Values_2",
+                            "msg_desc": "Contains actual values",
+                            "signals": [
+                                {"sig_name": "AMK_TempMotor", "sig_desc": "Actual speed value", "type":"int16_t"},
+                                {"sig_name": "AMK_TempInverter", "sig_desc": "Voltage of the DC bus", "type":"int16_t"},
+                                {"sig_name": "AMK_ErrorInfo", "sig_desc": "System reset", "type":"uint16_t"},
+                                {"sig_name": "AMK_TempIGBT", "sig_desc": "Error number", "type":"int16_t"}
+                            ],
+                            "msg_period": 5,
+                            "msg_id_override": "0x285"
+                        }
+                    ],
+                    "rx": [
+                        {
+                            "msg_name": "AMK_Setpoints",
+                            "msg_desc": "Contains control word and setpoints",
+                            "signals": [
+                                {"sig_name": "AMK_Control", "sig_desc": "Actual speed value", "type":"uint16_t"},
+                                {"sig_name": "AMK_TargetVelocity", "sig_desc": "Voltage of the DC bus", "type":"int16_t"},
+                                {"sig_name": "AMK_TorqueLimitPositive", "sig_desc": "System reset", "type":"int16_t"},
+                                {"sig_name": "AMK_TorqueLimitNegative", "sig_desc": "Error number", "type":"int16_t"}
+                            ],
+                            "msg_period": 5,
+                            "msg_id_override": "0x184"
+                        }
+                    ]
+                },
+                {
+                    "node_name": "Inverter2",
+                    "node_ssa": 59,
+                    "tx": [
+                        {
+                            "msg_name": "AMK2_Actual_Values_1",
+                            "msg_desc": "Contains the status word and actual values",
+                            "signals": [
+                                {"sig_name": "AMK_Status", "sig_desc": "Status word, bit field", "type":"uint16_t"},
                                 {"sig_name": "AMK_ActualTorque", "sig_desc": "Actual torque value", "type":"int16_t", "unit":"Nm", "scale":0.1},
                                 {"sig_name": "AMK_MotorSerialNumber", "sig_desc": "Serial number of the motor", "type":"uint32_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x282"
+                            "msg_id_override": "0x284"
                         },
                         {
-                            "msg_name": "AMK_Actual_Values_2",
+                            "msg_name": "AMK2_Actual_Values_2",
                             "msg_desc": "Contains actual values",
                             "signals": [
                                 {"sig_name": "AMK_ActualSpeed", "sig_desc": "Actual speed value", "type":"int16_t", "unit": "rpm"},
@@ -1093,34 +1115,12 @@
                                 {"sig_name": "AMK_DiagnosticNumber", "sig_desc": "Error number", "type":"uint16_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x284"
-                        },
-                        {
-                            "msg_name": "AMK_Temperatures_1",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_MotorTemp", "sig_desc": "Motor temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_InverterTemp", "sig_desc": "Inverter cold plate temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_IGBTTemp", "sig_desc": "IGBT temperature", "type":"int16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 5,
                             "msg_id_override": "0x286"
-                        },
-                        {
-                            "msg_name": "AMK_Temperatures_2",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_InternalTemp", "sig_desc": "Internal temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_ExternalTemp", "sig_desc": "External temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_TempSensorMotor", "sig_desc": "???", "type":"int16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x288"
                         }
                     ],
                     "rx": [
                         {
-                            "msg_name": "AMK_Setpoints",
+                            "msg_name": "AMK2_Setpoints",
                             "msg_desc": "Contains control word and setpoints",
                             "signals": [
                                 {"sig_name": "AMK_Control", "sig_desc": "Control word", "type":"uint16_t"},
@@ -1129,19 +1129,7 @@
                                 {"sig_name": "AMK_NegativeTorqueLimit", "sig_desc": "Negative Torque Limit", "type":"int16_t", "unit":"Nm", "scale":0.1}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x182"
-                        },
-                        {
-                            "msg_name": "AMK_Testing",
-                            "msg_desc": "Contains control word and setpoints",
-                            "signals": [
-                                {"sig_name": "AMK_InitStage", "sig_desc": "init stage", "type":"uint8_t", "choices":["power_on","percharge","dc_on","dc_on_check"]},
-                                {"sig_name": "AMK_Control", "sig_desc": "Control word", "type":"uint16_t"},
-                                {"sig_name": "AMK_Status_from_motor", "sig_desc": "Control word", "type":"uint16_t"},
-                                {"sig_name": "precharge", "sig_desc": "Control word", "type":"uint8_t"}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x384"
+                            "msg_id_override": "0x185"
                         }
                     ]
                 },

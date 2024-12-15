@@ -14,7 +14,7 @@
 #include "common/plettenberg/plettenberg.h"
 #include "common/psched/psched.h"
 #include "common/queue/queue.h"
-#include "common/amk/amk.h"
+//#include "common/amk/amk.h"
 
 /* TODO: Move CAN2 stuff here since can parse base is dumb */
 #include "common/phal_F4_F7/can/can.h"
@@ -222,6 +222,8 @@ ClockRateConfig_t clock_config = {
 void preflightAnimation(void);
 void preflightChecks(void);
 void heartBeatLED();
+void test_send();
+
 // void usartTxUpdate(void);
 // void usartIdleIRQ(volatile usart_init_t *huart, volatile usart_rx_buf_t *rx_buf);
 void send_fault(uint16_t, bool);
@@ -259,6 +261,11 @@ void can2TxUpdate(void)
     }
 }
 
+void test_send()
+{
+    SEND_AMK_SETPOINTS(0,0,0,0);
+}
+
 int main(void){
     /* Data Struct Initialization */
     // qConstruct(&q_tx_usart_l, MC_MAX_TX_LENGTH);
@@ -280,17 +287,18 @@ int main(void){
     schedInit(APB1ClockRateHz);
     configureAnim(preflightAnimation, preflightChecks, 60, 750);
 
-    taskCreate(coolingPeriodic, 50);
-    taskCreate(heartBeatLED, 500);
-    taskCreate(monitorSDCPeriodic, 20);
-    taskCreate(carHeartbeat, 500);
-    taskCreate(carPeriodic, 15);
-    taskCreate(interpretLoadSensor, 15);
-    taskCreate(updateSDCFaults, 300);
-    taskCreate(heartBeatTask, 100);
-    taskCreate(send_shockpots, 15);
-    taskCreate(parseMCDataPeriodic, MC_LOOP_DT);
-    taskCreate(daqPeriodic, DAQ_UPDATE_PERIOD);
+    taskCreate(test_send, 20);
+    // taskCreate(coolingPeriodic, 50);
+    // taskCreate(heartBeatLED, 500);
+    // taskCreate(monitorSDCPeriodic, 20);
+    // taskCreate(carHeartbeat, 500);
+    // taskCreate(carPeriodic, 15);
+    // taskCreate(interpretLoadSensor, 15);
+    // taskCreate(updateSDCFaults, 300);
+    // taskCreate(heartBeatTask, 100);
+    // taskCreate(send_shockpots, 15);
+    // taskCreate(parseMCDataPeriodic, MC_LOOP_DT);
+    // taskCreate(daqPeriodic, DAQ_UPDATE_PERIOD);
     // taskCreate(memFg, MEM_FG_TIME);
     taskCreateBackground(canTxUpdate);
     // taskCreateBackground(can2TxUpdate);

@@ -36,19 +36,11 @@ void canRxUpdate(void)
         {
             case ID_AMK_SETPOINTS:
                 can_data.AMK_Setpoints.AMK_Control = msg_data_a->AMK_Setpoints.AMK_Control;
-                can_data.AMK_Setpoints.AMK_TorqueSetpoint = (int16_t) msg_data_a->AMK_Setpoints.AMK_TorqueSetpoint;
-                can_data.AMK_Setpoints.AMK_PositiveTorqueLimit = (int16_t) msg_data_a->AMK_Setpoints.AMK_PositiveTorqueLimit;
-                can_data.AMK_Setpoints.AMK_NegativeTorqueLimit = (int16_t) msg_data_a->AMK_Setpoints.AMK_NegativeTorqueLimit;
+                can_data.AMK_Setpoints.AMK_TargetVelocity = (int16_t) msg_data_a->AMK_Setpoints.AMK_TargetVelocity;
+                can_data.AMK_Setpoints.AMK_TorqueLimitPositive = (int16_t) msg_data_a->AMK_Setpoints.AMK_TorqueLimitPositive;
+                can_data.AMK_Setpoints.AMK_TorqueLimitNegative = (int16_t) msg_data_a->AMK_Setpoints.AMK_TorqueLimitNegative;
                 can_data.AMK_Setpoints.stale = 0;
                 can_data.AMK_Setpoints.last_rx = sched.os_ticks;
-                break;
-            case ID_AMK_TESTING:
-                can_data.AMK_Testing.AMK_InitStage = msg_data_a->AMK_Testing.AMK_InitStage;
-                can_data.AMK_Testing.AMK_Control = msg_data_a->AMK_Testing.AMK_Control;
-                can_data.AMK_Testing.AMK_Status_from_motor = msg_data_a->AMK_Testing.AMK_Status_from_motor;
-                can_data.AMK_Testing.precharge = msg_data_a->AMK_Testing.precharge;
-                can_data.AMK_Testing.stale = 0;
-                can_data.AMK_Testing.last_rx = sched.os_ticks;
                 break;
             default:
                 __asm__("nop");
@@ -60,9 +52,6 @@ void canRxUpdate(void)
     CHECK_STALE(can_data.AMK_Setpoints.stale,
                 sched.os_ticks, can_data.AMK_Setpoints.last_rx,
                 UP_AMK_SETPOINTS);
-    CHECK_STALE(can_data.AMK_Testing.stale,
-                sched.os_ticks, can_data.AMK_Testing.last_rx,
-                UP_AMK_TESTING);
     /* END AUTO STALE CHECKS */
 }
 
@@ -82,7 +71,6 @@ bool initCANFilter()
     /* BEGIN AUTO FILTER */
     CAN1->FA1R |= (1 << 0);    // configure bank 0
     CAN1->sFilterRegister[0].FR1 = (ID_AMK_SETPOINTS << 3) | 4;
-    CAN1->sFilterRegister[0].FR2 = (ID_AMK_TESTING << 3) | 4;
     /* END AUTO FILTER */
 
     CAN1->FMR  &= ~CAN_FMR_FINIT;             // Enable Filters (exit filter init mode)
