@@ -172,6 +172,7 @@ void preflightChecks(void);
 void heatBeatLED();
 void send_iv_readings();
 void send_flowrates();
+void PDUTest(void);
 
 // To correctly execute preflight algorithm
 uint8_t led_anim_complete;
@@ -208,6 +209,8 @@ int main()
     schedInit(APB1ClockRateHz);
     configureAnim(preflightAnimation, preflightChecks, 20, 750);
 
+    taskCreate(PDUTest, 250);
+#if 0
     /* Schedule Periodic tasks here */
     taskCreate(heatBeatLED, 500);
     taskCreate(heartBeatTask, 100);
@@ -220,8 +223,16 @@ int main()
     taskCreate(send_iv_readings, 500);
     taskCreate(checkSwitchFaults, 100);
     taskCreate(send_flowrates, 200);
+#endif
     schedStart();
     return 0;
+}
+
+void PDUTest(void)
+{
+    PHAL_toggleGPIO(CRIT_5V_CTRL_GPIO_Port, CRIT_5V_CTRL_Pin);
+    PHAL_toggleGPIO(NCRIT_5V_CTRL_GPIO_Port, NCRIT_5V_CTRL_Pin);
+    // add the rest...
 }
 
 void preflightChecks(void) {
