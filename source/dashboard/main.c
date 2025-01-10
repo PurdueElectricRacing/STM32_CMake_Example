@@ -63,7 +63,7 @@ GPIOInitConfig_t gpio_config[] = {
  GPIO_INIT_USART1RX_PA10,
 
  // Buttons/Switches
- GPIO_INIT_INPUT(B_OK_GPIO_Port, B_OK_Pin, GPIO_INPUT_OPEN_DRAIN),
+ GPIO_INIT_INPUT(B_SELECT_GPIO_Port, B_SELECT_Pin, GPIO_INPUT_OPEN_DRAIN),
  GPIO_INIT_INPUT(B_DOWN_GPIO_Port, B_DOWN_Pin, GPIO_INPUT_OPEN_DRAIN),
  GPIO_INIT_INPUT(B_UP_GPIO_Port, B_UP_Pin, GPIO_INPUT_OPEN_DRAIN),
  GPIO_INIT_INPUT(ENC_A_GPIO_Port, ENC_A_Pin, GPIO_INPUT_OPEN_DRAIN),
@@ -162,29 +162,29 @@ void sendBrakeStatus();
 void interpretLoadSensor(void);
 void send_shockpots();
 float voltToForce(uint16_t load_read);
+
 // Communication queues
 q_handle_t q_tx_usart;
 
-int main (void){
-
+int main(void){
     /* Data Struct init */
     qConstruct(&q_tx_usart, NXT_STR_SIZE);
 
     /* HAL Initilization */
     PHAL_trimHSI(HSI_TRIM_DASHBOARD);
-    if(0 != PHAL_configureClockRates(&clock_config))
+    if (0 != PHAL_configureClockRates(&clock_config))
     {
         HardFault_Handler();
     }
-    if(false == PHAL_initGPIO(gpio_config, sizeof(gpio_config)/sizeof(GPIOInitConfig_t)))
+    if (false == PHAL_initGPIO(gpio_config, sizeof(gpio_config)/sizeof(GPIOInitConfig_t)))
     {
         HardFault_Handler();
     }
-    if(false == PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
+    if (false == PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
     {
         HardFault_Handler();
     }
-    if(false == PHAL_initDMA(&adc_dma_config))
+    if (false == PHAL_initDMA(&adc_dma_config))
     {
         HardFault_Handler();
     }
@@ -196,8 +196,6 @@ int main (void){
     PHAL_writeGPIO(IMD_LED_GPIO_Port, IMD_LED_Pin, 1);
     PHAL_writeGPIO(BMS_LED_GPIO_Port, BMS_LED_Pin, 1);
     PHAL_writeGPIO(PRCHG_LED_GPIO_Port, PRCHG_LED_Pin, 1);
-
-
 
     /* Task Creation */
     schedInit(APB1ClockRateHz);
@@ -211,8 +209,8 @@ int main (void){
     taskCreate(heartBeatTask, 100);
     taskCreate(send_shockpots, 15);
     taskCreate(interpretLoadSensor, 15);
-    taskCreate(update_data_pages, 200);
-    taskCreate(sendTVParameters, 4000);
+    taskCreate(updateTelemetryPages, 200);
+    taskCreate(sendTVParameters, 10000);
     taskCreate(updateSDCDashboard, 500);
     taskCreateBackground(usartTxUpdate);
     taskCreateBackground(canTxUpdate);
@@ -223,30 +221,43 @@ int main (void){
     return 0;
 }
 
+// Call initially to ensure the LCD is initialized to the proper value -
+// should be replaced with the struct prev page stuff eventually
+int zeroEncoder(volatile int8_t* start_pos) {
+    // Collect initial raw reading from encoder
+    uint8_t raw_enc_a = PHAL_readGPIO(ENC_A_GPIO_Port, ENC_A_Pin);
+    uint8_t raw_enc_b = PHAL_readGPIO(ENC_B_GPIO_Port, ENC_B_Pin);
+    uint8_t raw_res = (raw_enc_b | (raw_enc_a << 1));
+    *start_pos = raw_res;
+    lcd_data.encoder_position = 0;
+
+    return 1;
+}
+
 void preflightChecks(void) {
     static uint8_t state;
 
     switch (state++)
     {
         case 0:
-            if(false == PHAL_initCAN(CAN1, false, VCAN_BPS))
+            if (false == PHAL_initCAN(CAN1, false, VCAN_BPS))
             {
                 HardFault_Handler();
             }
             NVIC_EnableIRQ(CAN1_RX0_IRQn);
             break;
         case 1:
-            if(false == PHAL_initUSART(&lcd, APB2ClockRateHz))
+            if (false == PHAL_initUSART(&lcd, APB2ClockRateHz))
             {
                 HardFault_Handler();
             }
             break;
         case 2:
-            if(false == PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
+            if (false == PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
             {
                 HardFault_Handler();
             }
-            if(false == PHAL_initDMA(&adc_dma_config))
+            if (false == PHAL_initDMA(&adc_dma_config))
             {
                 HardFault_Handler();
             }
@@ -262,21 +273,18 @@ void preflightChecks(void) {
         case 4:
             enableInterrupts();
             break;
+        case 5:
+            initLCD();
+            break;
         case 6:
             // Zero Rotary Encoder
             zeroEncoder(&prev_rot_state);
-            break;
-        case 5:
-            initLCD();
             break;
         default:
             registerPreflightComplete(1);
             state = 255; // prevent wrap around
     }
 }
-
-
-
 
 void send_shockpots()
 {
@@ -293,17 +301,17 @@ void send_shockpots()
 void preflightAnimation(void) {
     // Controls external LEDs since they are more visible when dash is in car
     static uint32_t time_ext;
+    static uint32_t time;
 
     PHAL_writeGPIO(BMS_LED_GPIO_Port, BMS_LED_Pin, 1);
     PHAL_writeGPIO(IMD_LED_GPIO_Port, IMD_LED_Pin, 1);
     PHAL_writeGPIO(PRCHG_LED_GPIO_Port, PRCHG_LED_Pin, 1);
-    static uint32_t time;
-
+    
     PHAL_writeGPIO(HEART_LED_GPIO_Port, HEART_LED_Pin, 0);
     PHAL_writeGPIO(ERROR_LED_GPIO_Port, ERROR_LED_Pin, 0);
     PHAL_writeGPIO(CONN_LED_GPIO_Port, CONN_LED_Pin, 0);
 
-    switch (time++ % 6)
+    switch (time++ % 6) // Creates a sweeping pattern
     {
         case 0:
         case 5:
@@ -319,7 +327,7 @@ void preflightAnimation(void) {
             break;
     }
 
-    switch (time_ext++ % 4)
+    switch (time_ext++ % 4) // Creates a 25/75 blinking pattern
     {
         case 0:
             PHAL_writeGPIO(BMS_LED_GPIO_Port, BMS_LED_Pin, 0);
@@ -360,8 +368,6 @@ void interpretLoadSensor(void) {
     //send a can message w/ minimal force info
     //every 15 milliseconds
     SEND_LOAD_SENSOR_READINGS_DASH(force_load_l, force_load_r);
-
-
 }
 
 void heartBeatLED()
@@ -422,7 +428,7 @@ void EXTI15_10_IRQHandler() {
     // EXTI14 triggered the interrupt (B1_FLT)
     // This is the TOP button on the dashboard
     if (EXTI->PR & EXTI_PR_PR14) {
-        if (sched.os_ticks - last_click_time < 200) {
+        if (sched.os_ticks - last_click_time < 100) {
             last_click_time = sched.os_ticks;
             EXTI->PR |= EXTI_PR_PR14;       // Clear the interrupt pending bit for EXTI14
         }
@@ -437,7 +443,7 @@ void EXTI15_10_IRQHandler() {
     // This is the MIDDLE button on the dashbaord
     if (EXTI->PR & EXTI_PR_PR13)
     {
-        if (sched.os_ticks - last_click_time < 200) {
+        if (sched.os_ticks - last_click_time < 100) {
             last_click_time = sched.os_ticks;
             EXTI->PR |= EXTI_PR_PR13;       // Clear the interrupt pending bit for EXTI13
         }
@@ -453,7 +459,7 @@ void EXTI15_10_IRQHandler() {
     // This is the BOTTOM button on the dashboard
     if (EXTI->PR & EXTI_PR_PR12)
     {
-        if (sched.os_ticks - last_click_time < 300) {
+        if (sched.os_ticks - last_click_time < 100) {
             last_click_time = sched.os_ticks;
             EXTI->PR |= EXTI_PR_PR12;       // Clear the interrupt pending bit for EXTI12
         }
@@ -473,15 +479,15 @@ void EXTI15_10_IRQHandler() {
     }
 }
 
-// [prev_state][current_state] = direction (1 = CW, -1 = CCW, 0 = no movement)
-const int8_t encoder_transition_table[ENC_NUM_STATES][ENC_NUM_STATES] = {
-    { 0, -1,  1,  0},
-    { 1,  0,  0, -1},
-    {-1,  0,  0,  1},
-    { 0,  1, -1,  0}
-};
-
 void encoder_ISR() {
+    // [prev_state][current_state] = direction (1 = CW, -1 = CCW, 0 = no movement)
+    static const int8_t encoder_transition_table[ENC_NUM_STATES][ENC_NUM_STATES] = {
+        { 0, -1,  1,  0},
+        { 1,  0,  0, -1},
+        {-1,  0,  0,  1},
+        { 0,  1, -1,  0}
+    };
+
     uint8_t raw_enc_a = PHAL_readGPIO(ENC_A_GPIO_Port, ENC_A_Pin);
     uint8_t raw_enc_b = PHAL_readGPIO(ENC_B_GPIO_Port, ENC_B_Pin);
     uint8_t current_state = (raw_enc_b | (raw_enc_a << 1));
@@ -542,7 +548,7 @@ void enableInterrupts()
 uint8_t cmd[NXT_STR_SIZE] = {'\0'};
 void usartTxUpdate()
 {
-    if((false == PHAL_usartTxBusy(&lcd)) &&  (SUCCESS_G == qReceive(&q_tx_usart, cmd)))
+    if ((false == PHAL_usartTxBusy(&lcd)) && (SUCCESS_G == qReceive(&q_tx_usart, cmd)))
     {
         PHAL_usartTxDma(&lcd, (uint16_t *) cmd, strlen(cmd));
     }
@@ -559,16 +565,15 @@ void dashboard_bl_cmd_CALLBACK(CanParsedData_t *msg_data_a)
         Bootloader_ResetForFirmwareDownload();
 }
 
-
-static uint8_t upButtonBuffer;
-static uint8_t downButtonBuffer;
-
 // Poll for Dashboard User Input
 void pollDashboardInput()
 {
+    static uint8_t upButtonBuffer;
+    static uint8_t downButtonBuffer;
+
     // Check for Encoder Input
     upButtonBuffer <<= 1;
-    if (PHAL_readGPIO(GPIOD, 14) == 0)
+    if (PHAL_readGPIO(B_UP_GPIO_Port, B_UP_Pin) == 0)
     {
         upButtonBuffer |= 1;
     }
@@ -579,7 +584,7 @@ void pollDashboardInput()
     }
 
     downButtonBuffer <<= 1;
-    if (PHAL_readGPIO(GPIOD, 13) == 0)
+    if (PHAL_readGPIO(B_DOWN_GPIO_Port, B_DOWN_Pin) == 0)
     {
         downButtonBuffer |= 1;
     }
@@ -601,30 +606,6 @@ void pollDashboardInput()
         SEND_START_BUTTON(1);                     // Report start button pressed
         dashboard_input &= ~(1U << DASH_INPUT_START_BUTTON);
     }
-
-    // Check Up/Down Pressed
-    // if (dashboard_input & (1U << DASH_INPUT_UP_BUTTON) &&
-    //    (dashboard_input & (1U << DASH_INPUT_DOWN_BUTTON)))
-    // {
-    //     // Default to Up if Both Pressed in x ms
-    //     moveUp();
-    //     dashboard_input &= ~(1U << DASH_INPUT_UP_BUTTON);
-    //     dashboard_input &= ~(1U << DASH_INPUT_DOWN_BUTTON);
-    // }
-    // else if (dashboard_input & (1U << DASH_INPUT_UP_BUTTON))
-    // {
-    //     moveUp();
-    //     dashboard_input &= ~(1U << DASH_INPUT_UP_BUTTON);
-    // }
-    // else if (dashboard_input & (1U << DASH_INPUT_DOWN_BUTTON))
-    // {
-    //     moveDown();
-    //     dashboard_input &= ~(1U << DASH_INPUT_DOWN_BUTTON);
-    // }
-    // else
-    // {
-    //     // nothing
-    // }
 
     // Check Select Item Pressed
     if (dashboard_input & (1U << DASH_INPUT_SELECT_BUTTON))
