@@ -124,10 +124,10 @@ typedef enum
 
 
 // Aux Button inputs
-#define B_OK_GPIO_Port              (GPIOD)
-#define B_OK_Pin                    (13)
+#define B_SELECT_GPIO_Port          (GPIOD)
+#define B_SELECT_Pin                (12)
 #define B_DOWN_GPIO_Port            (GPIOD)
-#define B_DOWN_Pin                  (12)
+#define B_DOWN_Pin                  (13)
 #define B_UP_GPIO_Port              (GPIOD)
 #define B_UP_Pin                    (14)
 
@@ -161,7 +161,7 @@ typedef enum
 #define LCD_UART_TX_Pin             (9)
 #define LCD_UART_RX_GPIO_Port       (GPIOA)
 #define LCD_UART_RX_Pin             (10)
-#define LCD_NUM_PAGES               (8) // Number encoder selectable pages
+#define LCD_NUM_PAGES               (9) // Number encoder selectable pages
 
 // LV Status
 #define LV_5V_V_SENSE_GPIO_Port     (GPIOC)
