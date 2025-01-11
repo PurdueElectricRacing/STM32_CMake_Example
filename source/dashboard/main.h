@@ -180,6 +180,18 @@ typedef enum
 #define LV_24_V_FAULT_Pin           (8)
 #define LV_5V_SCALE                 (0.413F)
 
+// Voltage Sensing Resistors (in kOhms)
+#define LV_3V3_PULLUP               (4.3F)
+#define LV_3V3_PULLDOWN             (10.0F)
+#define LV_5V_PULLUP                (4.3F)
+#define LV_5V_PULLDOWN              (3.3F)
+#define LV_12V_PULLUP               (15.8F)
+#define LV_12V_PULLDOWN             (3.3F)
+#define LV_24V_PULLUP               (47.0F)
+#define LV_24V_PULLDOWN             (3.3F)
+#define ADC_MAX_VALUE               (4095)
+#define ADC_REF_VOLTAGE             (3.3F)
+
 void canTxSendToBack(CanMsgTypeDef_t *msg);
 
 #endif
