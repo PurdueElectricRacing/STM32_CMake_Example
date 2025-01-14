@@ -872,28 +872,28 @@ void update_race_telemetry() {
     // Update the state of charge
     if (can_data.main_hb.stale) {
         set_text(CAR_STAT, "S");
-        set_background(CAR_STAT, BLACK);
+        set_font_color(CAR_STAT, WHITE);
     } else {
         switch(can_data.main_hb.car_state) {
             case CAR_STATE_PRECHARGING:
                 set_font_color(CAR_STAT, ORANGE);
-                set_text(CAR_STAT, "PRCHG");
+                set_text(CAR_STAT, "PRECHARGE");
                 break;
             case CAR_STATE_ENERGIZED:
                 set_font_color(CAR_STAT, ORANGE);
-                set_text(CAR_STAT, "ENER");
+                set_text(CAR_STAT, "ENERGIZED");
                 break;
             case CAR_STATE_IDLE:
                 set_font_color(CAR_STAT, INFO_GRAY);
-                set_text(CAR_STAT, "INIT");
+                set_text(CAR_STAT, "IDLE");
                 break;
             case CAR_STATE_READY2DRIVE:
-                set_font_color(CAR_STAT, RACE_GREEN);
-                set_text(CAR_STAT, "ON");
+                set_font_color(CAR_STAT, GREEN);
+                set_text(CAR_STAT, "READY");
                 break;
             case CAR_STATE_ERROR:
                 set_font_color(CAR_STAT, YELLOW);
-                set_text(CAR_STAT, "ERR");
+                set_text(CAR_STAT, "ERROR");
                 break;
             case CAR_STATE_FATAL:
                 set_font_color(CAR_STAT, RED);
