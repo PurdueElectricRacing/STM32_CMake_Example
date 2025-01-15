@@ -150,7 +150,7 @@ menu_element_t tv_elements[] = {
         .min_value = 0,
         .max_value = 100, // decimal shifted left by 1
         .increment = 5,
-        .on_change = sendTVParameters
+        .on_change = NULL // TV Params Sent Periodically
     },
     {
         .type = ELEMENT_FLT,
@@ -159,7 +159,7 @@ menu_element_t tv_elements[] = {
         .min_value = 0,
         .max_value = 100, // decimal shifted left by 1
         .increment = 5,
-        .on_change = sendTVParameters
+        .on_change = NULL // TV Params Sent Periodically
     },
     {
         .type = ELEMENT_VAL,
@@ -168,13 +168,13 @@ menu_element_t tv_elements[] = {
         .min_value = 0,
         .max_value = 30,
         .increment = 1,
-        .on_change = sendTVParameters
+        .on_change = NULL // TV Params Sent Periodically
     },
     {
         .type = ELEMENT_OPTION,
         .object_name = TV_ENABLE_OP,
         .current_value = 0,
-        .on_change = sendTVParameters
+        .on_change = NULL // TV Params Sent Periodically
     }
 };
 
@@ -714,14 +714,18 @@ void select_cooling() {
     menu_select(&cooling_page);
 }
 
-void coolant_out_CALLBACK(CanParsedData_t* msg_data_a) { // todo check if deprecated?
+// Updates the status of cooling elements from the PDU 
+void coolant_out_CALLBACK(CanParsedData_t* msg_data_a) {
     cooling_elements[0].current_value = msg_data_a->coolant_out.dt_fan;
     cooling_elements[1].current_value = msg_data_a->coolant_out.dt_pump;
     cooling_elements[2].current_value = msg_data_a->coolant_out.bat_fan;
     cooling_elements[3].current_value = msg_data_a->coolant_out.bat_pump;
 
-    // needed?
-    // update_cooling_page() 
+    if (curr_page != PAGE_COOLING) {
+        return;
+    }
+
+    update_cooling_page();
 }
 
 void update_tv_page() {
