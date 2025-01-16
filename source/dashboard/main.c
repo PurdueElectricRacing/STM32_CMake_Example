@@ -134,10 +134,6 @@ ClockRateConfig_t clock_config = {
     .apb2_clock_target_hz       =(TargetCoreClockrateHz / (1)),
 };
 
-lcd_t lcd_data = {
-    .encoder_position = 0,
-};
-
 /* Locals for Clock Rates */
 extern uint32_t APB1ClockRateHz;
 extern uint32_t APB2ClockRateHz;
@@ -146,8 +142,7 @@ extern uint32_t PLLClockRateHz;
 
 // LCD Variables
 extern page_t curr_page;
-volatile int8_t prev_rot_state = 0;
-static volatile uint8_t dashboard_input;
+dashboard_input_state_t input_state = {0}; // Clear all input states
 
 /* Function Prototypes */
 void preflightChecks(void);
@@ -157,12 +152,13 @@ void usartTxUpdate();
 extern void HardFault_Handler();
 void enableInterrupts();
 void encoder_ISR();
-void pollDashboardInput();
+void handleDashboardInputs();
 void sendBrakeStatus();
 void interpretLoadSensor(void);
 void send_shockpots();
 float voltToForce(uint16_t load_read);
 void sendVoltageData();
+void zeroEncoder();
 
 // Communication queues
 q_handle_t q_tx_usart;
@@ -206,7 +202,7 @@ int main(void){
     taskCreate(updateFaultPageIndicators, 500);
     taskCreate(heartBeatLED, 500);
     taskCreate(pedalsPeriodic, 15);
-    taskCreate(pollDashboardInput, 25);
+    taskCreate(handleDashboardInputs, 50);
     taskCreate(heartBeatTask, 100);
     taskCreate(send_shockpots, 15);
     taskCreate(interpretLoadSensor, 15);
@@ -221,19 +217,6 @@ int main(void){
     schedStart();
 
     return 0;
-}
-
-// Call initially to ensure the LCD is initialized to the proper value -
-// should be replaced with the struct prev page stuff eventually
-int zeroEncoder(volatile int8_t* start_pos) {
-    // Collect initial raw reading from encoder
-    uint8_t raw_enc_a = PHAL_readGPIO(ENC_A_GPIO_Port, ENC_A_Pin);
-    uint8_t raw_enc_b = PHAL_readGPIO(ENC_B_GPIO_Port, ENC_B_Pin);
-    uint8_t raw_res = (raw_enc_b | (raw_enc_a << 1));
-    *start_pos = raw_res;
-    lcd_data.encoder_position = 0;
-
-    return 1;
 }
 
 void preflightChecks(void) {
@@ -280,7 +263,7 @@ void preflightChecks(void) {
             break;
         case 6:
             // Zero Rotary Encoder
-            zeroEncoder(&prev_rot_state);
+            zeroEncoder();
             break;
         default:
             registerPreflightComplete(1);
@@ -407,78 +390,89 @@ void heartBeatLED()
     trig = !trig;
 }
 
-static volatile uint32_t last_click_time;
+static volatile uint32_t last_input_time;
 
 void EXTI9_5_IRQHandler(void) {
-    // EXTI9 triggered the interrupt (ENC_B_FLT)
+    // EXTI9 (ENCODER B) triggered the interrupt
     if (EXTI->PR & EXTI_PR_PR9) {
         encoder_ISR();
-        dashboard_input |= (1 << DASH_INPUT_ROT_ENC);
+        input_state.update_page = 1;    // Set flag to update page
         EXTI->PR |= EXTI_PR_PR9;        // Clear the interrupt pending bit for EXTI9
 
     }
 }
 
 void EXTI15_10_IRQHandler() {
-    // EXTI10 triggered the interrupt (ENC_A_FLT)
-    if (EXTI->PR & EXTI_PR_PR10) {
+    // EXTI10 (ENCODER A) triggered the interrupt
+    if (EXTI->PR & EXTI_PR_PR10)
+    {
         encoder_ISR();
-        dashboard_input |= (1 << DASH_INPUT_ROT_ENC);
-        EXTI->PR |= EXTI_PR_PR10;       // Clear the interrupt pending bit for EXTI14
+        input_state.update_page = 1;    // Set flag to update page
+        EXTI->PR |= EXTI_PR_PR10;       // Clear the interrupt pending bit for EXTI10
     }
 
-    // EXTI14 triggered the interrupt (B1_FLT)
-    // This is the TOP button on the dashboard
-    if (EXTI->PR & EXTI_PR_PR14) {
-        if (sched.os_ticks - last_click_time < 100) {
-            last_click_time = sched.os_ticks;
+    // EXTI14 (UP Button) triggered the interrupt
+    if (EXTI->PR & EXTI_PR_PR14)
+    {
+        if (sched.os_ticks - last_input_time < 100) {
+            last_input_time = sched.os_ticks;
             EXTI->PR |= EXTI_PR_PR14;       // Clear the interrupt pending bit for EXTI14
         }
         else {
-            last_click_time = sched.os_ticks;
-            dashboard_input |= (1 << DASH_INPUT_UP_BUTTON);
+            last_input_time = sched.os_ticks;
+            input_state.up_button = 1;      // Set flag for up button
             EXTI->PR |= EXTI_PR_PR14;       // Clear the interrupt pending bit for EXTI14
         }
     }
 
-    // EXTI13 triggered the interrupt (B2_FLT)
-    // This is the MIDDLE button on the dashbaord
+    // EXTI13 (DOWN button) triggered the interrupt
     if (EXTI->PR & EXTI_PR_PR13)
     {
-        if (sched.os_ticks - last_click_time < 100) {
-            last_click_time = sched.os_ticks;
+        if (sched.os_ticks - last_input_time < 100) {
+            last_input_time = sched.os_ticks;
             EXTI->PR |= EXTI_PR_PR13;       // Clear the interrupt pending bit for EXTI13
         }
         else
         {
-            last_click_time = sched.os_ticks;
-            dashboard_input |= (1 << DASH_INPUT_DOWN_BUTTON);
+            last_input_time = sched.os_ticks;
+            input_state.down_button = 1;    // Set flag for down button
             EXTI->PR |= EXTI_PR_PR13;       // Clear the interrupt pending bit for EXTI13
         }
     }
 
-    // EXTI12 triggered the interrupt (B3_FLT)
-    // This is the BOTTOM button on the dashboard
+    // EXTI12 (SELECT button) triggered the interrupt
     if (EXTI->PR & EXTI_PR_PR12)
     {
-        if (sched.os_ticks - last_click_time < 100) {
-            last_click_time = sched.os_ticks;
+        if (sched.os_ticks - last_input_time < 100) {
+            last_input_time = sched.os_ticks;
             EXTI->PR |= EXTI_PR_PR12;       // Clear the interrupt pending bit for EXTI12
         }
         else
         {
-            last_click_time = sched.os_ticks;
-            dashboard_input |= (1 << DASH_INPUT_SELECT_BUTTON);
+            last_input_time = sched.os_ticks;
+            input_state.select_button = 1;  // Set flag for select button
             EXTI->PR |= EXTI_PR_PR12;       // Clear the interrupt pending bit for EXTI12
         }
     }
 
-    // EXTI11 triggered the interrupt (START_FLT)
-    if (EXTI->PR & EXTI_PR_PR11) {
+    // EXTI11 (START button) triggered the interrupt
+    if (EXTI->PR & EXTI_PR_PR11)
+    {
         PHAL_toggleGPIO(ERROR_LED_GPIO_Port, ERROR_LED_Pin); // Toggle LED for testing
-        dashboard_input |= (1 << DASH_INPUT_START_BUTTON);
         EXTI->PR |= EXTI_PR_PR11;       // Clear the interrupt pending bit for EXTI11
     }
+}
+
+
+// Call initially to ensure the LCD is initialized to the proper value -
+// should be replaced with the struct prev page stuff eventually
+void zeroEncoder() {
+    // Collect initial raw reading from encoder
+    uint8_t raw_enc_a = PHAL_readGPIO(ENC_A_GPIO_Port, ENC_A_Pin);
+    uint8_t raw_enc_b = PHAL_readGPIO(ENC_B_GPIO_Port, ENC_B_Pin);
+    uint8_t raw_res = (raw_enc_b | (raw_enc_a << 1));
+    input_state.prev_encoder_position = raw_res;
+    input_state.encoder_position = 0;
 }
 
 void encoder_ISR() {
@@ -495,19 +489,48 @@ void encoder_ISR() {
     uint8_t current_state = (raw_enc_b | (raw_enc_a << 1));
 
     // Get direction from the state transition table
-    int8_t direction = encoder_transition_table[prev_rot_state][current_state];
+    int8_t direction = encoder_transition_table[input_state.prev_encoder_position][current_state];
 
     if (direction != 0) {
-        lcd_data.encoder_position += direction;
+        input_state.encoder_position += direction;
 
-        if (lcd_data.encoder_position >= LCD_NUM_PAGES) {
-            lcd_data.encoder_position -= LCD_NUM_PAGES;
-        } else if (lcd_data.encoder_position < 0) {
-            lcd_data.encoder_position += LCD_NUM_PAGES;
+        if (input_state.encoder_position >= LCD_NUM_PAGES) {
+            input_state.encoder_position -= LCD_NUM_PAGES;
+        } else if (input_state.encoder_position < 0) { // Wrap around
+            input_state.encoder_position += LCD_NUM_PAGES;
         }
     }
 
-    prev_rot_state = current_state;
+    input_state.prev_encoder_position = current_state;
+}
+
+// Handle Dashboard User Inputs periodically
+void handleDashboardInputs()
+{
+    if (input_state.up_button) {
+        input_state.up_button = 0;
+        moveUp();
+    }
+
+    if (input_state.down_button) {
+        input_state.down_button = 0;
+        moveDown();
+    }
+
+    if (input_state.select_button) {
+        input_state.select_button = 0;
+        selectItem();
+    }
+
+    if (input_state.update_page) {
+        input_state.update_page = 0;
+        updatePage();
+    }
+
+    if (input_state.start_button) {
+        input_state.start_button = 0;
+        SEND_START_BUTTON(1);
+    }
 }
 
 void enableInterrupts()
@@ -567,56 +590,6 @@ void dashboard_bl_cmd_CALLBACK(CanParsedData_t *msg_data_a)
         Bootloader_ResetForFirmwareDownload();
 }
 
-// Poll for Dashboard User Input
-void pollDashboardInput()
-{
-    static uint8_t upButtonBuffer;
-    static uint8_t downButtonBuffer;
-
-    // Check for Encoder Input
-    upButtonBuffer <<= 1;
-    if (PHAL_readGPIO(B_UP_GPIO_Port, B_UP_Pin) == 0)
-    {
-        upButtonBuffer |= 1;
-    }
-    upButtonBuffer &= 0b00011111;
-    if (upButtonBuffer == 0b00000001)
-    {
-        moveUp();
-    }
-
-    downButtonBuffer <<= 1;
-    if (PHAL_readGPIO(B_DOWN_GPIO_Port, B_DOWN_Pin) == 0)
-    {
-        downButtonBuffer |= 1;
-    }
-    downButtonBuffer &= 0b00011111;
-    if (downButtonBuffer == 0b00000001)
-    {
-        moveDown();
-    }
-
-    if (dashboard_input & (1U << DASH_INPUT_ROT_ENC))
-    {
-        updatePage();
-        dashboard_input &= ~(1U << DASH_INPUT_ROT_ENC);
-    }
-
-    // Check for Start Button Pressed
-    if (dashboard_input & (1U << DASH_INPUT_START_BUTTON))
-    {
-        SEND_START_BUTTON(1);                     // Report start button pressed
-        dashboard_input &= ~(1U << DASH_INPUT_START_BUTTON);
-    }
-
-    // Check Select Item Pressed
-    if (dashboard_input & (1U << DASH_INPUT_SELECT_BUTTON))
-    {
-        selectItem();
-        dashboard_input &= ~(1U << DASH_INPUT_SELECT_BUTTON);
-    }
-}
-
 void sendVoltageData()
 {
     float adc_to_voltage = ADC_REF_VOLTAGE / 4095.0;
@@ -640,5 +613,5 @@ void sendVoltageData()
 void HardFault_Handler()
 {
    schedPause();
-   while(1) IWDG->KR = 0xAAAA;
+   while(1) IWDG->KR = 0xAAAA; // Reset watchdog
 }

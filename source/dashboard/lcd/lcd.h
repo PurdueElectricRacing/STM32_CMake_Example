@@ -136,10 +136,6 @@ typedef enum {
 } page_t;
 
 typedef struct {
-  volatile int8_t encoder_position;
-} lcd_t;
-
-typedef struct {
   void (*update)(void);
   void (*move_up)(void);
   void (*move_down)(void);

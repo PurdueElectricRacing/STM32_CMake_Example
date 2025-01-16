@@ -19,9 +19,9 @@ volatile uint16_t fault_buf[5] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};   // 
 char *errorText;                        // Pointer to data to display for the Error, Warning, and Critical Fault codes
 extern uint16_t filtered_pedals;        // Global from pedals module for throttle display
 extern q_handle_t q_fault_history;      // Global queue from fault library for fault history
-extern lcd_t lcd_data;
 uint8_t fault_time_displayed;           // Amount of units of time that the fault has been shown to the driver
 extern driver_profile_t driver_profiles[4];
+extern dashboard_input_state_t input_state; // Global dashboard input states 
 
 
 // Driver Page Functions
@@ -110,6 +110,7 @@ menu_element_t cooling_elements[] = {
         .min_value = 0,
         .max_value = 100,
         .increment = 25,
+        .on_change = sendCoolingParameters
     },
     {
         .type = ELEMENT_OPTION,
@@ -124,6 +125,7 @@ menu_element_t cooling_elements[] = {
         .min_value = 0,
         .max_value = 100,
         .increment = 25,
+        .on_change = sendCoolingParameters
     },
     {
         .type = ELEMENT_OPTION,
@@ -324,7 +326,7 @@ void updatePage() {
     bool is_error_page = (curr_page == PAGE_ERROR) || (curr_page == PAGE_WARNING) || (curr_page == PAGE_FATAL);
     
     if (!is_error_page) {
-        curr_page = lcd_data.encoder_position;
+        curr_page = input_state.encoder_position;
         fault_time_displayed = 0;
     }
 
