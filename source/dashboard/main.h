@@ -49,17 +49,15 @@ typedef struct __attribute__((packed))
 
 volatile extern raw_adc_values_t raw_adc_values;
 
-typedef enum
-{
-    DASH_INPUT_NONE,
-    DASH_INPUT_ROT_ENC,
-    DASH_INPUT_UP_BUTTON,
-    DASH_INPUT_DOWN_BUTTON,
-    DASH_INPUT_SELECT_BUTTON,
-    DASH_INPUT_START_BUTTON,
-    DASH_INPUT_COUNT,
-    DASH_INPUT_INVALID,
-} dashboard_input_t;
+typedef struct {
+  volatile int8_t encoder_position;
+  volatile int8_t prev_encoder_position;
+  volatile uint8_t update_page;
+  volatile uint8_t up_button;
+  volatile uint8_t down_button;
+  volatile uint8_t select_button;
+  volatile uint8_t start_button;
+} dashboard_input_state_t;
 
 // Status LED Indicators
 #define CONN_LED_GPIO_Port          (GPIOE)
