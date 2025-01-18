@@ -78,7 +78,7 @@
 #define DLC_DASHBOARD_TV_PARAMETERS 7
 #define DLC_MAIN_HB 2
 #define DLC_REAR_WHEEL_SPEEDS 8
-#define DLC_REAR_MOTOR_TEMPS 4
+#define DLC_REAR_MOTOR_TEMPS 6
 #define DLC_MAX_CELL_TEMP 2
 #define DLC_FAULT_SYNC_PDU 3
 #define DLC_FAULT_SYNC_MAIN_MODULE 3
@@ -349,8 +349,10 @@ typedef union {
     struct {
         uint64_t left_mot_temp: 8;
         uint64_t right_mot_temp: 8;
-        uint64_t left_ctrl_temp: 8;
-        uint64_t right_ctrl_temp: 8;
+        uint64_t left_inv_temp: 8;
+        uint64_t right_inv_temp: 8;
+        uint64_t left_igbt_temp: 8;
+        uint64_t right_igbt_temp: 8;
     } rear_motor_temps;
     struct {
         uint64_t max_temp: 16;
@@ -442,8 +444,10 @@ typedef struct {
     struct {
         uint8_t left_mot_temp;
         uint8_t right_mot_temp;
-        uint8_t left_ctrl_temp;
-        uint8_t right_ctrl_temp;
+        uint8_t left_inv_temp;
+        uint8_t right_inv_temp;
+        uint8_t left_igbt_temp;
+        uint8_t right_igbt_temp;
         uint8_t stale;
         uint32_t last_rx;
     } rear_motor_temps;

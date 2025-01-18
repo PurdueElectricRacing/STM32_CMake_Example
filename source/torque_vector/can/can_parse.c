@@ -101,8 +101,10 @@ void canRxUpdate()
             case ID_REAR_MOTOR_TEMPS:
                 can_data.rear_motor_temps.left_mot_temp = msg_data_a->rear_motor_temps.left_mot_temp;
                 can_data.rear_motor_temps.right_mot_temp = msg_data_a->rear_motor_temps.right_mot_temp;
-                can_data.rear_motor_temps.left_ctrl_temp = msg_data_a->rear_motor_temps.left_ctrl_temp;
-                can_data.rear_motor_temps.right_ctrl_temp = msg_data_a->rear_motor_temps.right_ctrl_temp;
+                can_data.rear_motor_temps.left_inv_temp = msg_data_a->rear_motor_temps.left_inv_temp;
+                can_data.rear_motor_temps.right_inv_temp = msg_data_a->rear_motor_temps.right_inv_temp;
+                can_data.rear_motor_temps.left_igbt_temp = msg_data_a->rear_motor_temps.left_igbt_temp;
+                can_data.rear_motor_temps.right_igbt_temp = msg_data_a->rear_motor_temps.right_igbt_temp;
                 can_data.rear_motor_temps.stale = 0;
                 can_data.rear_motor_temps.last_rx = sched.os_ticks;
                 break;

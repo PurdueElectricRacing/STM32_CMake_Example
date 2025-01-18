@@ -8,16 +8,21 @@
 can_stats_t can_stats;
 
 // TODO: support CAN2
+// CAN2 cannot happen in here, move it over to MAIN stuff
 q_handle_t q_tx_can1_s[CAN_TX_MAILBOX_CNT];
+q_handle_t q_tx_can2_s[CAN_TX_MAILBOX_CNT];
 q_handle_t q_rx_can;
-uint32_t mbx_last_send_time[CAN_TX_MAILBOX_CNT];
+uint32_t can1_mbx_last_send_time[CAN_TX_MAILBOX_CNT];
+uint32_t can2_mbx_last_send_time[CAN_TX_MAILBOX_CNT];
 
 void initCANParseBase()
 {
     for (uint8_t i = 0; i < CAN_TX_MAILBOX_CNT; ++i)
     {
         qConstruct(&q_tx_can1_s[i], sizeof(CanMsgTypeDef_t));
-        mbx_last_send_time[i] = 0;
+        qConstruct(&q_tx_can2_s[i], sizeof(CanMsgTypeDef_t));
+        can1_mbx_last_send_time[i] = 0;
+        can2_mbx_last_send_time[i] = 0;
     }
     qConstruct(&q_rx_can, sizeof(CanMsgTypeDef_t));
     can_stats = (can_stats_t){0};
@@ -33,20 +38,38 @@ void canTxSendToBack(CanMsgTypeDef_t *msg)
         {
             case 0:
             case 1:
-                qh = &q_tx_can1_s[0];
+                if (msg->Bus == CAN1) {
+                    qh = &q_tx_can1_s[0];
+                } else {
+                    qh = &q_tx_can2_s[0];
+                }
                 break;
             case 2:
             case 3:
-                qh = &q_tx_can1_s[1];
+                if (msg->Bus == CAN1) {
+                    qh = &q_tx_can1_s[1];
+                } else {
+                    qh = &q_tx_can2_s[1];
+                }
                 break;
             default:
-                qh = &q_tx_can1_s[2];
+                if (msg->Bus == CAN1) {
+                    qh = &q_tx_can1_s[2];
+                } else {
+                    qh = &q_tx_can2_s[2];
+                }
                 break;
         }
     }
     else
     {
-        qh = &q_tx_can1_s[0]; // IDE = 0 doesn't have an HLP
+        // IDE = 0 doesn't have an HLP
+        if (msg->Bus == CAN1) {
+            qh = &q_tx_can1_s[0];
+        } else {
+            qh = &q_tx_can2_s[0];
+        }
+        // qh = &q_tx_can1_s[0]; // IDE = 0 doesn't have an HLP
     }
     if (qSendToBack(qh, msg) != SUCCESS_G)
     {
@@ -66,10 +89,10 @@ void canTxUpdate(void)
             if (qReceive(&q_tx_can1_s[i], &tx_msg) == SUCCESS_G)    // Check queue for items and take if there is one
             {
                 PHAL_txCANMessage(&tx_msg, i);
-                mbx_last_send_time[i] = sched.os_ticks;
+                can1_mbx_last_send_time[i] = sched.os_ticks;
             }
         }
-        else if (sched.os_ticks - mbx_last_send_time[i] > CAN_TX_TIMEOUT_MS)
+        else if (sched.os_ticks - can1_mbx_last_send_time[i] > CAN_TX_TIMEOUT_MS)
         {
             PHAL_txCANAbort(CAN1, i); // aborts tx and empties the mailbox
             can_stats.tx_fail++;

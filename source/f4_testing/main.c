@@ -4,6 +4,7 @@
 #include "common/phal_F4_F7/dma/dma.h"
 #include "common/phal_F4_F7/spi/spi.h"
 #include "common/phal_F4_F7/usart/usart.h"
+#include "common/phal_F4_F7/can/can.h"
 #include "common/psched/psched.h"
 #include "string.h"
 
@@ -62,6 +63,10 @@ GPIOInitConfig_t gpio_config[] = {
     GPIO_INIT_AF(SPI_SCK_PORT, SPI_SCK_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
     GPIO_INIT_AF(SPI_MOSI_PORT, SPI_MOSI_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
     GPIO_INIT_AF(SPI_MISO_PORT, SPI_MISO_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_OPEN_DRAIN, GPIO_INPUT_OPEN_DRAIN),
+
+    // CAN
+    GPIO_INIT_CANRX_PA11,
+    GPIO_INIT_CANTX_PA12,
 
 };
 
@@ -138,6 +143,11 @@ int main()
     PHAL_startTxfer(&adc_dma_config);
     PHAL_startADC(ADC1);
     PHAL_usartRxDma(&lcd, (uint16_t *) msg, 5, 1);
+    if(!PHAL_initCAN(CAN1, false, VCAN_BPS))
+    {
+        HardFault_Handler();
+    }
+    NVIC_EnableIRQ(CAN1_RX0_IRQn);
         /* Task Creation */
     schedInit(APB1ClockRateHz);
         taskCreate(ledblink, 50);
