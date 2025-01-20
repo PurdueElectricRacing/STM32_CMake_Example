@@ -78,16 +78,16 @@ typedef struct {
     uint8_t brake_travel_threshold;
     uint8_t throttle_travel_threshold;
     uint8_t reserved;
-} driver_profile_t;
+} driver_pedal_profile_t;
 
 extern pedal_calibration_t pedal_calibration;
 extern uint16_t filtered_pedals;
 extern uint16_t thtl_limit;
-extern driver_profile_t driver_profiles[4];
+extern driver_pedal_profile_t driver_pedal_profiles[4];
 
 /* Function Prototypes */
 void pedalsPeriodic(void);
-int writeProfiles(void);
-void readProfiles(void);
+int writePedalProfiles(void);
+void readPedalProfiles(void);
 
 #endif

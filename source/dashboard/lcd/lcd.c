@@ -21,7 +21,7 @@ extern uint16_t filtered_pedals;        // Global from pedals module for throttl
 extern q_handle_t q_tx_can;             // Global queue for CAN tx
 extern q_handle_t q_fault_history;      // Global queue from fault library for fault history
 uint8_t fault_time_displayed;           // Amount of units of time that the fault has been shown to the driver
-extern driver_profile_t driver_profiles[4];
+extern driver_pedal_profile_t driver_pedal_profiles[4];
 extern dashboard_input_state_t input_state; // Global dashboard input states 
 
 
@@ -318,7 +318,7 @@ void initLCD() {
     set_baud(115200);
     set_brightness(100);
 
-    readProfiles();
+    readPedalProfiles();
     profile_page.saved = true;
 
     // Set page (leave preflight)
@@ -346,27 +346,45 @@ void updatePage() {
 
     // Set the page on display
     switch (curr_page) {
-        case PAGE_RACE: set_page(RACE_STRING); break;
-        case PAGE_COOLING: set_page(COOLING_STRING); break;
-        case PAGE_TVSETTINGS: set_page(TVSETTINGS_STRING); break;
-        case PAGE_FAULTS: set_page(FAULT_STRING); break;
-        case PAGE_SDCINFO: set_page(SDCINFO_STRING); break;
-        case PAGE_DRIVER: set_page(DRIVER_STRING); break;
-        case PAGE_PROFILES: set_page(DRIVER_CONFIG_STRING); break;
-        case PAGE_LOGGING: set_page(LOGGING_STRING); break;
-        case PAGE_APPS: set_page(APPS_STRING); break;
-        case PAGE_WARNING:
-            set_page(WARN_STRING);
-            set_text(ERR_TXT, errorText);
-            return;
-        case PAGE_ERROR:
-            set_page(ERR_STRING);
-            set_text(ERR_TXT, errorText);
-            return;
-        case PAGE_FATAL:
-            set_page(FATAL_STRING);
-            set_text(ERR_TXT, errorText);
-            return;
+    case PAGE_RACE:
+      set_page(RACE_STRING);
+      break;
+    case PAGE_COOLING:
+      set_page(COOLING_STRING);
+      break;
+    case PAGE_TVSETTINGS:
+      set_page(TVSETTINGS_STRING);
+      break;
+    case PAGE_FAULTS:
+      set_page(FAULT_STRING);
+      break;
+    case PAGE_SDCINFO:
+      set_page(SDCINFO_STRING);
+      break;
+    case PAGE_DRIVER:
+      set_page(DRIVER_STRING);
+      break;
+    case PAGE_PROFILES:
+      set_page(DRIVER_CONFIG_STRING);
+      break;
+    case PAGE_LOGGING:
+      set_page(LOGGING_STRING);
+      break;
+    case PAGE_APPS:
+      set_page(APPS_STRING);
+      break;
+    case PAGE_WARNING:
+      set_page(WARN_STRING);
+      set_text(ERR_TXT, errorText);
+      return;
+    case PAGE_ERROR:
+      set_page(ERR_STRING);
+      set_text(ERR_TXT, errorText);
+      return;
+    case PAGE_FATAL:
+      set_page(FATAL_STRING);
+      set_text(ERR_TXT, errorText);
+      return;
     }
 
     // Call update handler if available
@@ -638,8 +656,8 @@ void update_profile_page() { // todo this function is kinda jank
         case 3: set_text(PROFILE_CURRENT_TXT, DRIVER4_NAME); break;
     }
     
-    profile_elements[0].current_value = driver_profiles[driver_index].brake_travel_threshold;
-    profile_elements[1].current_value = driver_profiles[driver_index].throttle_travel_threshold;
+    profile_elements[0].current_value = driver_pedal_profiles[driver_index].brake_travel_threshold;
+    profile_elements[1].current_value = driver_pedal_profiles[driver_index].throttle_travel_threshold;
 
     // Update display and styling
     menu_refresh_page(&profile_page);
@@ -669,10 +687,10 @@ void select_profile() {
     if (profile_page.current_index == 2) { // Save button
         int driver_index = menu_list_get_selected(&driver_page);
         // Save profile values
-        driver_profiles[driver_index].brake_travel_threshold = profile_elements[0].current_value;
-        driver_profiles[driver_index].throttle_travel_threshold = profile_elements[1].current_value;
+        driver_pedal_profiles[driver_index].brake_travel_threshold = profile_elements[0].current_value;
+        driver_pedal_profiles[driver_index].throttle_travel_threshold = profile_elements[1].current_value;
 
-        if (PROFILE_WRITE_SUCCESS != writeProfiles()) {
+        if (PROFILE_WRITE_SUCCESS != writePedalProfiles()) {
             profile_page.saved = false;
             set_font_color(PROFILE_STATUS_TXT, RED);
             set_text(PROFILE_STATUS_TXT, "FAILED");
