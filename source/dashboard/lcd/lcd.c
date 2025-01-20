@@ -53,6 +53,7 @@ void update_faults_page();
 void move_up_faults();
 void move_down_faults();
 void select_fault();
+void update_fault_messages();
 void fault_button_callback();
 
 // Race Page Functions
@@ -60,8 +61,10 @@ void update_race_telemetry();
 void update_race_page();
 void select_race();
 
+// Warning/Error/Fatal Page Functions
 void select_error_page();
 
+// DAQ Logging Page Functions
 void update_logging_page();
 void select_logging();
 
@@ -413,6 +416,12 @@ void update_apps_telemetry() {
     if (checkFault(ID_IMPLAUS_DETECTED_FAULT)) {
         set_text(APPS_STATUS, "IMP Detected");
         set_font_color(APPS_STATUS, RED);
+    } else if (checkFault(ID_APPS_WIRING_T1_FAULT)) {
+        set_text(APPS_STATUS, "T1 Wiring");
+        set_font_color(APPS_STATUS, RED);
+    } else if (checkFault(ID_APPS_WIRING_T2_FAULT)) {
+        set_text(APPS_STATUS, "T2 Wiring");
+        set_font_color(APPS_STATUS, RED);
     } else {
         set_text(APPS_STATUS, "CLEAR");
         set_font_color(APPS_STATUS, GREEN);
@@ -746,7 +755,7 @@ void select_tv() {
     race_elements[0].current_value = tv_elements[3].current_value; // Sync TV settings
 }
 
-void update_faults_page() {
+void update_fault_messages() {
     if (fault_buf[0] == 0xFFFF) {
         set_text(FAULT1_TXT, FAULT_NONE_STRING);
     } else {
@@ -776,6 +785,10 @@ void update_faults_page() {
     } else {
         set_text(FAULT5_TXT, faultArray[fault_buf[4]].screen_MSG);
     }
+}
+
+void update_faults_page() {
+    update_fault_messages();
 
     menu_refresh_page(&faults_page);
 }
@@ -821,6 +834,8 @@ void fault_button_callback() {
     } else {
         clear_fault(hover_index);
     }
+
+    update_fault_messages();
 }
 
 void update_race_page() {
