@@ -25,7 +25,7 @@ uint8_t b2_idx = 0;
 
 uint16_t filtered_pedals;
 
-driver_profile_t driver_profiles[4] = {
+driver_pedal_profile_t driver_pedal_profiles[4] = {
     {0, 10,10,0},
     {1, 10,10,0},
     {2, 10,10,0},
@@ -98,7 +98,8 @@ void pedalsPeriodic(void)
 static const uint32_t* PROFILE_FLASH_START = (uint32_t*)ADDR_FLASH_SECTOR_3;
 static volatile uint32_t* profile_current_address;
 
-int writeProfiles() { // TODO switch to EEPROM
+// TODO move to main
+int writePedalProfiles() { // TODO switch to EEPROM
     profile_current_address = (volatile uint32_t*)PROFILE_FLASH_START;
 
     if (FLASH_OK != PHAL_flashErasePage(PROFILES_START_SECTOR)) { // !! Fix the crash here
@@ -107,7 +108,7 @@ int writeProfiles() { // TODO switch to EEPROM
 
     for (uint8_t i = 0; i < NUM_PROFILES; ++i) {
         if (FLASH_OK != PHAL_flashWriteU32((uint32_t)profile_current_address, 
-                                         *(uint32_t*)&driver_profiles[i])) {
+                                         *(uint32_t*)&driver_pedal_profiles[i])) {
             return PROFILE_WRITE_FAIL;
         }
         profile_current_address++;
@@ -116,13 +117,13 @@ int writeProfiles() { // TODO switch to EEPROM
     return PROFILE_WRITE_SUCCESS;
 }
 
-void readProfiles() {
+void readPedalProfiles() {
     uint32_t read_address = ADDR_FLASH_SECTOR_11;
 
     for (uint8_t i = 0; i < NUM_PROFILES; ++i) {
-        uint32_t *data = (uint32_t *)&driver_profiles[i];
+        uint32_t *data = (uint32_t *)&driver_pedal_profiles[i];
         *data = *((uint32_t *)read_address);
 
-        read_address += sizeof(driver_profile_t);
+        read_address += sizeof(driver_pedal_profile_t);
     }
 }

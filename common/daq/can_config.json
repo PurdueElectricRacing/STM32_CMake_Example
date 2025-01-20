@@ -703,7 +703,7 @@
                             "signals":[
                                 {"sig_name": "mcu_temp", "type":"int16_t"}
                             ],
-                            "msg_period":500,
+                            "msg_period":4000,
                             "msg_hlp":4,
                             "msg_pgn":101
                         },
