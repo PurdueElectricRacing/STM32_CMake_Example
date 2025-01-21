@@ -36,6 +36,7 @@ void update_profile_page();
 void move_up_profile();
 void move_down_profile();
 void select_profile();
+void profile_save_button_callback();
 
 // Cooling Page Functions
 void update_cooling_page();
@@ -263,7 +264,7 @@ menu_page_t driver_page = {
 // Profile page menu elements
 menu_element_t profile_elements[] = {
     {
-        .type = ELEMENT_VAL,
+        .type = ELEMENT_FLT,
         .object_name = PROFILE_BRAKE_FLT,
         .current_value = 0,
         .min_value = 0,
@@ -271,7 +272,7 @@ menu_element_t profile_elements[] = {
         .increment = 5,
     },
     {
-        .type = ELEMENT_VAL,
+        .type = ELEMENT_FLT,
         .object_name = PROFILE_THROTTLE_FLT,
         .current_value = 0,
         .min_value = 0,
@@ -281,7 +282,7 @@ menu_element_t profile_elements[] = {
     {
         .type = ELEMENT_BUTTON,
         .object_name = PROFILE_SAVE_BUTTON,
-        .on_change = NULL // todo replace with save function
+        .on_change = profile_save_button_callback
     }
 };
 
@@ -346,45 +347,45 @@ void updatePage() {
 
     // Set the page on display
     switch (curr_page) {
-    case PAGE_RACE:
-      set_page(RACE_STRING);
-      break;
-    case PAGE_COOLING:
-      set_page(COOLING_STRING);
-      break;
-    case PAGE_TVSETTINGS:
-      set_page(TVSETTINGS_STRING);
-      break;
-    case PAGE_FAULTS:
-      set_page(FAULT_STRING);
-      break;
-    case PAGE_SDCINFO:
-      set_page(SDCINFO_STRING);
-      break;
-    case PAGE_DRIVER:
-      set_page(DRIVER_STRING);
-      break;
-    case PAGE_PROFILES:
-      set_page(DRIVER_CONFIG_STRING);
-      break;
-    case PAGE_LOGGING:
-      set_page(LOGGING_STRING);
-      break;
-    case PAGE_APPS:
-      set_page(APPS_STRING);
-      break;
-    case PAGE_WARNING:
-      set_page(WARN_STRING);
-      set_text(ERR_TXT, errorText);
-      return;
-    case PAGE_ERROR:
-      set_page(ERR_STRING);
-      set_text(ERR_TXT, errorText);
-      return;
-    case PAGE_FATAL:
-      set_page(FATAL_STRING);
-      set_text(ERR_TXT, errorText);
-      return;
+        case PAGE_RACE:
+            set_page(RACE_STRING);
+            break;
+        case PAGE_COOLING:
+            set_page(COOLING_STRING);
+            break;
+        case PAGE_TVSETTINGS:
+            set_page(TVSETTINGS_STRING);
+            break;
+        case PAGE_FAULTS:
+            set_page(FAULT_STRING);
+            break;
+        case PAGE_SDCINFO:
+            set_page(SDCINFO_STRING);
+            break;
+        case PAGE_DRIVER:
+            set_page(DRIVER_STRING);
+            break;
+        case PAGE_PROFILES:
+            set_page(DRIVER_CONFIG_STRING);
+            break;
+        case PAGE_LOGGING:
+            set_page(LOGGING_STRING);
+            break;
+        case PAGE_APPS:
+            set_page(APPS_STRING);
+            break;
+        case PAGE_WARNING:
+            set_page(WARN_STRING);
+            set_text(ERR_TXT, errorText);
+            return;
+        case PAGE_ERROR:
+            set_page(ERR_STRING);
+            set_text(ERR_TXT, errorText);
+            return;
+        case PAGE_FATAL:
+            set_page(FATAL_STRING);
+            set_text(ERR_TXT, errorText);
+            return;
     }
 
     // Call update handler if available
@@ -642,18 +643,26 @@ void select_driver() {
     menu_select(&driver_page);
 }
 
-void update_profile_page() { // todo this function is kinda jank
+void update_profile_page() {
     // Update displayed driver name
     int driver_index = menu_list_get_selected(&driver_page);
     if (driver_index < 0) {
         return;
     }
     
-    switch (driver_index) { 
-        case 0: set_text(PROFILE_CURRENT_TXT, DRIVER1_NAME); break;
-        case 1: set_text(PROFILE_CURRENT_TXT, DRIVER2_NAME); break;
-        case 2: set_text(PROFILE_CURRENT_TXT, DRIVER3_NAME); break;
-        case 3: set_text(PROFILE_CURRENT_TXT, DRIVER4_NAME); break;
+    switch (driver_index) {
+        case 0:
+            set_text(PROFILE_CURRENT_TXT, DRIVER1_NAME);
+            break;
+        case 1:
+            set_text(PROFILE_CURRENT_TXT, DRIVER2_NAME);
+            break;
+        case 2:
+            set_text(PROFILE_CURRENT_TXT, DRIVER3_NAME);
+            break;
+        case 3:
+            set_text(PROFILE_CURRENT_TXT, DRIVER4_NAME);
+            break;
     }
     
     profile_elements[0].current_value = driver_pedal_profiles[driver_index].brake_travel_threshold;
@@ -684,24 +693,6 @@ void move_down_profile() {
 }
 
 void select_profile() {
-    if (profile_page.current_index == 2) { // Save button
-        int driver_index = menu_list_get_selected(&driver_page);
-        // Save profile values
-        driver_pedal_profiles[driver_index].brake_travel_threshold = profile_elements[0].current_value;
-        driver_pedal_profiles[driver_index].throttle_travel_threshold = profile_elements[1].current_value;
-
-        if (PROFILE_WRITE_SUCCESS != writePedalProfiles()) {
-            profile_page.saved = false;
-            set_font_color(PROFILE_STATUS_TXT, RED);
-            set_text(PROFILE_STATUS_TXT, "FAILED");
-        } else {
-            profile_page.saved = true;
-            set_font_color(PROFILE_STATUS_TXT, GREEN);
-            set_text(PROFILE_STATUS_TXT, "SAVED");
-        }
-        return;
-    }
-
     // Handle other elements using menu system
     menu_select(&profile_page);
     
@@ -710,6 +701,23 @@ void select_profile() {
         profile_page.saved = false;
         set_font_color(PROFILE_STATUS_TXT, RED);
         set_text(PROFILE_STATUS_TXT, "UNSAVED");
+    }
+}
+
+void profile_save_button_callback() {
+    int driver_index = menu_list_get_selected(&driver_page);
+    // Save profile values
+    driver_pedal_profiles[driver_index].brake_travel_threshold = profile_elements[0].current_value;
+    driver_pedal_profiles[driver_index].throttle_travel_threshold = profile_elements[1].current_value;
+
+    if (PROFILE_WRITE_SUCCESS != writePedalProfiles()) {
+        profile_page.saved = false;
+        set_font_color(PROFILE_STATUS_TXT, RED);
+        set_text(PROFILE_STATUS_TXT, "FAILED");
+    } else {
+        profile_page.saved = true;
+        set_font_color(PROFILE_STATUS_TXT, GREEN);
+        set_text(PROFILE_STATUS_TXT, "SAVED");
     }
 }
 
