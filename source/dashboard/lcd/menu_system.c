@@ -140,9 +140,10 @@ void menu_increment_value(menu_element_t *element) {
     }
 
     switch (element->type) {
-        case ELEMENT_FLT: // Fall through
-        case ELEMENT_VAL:
+        case ELEMENT_FLT:
             set_value(element->object_name, element->current_value);
+            break;
+        case ELEMENT_VAL:
             set_textf(element->object_name, "%d", element->current_value);
             break;
         default:
@@ -158,9 +159,10 @@ void menu_decrement_value(menu_element_t *element) {
     }
 
     switch (element->type) {
-        case ELEMENT_FLT: // Fall through
-        case ELEMENT_VAL:
+        case ELEMENT_FLT:
             set_value(element->object_name, element->current_value);
+            break;
+        case ELEMENT_VAL:
             set_textf(element->object_name, "%d", element->current_value);
             break;
         default:

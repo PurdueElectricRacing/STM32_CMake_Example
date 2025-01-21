@@ -3,7 +3,6 @@
 #include "main.h"
 #include "common/phal_F4_F7/gpio/gpio.h"
 #include "can_parse.h"
-#include "lcd.h"
 #include <stdint.h>
 
 pedals_t pedals = {0};
@@ -102,7 +101,8 @@ static volatile uint32_t* profile_current_address;
 int writePedalProfiles() { // TODO switch to EEPROM
     profile_current_address = (volatile uint32_t*)PROFILE_FLASH_START;
 
-    if (FLASH_OK != PHAL_flashErasePage(PROFILES_START_SECTOR)) { // !! Fix the crash here
+     // !! This will cause a crash if watchdog is enabled !!
+    if (FLASH_OK != PHAL_flashErasePage(PROFILES_START_SECTOR)) {
         return PROFILE_WRITE_FAIL;
     }
 
@@ -118,7 +118,7 @@ int writePedalProfiles() { // TODO switch to EEPROM
 }
 
 void readPedalProfiles() {
-    uint32_t read_address = ADDR_FLASH_SECTOR_11;
+    uint32_t read_address = ADDR_FLASH_SECTOR_3;
 
     for (uint8_t i = 0; i < NUM_PROFILES; ++i) {
         uint32_t *data = (uint32_t *)&driver_pedal_profiles[i];
