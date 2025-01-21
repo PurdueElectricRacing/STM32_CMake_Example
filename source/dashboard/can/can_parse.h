@@ -35,7 +35,8 @@ typedef union {
 #define ID_COOLING_DRIVER_REQUEST 0xc0002c5
 #define ID_FILT_THROTTLE_BRAKE 0x4000245
 #define ID_START_BUTTON 0x4000005
-#define ID_DASHBOARD_VOLTS_TEMP 0x10001945
+#define ID_DASHBOARD_MCU_TEMP 0x10001945
+#define ID_DASHBOARD_VOLTAGE 0x10001985
 #define ID_DASHBOARD_TV_PARAMETERS 0x4000dc5
 #define ID_DASHBOARD_START_LOGGING 0x4000e05
 #define ID_DASH_CAN_STATS 0x10016305
@@ -75,7 +76,8 @@ typedef union {
 #define DLC_COOLING_DRIVER_REQUEST 5
 #define DLC_FILT_THROTTLE_BRAKE 3
 #define DLC_START_BUTTON 1
-#define DLC_DASHBOARD_VOLTS_TEMP 6
+#define DLC_DASHBOARD_MCU_TEMP 2
+#define DLC_DASHBOARD_VOLTAGE 8
 #define DLC_DASHBOARD_TV_PARAMETERS 7
 #define DLC_DASHBOARD_START_LOGGING 1
 #define DLC_DASH_CAN_STATS 4
@@ -156,12 +158,19 @@ typedef union {
         data_a->start_button.start = start_;\
         canTxSendToBack(&msg);\
     } while(0)
-#define SEND_DASHBOARD_VOLTS_TEMP(mcu_temp_, volts_5v_, volts_3v3_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_DASHBOARD_VOLTS_TEMP, .DLC=DLC_DASHBOARD_VOLTS_TEMP, .IDE=1};\
+#define SEND_DASHBOARD_MCU_TEMP(mcu_temp_) do {\
+        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_DASHBOARD_MCU_TEMP, .DLC=DLC_DASHBOARD_MCU_TEMP, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
-        data_a->dashboard_volts_temp.mcu_temp = mcu_temp_;\
-        data_a->dashboard_volts_temp.volts_5v = volts_5v_;\
-        data_a->dashboard_volts_temp.volts_3v3 = volts_3v3_;\
+        data_a->dashboard_mcu_temp.mcu_temp = mcu_temp_;\
+        canTxSendToBack(&msg);\
+    } while(0)
+#define SEND_DASHBOARD_VOLTAGE(volts_3v3_, volts_5v_, volts_12v_, volts_24v_) do {\
+        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_DASHBOARD_VOLTAGE, .DLC=DLC_DASHBOARD_VOLTAGE, .IDE=1};\
+        CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
+        data_a->dashboard_voltage.volts_3v3 = volts_3v3_;\
+        data_a->dashboard_voltage.volts_5v = volts_5v_;\
+        data_a->dashboard_voltage.volts_12v = volts_12v_;\
+        data_a->dashboard_voltage.volts_24v = volts_24v_;\
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_DASHBOARD_TV_PARAMETERS(tv_enabled_, tv_deadband_val_, tv_intensity_val_, tv_p_val_) do {\
@@ -276,9 +285,13 @@ typedef union {
     } start_button;
     struct {
         uint64_t mcu_temp: 16;
-        uint64_t volts_5v: 16;
+    } dashboard_mcu_temp;
+    struct {
         uint64_t volts_3v3: 16;
-    } dashboard_volts_temp;
+        uint64_t volts_5v: 16;
+        uint64_t volts_12v: 16;
+        uint64_t volts_24v: 16;
+    } dashboard_voltage;
     struct {
         uint64_t tv_enabled: 1;
         uint64_t tv_deadband_val: 16;

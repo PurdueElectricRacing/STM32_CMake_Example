@@ -350,10 +350,14 @@ BO_ 2214593093 filt_throttle_brake: 3 Dashboard
 BO_ 2214592517 start_button: 1 Dashboard
  SG_ start : 0|1@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 2415925573 dashboard_volts_temp: 6 Dashboard
- SG_ volts_3v3 : 32|16@1+ (1,0) [0|0] "" Vector__XXX
- SG_ volts_5v : 16|16@1+ (1,0) [0|0] "" Vector__XXX
+BO_ 2415925573 dashboard_mcu_temp: 2 Dashboard
  SG_ mcu_temp : 0|16@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 2415925637 dashboard_voltage: 8 Dashboard
+ SG_ volts_24v : 48|16@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ volts_12v : 32|16@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ volts_5v : 16|16@1+ (0.01,0) [0|0] "V" Vector__XXX
+ SG_ volts_3v3 : 0|16@1+ (0.01,0) [0|0] "V" Vector__XXX
 
 BO_ 2214596037 dashboard_tv_parameters: 7 Dashboard
  SG_ tv_p_val : 33|16@1+ (1,0) [0|0] "" Vector__XXX
@@ -900,9 +904,12 @@ CM_ SG_ 2214593093 throttle "";
 CM_ BO_ 2214592517 "Car start button pressed";
 CM_ SG_ 2214592517 start "";
 CM_ BO_ 2415925573 "periodic dashboard MCU temp";
-CM_ SG_ 2415925573 volts_3v3 "";
-CM_ SG_ 2415925573 volts_5v "";
 CM_ SG_ 2415925573 mcu_temp "";
+CM_ BO_ 2415925637 "periodic dashboard MCU temp";
+CM_ SG_ 2415925637 volts_24v "";
+CM_ SG_ 2415925637 volts_12v "";
+CM_ SG_ 2415925637 volts_5v "";
+CM_ SG_ 2415925637 volts_3v3 "";
 CM_ BO_ 2214596037 "periodic dashboard tv parameters";
 CM_ SG_ 2214596037 tv_p_val "";
 CM_ SG_ 2214596037 tv_intensity_val "";

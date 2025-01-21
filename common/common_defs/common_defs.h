@@ -16,7 +16,7 @@
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) < (y) ? (y) : (x))
 #define CLAMP(x, min, max)  MAX((min), MIN((x), (max)))
-#define ABS(x) ((x) < 0 ? (-1 * x) : x)
+#define ABS(x) ((x) < 0 ? (-1 * (x)) : (x))
 
 // Base-2 logarithm that rounds down
 #define LOG2_DOWN(x) (31U - __builtin_clzl((x)))
