@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2022
  * 
  */
-#include "common/phal_L4/eeprom_spi/eeprom_spi.h"
+#include "common/eeprom_spi/eeprom_spi.h"
 
 // Local defines
 #define E_READ  0x03    //!< Read data from memory beginning at selected address

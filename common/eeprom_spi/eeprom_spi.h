@@ -7,21 +7,30 @@
  * @copyright Copyright (c) 2022
  * 
  */
-#ifndef _PHAL_EEPROM_SPI_H_
-#define _PHAL_EEPROM_SPI_H_
+#ifndef _EEPROM_SPI_H_
+#define _EEPROM_SPI_H_
 
 #ifdef STM32L496xx
 #include "stm32l496xx.h"
-#elif STM32L471xx
+#include "common/phal_L4/gpio/gpio.h"
+#include "common/phal_L4/spi/spi.h"
+#elif defined(STM32L471xx)
 #include "stm32l471xx.h"
-#elif STM32L432xx
+#include "common/phal_L4/gpio/gpio.h"
+#include "common/phal_L4/spi/spi.h"
+#elif defined(STM32L432xx)
 #include "stm32l432xx.h"
+#include "common/phal_L4/gpio/gpio.h"
+#include "common/phal_L4/spi/spi.h"
+#elif defined(STM32F407xx)
+#include "stm32f407xx.h"
+#include "common/phal_F4_F7/gpio/gpio.h"
+#include "common/phal_F4_F7/spi/spi.h"
 #else
 #error "Please define a STM32 arch"
 #endif
 
-#include "common/phal_L4/gpio/gpio.h"
-#include "common/phal_L4/spi/spi.h"
+
 #include "common/common_defs/common_defs.h"
 #include "stddef.h"
 #include "stdbool.h"

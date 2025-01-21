@@ -9,7 +9,7 @@
 #include "common/phal_L4/usart/usart.h"
 #include "common/phal_L4/tim/tim.h"
 #include "common/phal_L4/dma/dma.h"
-#include "common/phal_L4/eeprom_spi/eeprom_spi.h"
+#include "common/eeprom_spi/eeprom_spi.h"
 #include <math.h>
 
 /* Module Includes */

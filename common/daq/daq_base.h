@@ -22,7 +22,7 @@
 #include "common/phal_L4/can/can.h"
 #include "common/phal_L4/gpio/gpio.h"
 #define DAQ_EEPROM_ENABLE
-#include "common/phal_L4/eeprom_spi/eeprom_spi.h"
+#include "common/eeprom_spi/eeprom_spi.h"
 #endif
 #include "common/queue/queue.h"
 
