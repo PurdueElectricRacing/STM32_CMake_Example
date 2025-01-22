@@ -4,9 +4,9 @@
  * @brief  Buffer for one producer, multiple consumers
  * @version 0.1
  * @date 2024-02-18
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #include "buffer.h"
 
@@ -32,10 +32,10 @@ void bConstruct(b_handle_t *b, uint32_t item_size, uint32_t buff_size)
 /**
  * @brief Gets the head location for writing 1 item
  *        Call bCommitWrite when done writing data
- * @param b 
- * @param tx_loc 
- * @param available 
- * @return uint8_t 
+ * @param b
+ * @param tx_loc
+ * @param available
+ * @return uint8_t
  */
 int8_t bGetHeadForWrite(b_handle_t *b, void** tx_loc, uint32_t *contiguous_items)
 {
@@ -50,7 +50,7 @@ int8_t bGetHeadForWrite(b_handle_t *b, void** tx_loc, uint32_t *contiguous_items
         *contiguous_items = b->_max_items - head;
         if (b->_min_tail == 0) (*contiguous_items)--; // edge case
     }
-    if (*contiguous_items == 0) 
+    if (*contiguous_items == 0)
     {
         ++b->overflows;
         return -1; // No room
@@ -65,8 +65,8 @@ int8_t bGetHeadForWrite(b_handle_t *b, void** tx_loc, uint32_t *contiguous_items
  *        and AFTER writing your data
  *        Note: Ensure these calls occur in order
  *              (i.e. not preempted by another producer)
- * @param b 
- * @return uint8_t 
+ * @param b
+ * @return uint8_t
  */
 int8_t bCommitWrite(b_handle_t *b, uint32_t items_written)
 {
@@ -80,7 +80,7 @@ int8_t bCommitWrite(b_handle_t *b, uint32_t items_written)
         max_contig = b->_max_items - head;
         if (b->_min_tail == 0) max_contig--; // edge case
     }
-    if (items_written > max_contig ) 
+    if (items_written > max_contig )
     {
         ++b->overflows;
         return -1;
@@ -95,7 +95,7 @@ int8_t bCommitWrite(b_handle_t *b, uint32_t items_written)
 int8_t bSendToBack(b_handle_t *b, const void* data)
 {
     uint32_t next_head = (b->_head + 1) % b->_max_items;
-    if (b->_min_tail_active && next_head == b->_min_tail) 
+    if (b->_min_tail_active && next_head == b->_min_tail)
     {
         ++b->overflows;
         return -1;                // No room
@@ -139,7 +139,7 @@ static void bUpdateMinTail(b_handle_t *b)
 
 /**
  * @brief Returns number of items left to read for given tail
- * 
+ *
  */
 uint32_t bGetItemCount(b_handle_t *b, uint8_t t_idx)
 {
@@ -152,7 +152,7 @@ uint32_t bGetItemCount(b_handle_t *b, uint8_t t_idx)
 
 /**
  * @brief Returns the total number of items in the buffer
- * 
+ *
  */
 uint32_t bGetFillLevel(b_handle_t *b)
 {
@@ -178,12 +178,12 @@ void bDeactivateTail(b_handle_t *b, uint8_t t_idx)
 
 /**
  * @brief Gets the number of contiguous items available to read at *rx_loc
- * 
- * @param b 
- * @param tail 
- * @param rx_loc 
+ *
+ * @param b
+ * @param tail
+ * @param rx_loc
  * @param contiguous_items
- * @return int8_t 
+ * @return int8_t
  */
 int8_t bGetTailForRead(b_handle_t *b, uint8_t t_idx, void** rx_loc, uint32_t *contiguous_items)
 {
@@ -204,11 +204,11 @@ int8_t bGetTailForRead(b_handle_t *b, uint8_t t_idx, void** rx_loc, uint32_t *co
  *        Note: ensure read calls of a tail occur in order
  *        Note: ensure 'items_read' is not larger than
  *              the contiguous_items that was given
- * 
- * @param b 
- * @param t 
+ *
+ * @param b
+ * @param t
  * @param items_read Number of items read (NOT bytes)
- * @return int8_t 
+ * @return int8_t
  */
 int8_t bCommitRead(b_handle_t *b, uint8_t t_idx, uint32_t items_read)
 {
@@ -219,7 +219,7 @@ int8_t bCommitRead(b_handle_t *b, uint8_t t_idx, uint32_t items_read)
     uint32_t max_contig_items = 0;
     if (t->_tail <= head) max_contig_items = head - t->_tail;
     else max_contig_items = b->_max_items - t->_tail;
-    if (items_read > max_contig_items) 
+    if (items_read > max_contig_items)
     {
         ++b->underflows;
         return -2;
