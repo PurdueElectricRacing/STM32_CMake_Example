@@ -26,6 +26,10 @@
 #include "stm32f407xx.h"
 #include "common/phal_F4_F7/gpio/gpio.h"
 #include "common/phal_F4_F7/spi/spi.h"
+#elif defined(STM32F732xx)
+#include "stm32f732xx.h"
+#include "common/phal_F4_F7/gpio/gpio.h"
+#include "common/phal_F4_F7/spi/spi.h"
 #else
 #error "Please define a STM32 arch"
 #endif
@@ -34,6 +38,7 @@
 #include "common/common_defs/common_defs.h"
 #include "stddef.h"
 #include "stdbool.h"
+#include "stdint.h"
 
 // Defines
 #define MAX_PAGES       63
