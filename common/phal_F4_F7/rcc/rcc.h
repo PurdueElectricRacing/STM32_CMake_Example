@@ -11,7 +11,6 @@
 #ifndef _PHAL_RCC_H_
 #define _PHAL_RCC_H_
 
-#include "common/phal_L4/rcc/rcc.h"
 #include <inttypes.h>
 #include <stdbool.h>
 
