@@ -1,16 +1,7 @@
 #ifndef __COMMON_FREERTOS_H__
 #define __COMMON_FREERTOS_H__
 
-#include "FreeRTOS.h"
 #include "cmsis_os2.h"
-
-#include "atomic.h"
-#include "list.h"
-#include "queue.h"
-#include "semphr.h"
-#include "task.h"
-#include "timers.h"
-
 #include <stdint.h>
 
 #if 0
@@ -115,28 +106,33 @@ void rtosWrapper(void *);
 #define getTaskHandle(NAME) threadWrapperName(NAME).handle
 
 // queues
-#define defineStaticQueue(NAME, ITEM, COUNT)         \
-    QueueHandle_t NAME;                              \
-    static StaticQueue_t xStaticQueue_##NAME;        \
-    uint8_t ucQueueStorageArea_##NAME[sizeof(ITEM) * (COUNT)];
+#define defineStaticQueue(NAME, ITEM, COUNT)                      \
+    osMessageQueueId_t NAME;                                      \
+    static uint8_t ucQueueStorageArea_##NAME[sizeof(ITEM) * (COUNT)]; \
+    static osMessageQueueAttr_t attr_##NAME = {                   \
+        .name = #NAME,                                            \
+        .mq_mem = ucQueueStorageArea_##NAME,                      \
+        .mq_size = sizeof(ucQueueStorageArea_##NAME),             \
+        .cb_mem = NULL,                                           \
+        .cb_size = 0                                              \
+    };
 
-#define createStaticQueue(NAME, ITEM, COUNT)         \
-    xQueueCreateStatic((COUNT),                      \
-                       sizeof(ITEM),                 \
-                       ucQueueStorageArea_##NAME,    \
-                       &xStaticQueue_##NAME);
+#define createStaticQueue(NAME, ITEM, COUNT)                      \
+    NAME = osMessageQueueNew((COUNT), sizeof(ITEM), &attr_##NAME);
 
 // semaphores
-#define defineStaticSemaphore(NAME)                 \
-    SemaphoreHandle_t NAME;                         \
-    static StaticSemaphore_t xStaticSemaphore_##NAME;
-#define createStaticSemaphore(NAME)                 \
-    xSemaphoreCreateMutexStatic(&(xStaticSemaphore_##NAME));
+#define defineStaticSemaphore(NAME)                               \
+    osSemaphoreId_t NAME;                                         \
+    static osSemaphoreAttr_t attr_##NAME = {                      \
+        .name = #NAME,                                            \
+        .cb_mem = NULL,                                           \
+        .cb_size = 0                                              \
+    };
 
+#define createStaticSemaphore(NAME)                               \
+    NAME = osSemaphoreNew(1, 1, &attr_##NAME);
 
-#define getTick() xTaskGetTickCount()
-#define getTickms() pdMS_TO_TICKS(getTick())
-
-#define mDelay(ms) (osDelay(pdMS_TO_TICKS((ms))))
+#define getTick() osKernelGetTickCount()
+#define getTickms() osKernelGetTickCount() // CMSIS handles ticks directly
 
 #endif // __COMMON_FREERTOS_H__

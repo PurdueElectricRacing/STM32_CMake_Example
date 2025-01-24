@@ -10,6 +10,7 @@
  *
  */
 
+#include "cmsis_os2.h"
 #include "f4_testing.h"
 
 // Guard so cmake doesn't compile all tests
@@ -107,8 +108,8 @@ int main()
     createThread(usartSend);
 
     // Create objects
-    myQueue = createStaticQueue(myQueue, uint32_t, 0x45);
-    mySemaphore = createStaticSemaphore(mySemaphore);
+    createStaticQueue(myQueue, uint32_t, 0x45);
+    createStaticSemaphore(mySemaphore);
 
     osKernelStart(); // Go!
 
@@ -137,7 +138,7 @@ void ledblink4()
 
 void usartSend()
 {
-    if (xSemaphoreTake(mySemaphore, ( TickType_t ) 10 ) == pdTRUE)
+    if (osSemaphoreAcquire(mySemaphore, 10) == osOK)
     {
         /* We were able to obtain the semaphore and can now access the
             shared resource. */
@@ -146,7 +147,7 @@ void usartSend()
 
         /* We have finished accessing the shared resource. Release the
            semaphore. */
-        xSemaphoreGive(mySemaphore);
+        osSemaphoreRelease(mySemaphore);
     }
 }
 
