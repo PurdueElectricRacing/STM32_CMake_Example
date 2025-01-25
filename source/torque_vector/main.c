@@ -56,15 +56,15 @@ GPIOInitConfig_t gpio_config[] = {
     GPIO_INIT_OUTPUT(PPS_GPS_PORT, PPS_GPS_PIN, GPIO_OUTPUT_LOW_SPEED),
 
     // SPI1 - ACCEL & GYRO
-    // GPIO_INIT_AF(SPI1_SCLK_PORT, SPI1_SCLK_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
-    // GPIO_INIT_AF(SPI1_MOSI_PORT, SPI1_MOSI_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
-    // GPIO_INIT_AF(SPI1_MISO_PORT, SPI1_MISO_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_OPEN_DRAIN, GPIO_INPUT_OPEN_DRAIN),
-    // GPIO_INIT_OUTPUT(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, GPIO_OUTPUT_HIGH_SPEED),
-    // GPIO_INIT_OUTPUT(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, GPIO_OUTPUT_HIGH_SPEED),
+    GPIO_INIT_AF(SPI1_SCLK_PORT, SPI1_SCLK_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
+    GPIO_INIT_AF(SPI1_MOSI_PORT, SPI1_MOSI_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
+    GPIO_INIT_AF(SPI1_MISO_PORT, SPI1_MISO_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_OPEN_DRAIN, GPIO_INPUT_OPEN_DRAIN),
+    GPIO_INIT_OUTPUT(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, GPIO_OUTPUT_HIGH_SPEED),
+    GPIO_INIT_OUTPUT(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, GPIO_OUTPUT_HIGH_SPEED),
 
     // UART Logging
-    GPIO_INIT_USART1TX_PA9,
-    GPIO_INIT_USART1RX_PA10,
+    // GPIO_INIT_USART1TX_PA9,
+    // GPIO_INIT_USART1RX_PA10,
 
     // GPS SPI
     // GPIO_INIT_AF(SPI2_CLK_GPS_PORT, SPI2_CLK_GPS_PIN, 5, GPIO_OUTPUT_HIGH_SPEED, GPIO_OUTPUT_PUSH_PULL, GPIO_INPUT_PULL_DOWN),
@@ -231,7 +231,7 @@ int main(void)
     // taskCreateBackground(canRxUpdate);
 
     taskCreate(heartBeatLED, 500);
-    taskCreate(testUsart, 500);
+    //taskCreate(testUsart, 500);
     //taskCreate(heartBeatTask, 100);
 
     // taskCreate(parseIMU, 20);
@@ -256,15 +256,15 @@ void preflightChecks(void)
         //     HardFault_Handler();
         // }
         // NVIC_EnableIRQ(CAN1_RX0_IRQn);
-        // PHAL_writeGPIO(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, 0);
-        // PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 0);
+        PHAL_writeGPIO(SPI1_CSB_ACCEL_PORT, SPI1_CSB_ACCEL_PIN, 0);
+        PHAL_writeGPIO(SPI1_CSB_GYRO_PORT, SPI1_CSB_GYRO_PIN, 0);
         break;
     case 2:
         /* USART initialization */
-        if (!PHAL_initUSART(&huart_gps, APB1ClockRateHz))
-        {
-            HardFault_Handler();
-        }
+        // if (!PHAL_initUSART(&huart_gps, APB1ClockRateHz))
+        // {
+        //     HardFault_Handler();
+        // }
         break;
     case 3:
         // GPS Initialization
@@ -278,17 +278,17 @@ void preflightChecks(void)
         break;
     case 10:
         /* SPI initialization */
-        // if (!PHAL_SPI_init(&spi_config))
-        // {
-        //     HardFault_Handler();
-        // }
-        // spi_config.data_rate = APB2ClockRateHz / 16;
+        if (!PHAL_SPI_init(&spi_config))
+        {
+            HardFault_Handler();
+        }
+        spi_config.data_rate = APB2ClockRateHz / 16;
         break;
     case 200:
-        // if (!BMI088_init(&bmi_config))
-        // {
-        //     HardFault_Handler();
-        // }
+        if (!BMI088_init(&bmi_config))
+        {
+            HardFault_Handler();
+        }
         break;
     case 250:
         //BMI088_powerOnAccel(&bmi_config);
