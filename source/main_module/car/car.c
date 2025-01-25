@@ -479,13 +479,13 @@ void parseMCDataPeriodic(void)
     static uint32_t last_tmp_t;
     if (sched.os_ticks - last_tmp_t >= 500)
     {
-        SEND_REAR_MOTOR_TEMPS(
-                                (uint8_t) car.motor_l.motor_temp,
-                                (uint8_t) car.motor_r.motor_temp,
-                                (uint8_t) car.motor_l.inverter_temp,
-                                (uint8_t) car.motor_r.inverter_temp,
-                                (uint8_t) car.motor_l.igbt_temp,
-                                (uint8_t) car.motor_r.igbt_temp);
+        // SEND_REAR_MOTOR_TEMPS(
+        //                         (uint8_t) car.motor_l.motor_temp,
+        //                         (uint8_t) car.motor_r.motor_temp,
+        //                         (uint8_t) car.motor_l.inverter_temp,
+        //                         (uint8_t) car.motor_r.inverter_temp,
+        //                         (uint8_t) car.motor_l.igbt_temp,
+        //                         (uint8_t) car.motor_r.igbt_temp);
         // SEND_NUM_MC_SKIPS(num_failed_msgs_r, num_failed_msgs_l);
         last_tmp_t = sched.os_ticks;
     }

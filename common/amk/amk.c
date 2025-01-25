@@ -69,15 +69,15 @@ void amkSetTorque(amk_motor_t* motor, int16_t torque_setpoint)
     }
 
     /* Scale up since unit is 0.1% of nominal torque */
-    torque_setpoint *= 10;
+    // torque_setpoint *= 10;
 
     motor->torque_setpoint = torque_setpoint;
 
     if (torque_setpoint < 0) {
-        motor->torque_limit_negative = -100;
-        motor->torque_limit_positive = 0;
+        motor->torque_limit_negative = -1000;
+        motor->torque_limit_positive = 1;
     } else {
-        motor->torque_limit_positive = 500;
+        motor->torque_limit_positive = 1000;
 
         /* NOTE: For some reason it cannot be 0, so do -0.1% (according to UIUC's team) */
         motor->torque_limit_negative = -1;
@@ -88,42 +88,42 @@ void amkSetTorque(amk_motor_t* motor, int16_t torque_setpoint)
 static void amkGetData(amk_motor_t* motor)
 {
     if (!can_data.AMK_Actual_Values_1.stale) {
-        motor->status.AMK_bSystemReady = can_data.AMK_Actual_Values_1.AMK_Status_bSystemReady;
-        motor->status.AMK_bError = can_data.AMK_Actual_Values_1.AMK_Status_bError;
-        motor->status.AMK_bWarn = can_data.AMK_Actual_Values_1.AMK_Status_bWarn;
-        motor->status.AMK_bQuitDcOn = can_data.AMK_Actual_Values_1.AMK_Status_bQuitDcOn;
-        motor->status.AMK_bDcOn = can_data.AMK_Actual_Values_1.AMK_Status_bDcOn;
-        motor->status.AMK_bQuitInverterOn = can_data.AMK_Actual_Values_1.AMK_Status_bQuitInverterOn;
-        motor->status.AMK_bInverterOn = can_data.AMK_Actual_Values_1.AMK_Status_bInverterOn;
-        motor->status.AMK_bDerating = can_data.AMK_Actual_Values_1.AMK_Status_bDerating;
-
-        motor->actual_torque = can_data.AMK_Actual_Values_1.AMK_ActualTorque;
-        motor->serial_num = can_data.AMK_Actual_Values_1.AMK_MotorSerialNumber;
+        // motor->status.AMK_bSystemReady = can_data.AMK_Actual_Values_1.AMK_Status_bSystemReady;
+        // motor->status.AMK_bError = can_data.AMK_Actual_Values_1.AMK_Status_bError;
+        // motor->status.AMK_bWarn = can_data.AMK_Actual_Values_1.AMK_Status_bWarn;
+        // motor->status.AMK_bQuitDcOn = can_data.AMK_Actual_Values_1.AMK_Status_bQuitDcOn;
+        // motor->status.AMK_bDcOn = can_data.AMK_Actual_Values_1.AMK_Status_bDcOn;
+        // motor->status.AMK_bQuitInverterOn = can_data.AMK_Actual_Values_1.AMK_Status_bQuitInverterOn;
+        // motor->status.AMK_bInverterOn = can_data.AMK_Actual_Values_1.AMK_Status_bInverterOn;
+        // motor->status.AMK_bDerating = can_data.AMK_Actual_Values_1.AMK_Status_bDerating;
+        //
+        // motor->actual_torque = can_data.AMK_Actual_Values_1.AMK_ActualTorque;
+        // motor->serial_num = can_data.AMK_Actual_Values_1.AMK_MotorSerialNumber;
     } else {
         setFault(motor->stale_fault_id, true);
     }
 
-    if (!can_data.AMK_Actual_Values_2.stale) {
-        motor->actual_speed = can_data.AMK_Actual_Values_2.AMK_ActualSpeed;
-        motor->dc_bus_voltage = can_data.AMK_Actual_Values_2.AMK_DCBusVoltage;
-        motor->system_reset = can_data.AMK_Actual_Values_2.AMK_SystemReset;
-        motor->diagnostic_num = can_data.AMK_Actual_Values_2.AMK_DiagnosticNumber;
-    } else {
-        setFault(motor->stale_fault_id, true);
-    }
+    // if (!can_data.AMK_Actual_Values_2.stale) {
+    //     motor->actual_speed = can_data.AMK_Actual_Values_2.AMK_ActualSpeed;
+    //     motor->dc_bus_voltage = can_data.AMK_Actual_Values_2.AMK_DCBusVoltage;
+    //     motor->system_reset = can_data.AMK_Actual_Values_2.AMK_SystemReset;
+    //     motor->diagnostic_num = can_data.AMK_Actual_Values_2.AMK_DiagnosticNumber;
+    // } else {
+    //     setFault(motor->stale_fault_id, true);
+    // }
 
-    if (!can_data.AMK_Temperatures_1.stale) {
-        motor->motor_temp = can_data.AMK_Temperatures_1.AMK_MotorTemp;
-        motor->inverter_temp = can_data.AMK_Temperatures_1.AMK_InverterTemp;
-        motor->igbt_temp = can_data.AMK_Temperatures_1.AMK_IGBTTemp;
-    } else {
-        setFault(motor->stale_fault_id, true);
-    }
+    // if (!can_data.AMK_Temperatures_1.stale) {
+    //     motor->motor_temp = can_data.AMK_Temperatures_1.AMK_MotorTemp;
+    //     motor->inverter_temp = can_data.AMK_Temperatures_1.AMK_InverterTemp;
+    //     motor->igbt_temp = can_data.AMK_Temperatures_1.AMK_IGBTTemp;
+    // } else {
+    //     setFault(motor->stale_fault_id, true);
+    // }
 }
 
 static void motorSendSetpoints(amk_motor_t* motor)
 {
-    SEND_AMK_SETPOINTS(motor->control.AMK_bReserve1,
+    SEND_AMK_SETPOINTS_1(motor->control.AMK_bReserve1,
                          motor->control.AMK_bInverterOn,
                          motor->control.AMK_bDcOn,
                          motor->control.AMK_bEnable,
@@ -182,6 +182,7 @@ static void amkRunning(amk_motor_t* motor)
         if (motor->status.AMK_bError) {
             motor->states.running_state = AMK_RUNNING_ERROR;
         }
+        amkSetTorque(motor, 100);
 
         break;
     case AMK_RUNNING_ERROR:

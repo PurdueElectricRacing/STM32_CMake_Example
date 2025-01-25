@@ -87,7 +87,7 @@ typedef union {
 #define DLC_ORION_CURRENTS_VOLTS 4
 #define DLC_ORION_ERRORS 4
 #define DLC_MAX_CELL_TEMP 2
-#define DLC_REAR_MOTOR_TEMPS 6
+#define DLC_REAR_MOTOR_TEMPS 4
 #define DLC_PRECHARGE_HB 2
 #define DLC_REAR_WHEEL_SPEEDS 8
 #define DLC_COOLANT_TEMPS 4
@@ -375,10 +375,8 @@ typedef union {
     struct {
         uint64_t left_mot_temp: 8;
         uint64_t right_mot_temp: 8;
-        uint64_t left_inv_temp: 8;
-        uint64_t right_inv_temp: 8;
-        uint64_t left_igbt_temp: 8;
-        uint64_t right_igbt_temp: 8;
+        uint64_t left_ctrl_temp: 8;
+        uint64_t right_ctrl_temp: 8;
     } rear_motor_temps;
     struct {
         uint64_t IMD: 8;
@@ -558,10 +556,8 @@ typedef struct {
     struct {
         uint8_t left_mot_temp;
         uint8_t right_mot_temp;
-        uint8_t left_inv_temp;
-        uint8_t right_inv_temp;
-        uint8_t left_igbt_temp;
-        uint8_t right_igbt_temp;
+        uint8_t left_ctrl_temp;
+        uint8_t right_ctrl_temp;
         uint8_t stale;
         uint32_t last_rx;
     } rear_motor_temps;
