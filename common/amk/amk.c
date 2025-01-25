@@ -19,7 +19,7 @@ void amkInit(amk_motor_t* motor, bool* pchg_complete)
 {
     *motor = (amk_motor_t){
         /* States */
-        .states.state = AMK_STATE_OFF,
+        .states.state = AMK_STATE_INIT,
         .states.init_state = AMK_INIT_POWER_ON,
         .states.deinit_state = AMK_DEINIT_ZERO_SETPOINTS,
         .states.running_state = AMK_RUNNING_GOOD,
@@ -182,7 +182,7 @@ static void amkRunning(amk_motor_t* motor)
         if (motor->status.AMK_bError) {
             motor->states.running_state = AMK_RUNNING_ERROR;
         }
-        amkSetTorque(motor, 100);
+        // amkSetTorque(motor, 100);
 
         break;
     case AMK_RUNNING_ERROR:

@@ -238,26 +238,26 @@ uint16_t num_failed_msgs_l;
 extern q_handle_t q_tx_can2_s[CAN_TX_MAILBOX_CNT];
 extern uint32_t can2_mbx_last_send_time[CAN_TX_MAILBOX_CNT];
 
-void can2TxUpdate(void)
-{
-    CanMsgTypeDef_t tx_msg;
-    for (uint8_t i = 0; i < CAN_TX_MAILBOX_CNT; ++i)
-    {
-        if(PHAL_txMailboxFree(CAN2, i))
-        {
-            if (qReceive(&q_tx_can2_s[i], &tx_msg) == SUCCESS_G)    // Check queue for items and take if there is one
-            {
-                PHAL_txCANMessage(&tx_msg, i);
-                can2_mbx_last_send_time[i] = sched.os_ticks;
-            }
-        }
-        else if (sched.os_ticks - can2_mbx_last_send_time[i] > CAN_TX_TIMEOUT_MS)
-        {
-            PHAL_txCANAbort(CAN2, i); // aborts tx and empties the mailbox
-            can_stats.tx_fail++;
-        }
-    }
-}
+// void can2TxUpdate(void)
+// {
+//     CanMsgTypeDef_t tx_msg;
+//     for (uint8_t i = 0; i < CAN_TX_MAILBOX_CNT; ++i)
+//     {
+//         if(PHAL_txMailboxFree(CAN2, i))
+//         {
+//             if (qReceive(&q_tx_can2_s[i], &tx_msg) == SUCCESS_G)    // Check queue for items and take if there is one
+//             {
+//                 PHAL_txCANMessage(&tx_msg, i);
+//                 can2_mbx_last_send_time[i] = sched.os_ticks;
+//             }
+//         }
+//         else if (sched.os_ticks - can2_mbx_last_send_time[i] > CAN_TX_TIMEOUT_MS)
+//         {
+//             PHAL_txCANAbort(CAN2, i); // aborts tx and empties the mailbox
+//             can_stats.tx_fail++;
+//         }
+//     }
+// }
 
 int main(void){
     /* Data Struct Initialization */
@@ -332,11 +332,11 @@ void preflightChecks(void) {
             // }
             break;
         case 1:
-            if(!PHAL_initCAN(CAN2, false, VCAN_BPS))
-            {
-                HardFault_Handler();
-            }
-            NVIC_EnableIRQ(CAN2_RX0_IRQn);
+            // if(!PHAL_initCAN(CAN2, false, VCAN_BPS))
+            // {
+            //     HardFault_Handler();
+            // }
+            // NVIC_EnableIRQ(CAN2_RX0_IRQn);
             // spi_config.data_rate = APB2ClockRateHz / 16; // 5 MHz
             // if (!PHAL_SPI_init(&spi_config))
             //     HardFault_Handler();
@@ -526,10 +526,10 @@ void CAN1_RX0_IRQHandler()
     canParseIRQHandler(CAN1);
 }
 
-void CAN2_RX0_IRQHandler()
-{
-    canParseIRQHandler(CAN2);
-}
+// void CAN2_RX0_IRQHandler()
+// {
+//     canParseIRQHandler(CAN2);
+// }
 
 void main_module_bl_cmd_CALLBACK(CanParsedData_t *msg_data_a)
 {
