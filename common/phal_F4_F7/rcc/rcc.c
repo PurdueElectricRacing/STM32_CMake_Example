@@ -234,6 +234,7 @@ bool PHAL_configurePLLSystemClock(uint32_t system_clock_target_hz)
     FLASH->ACR = flash_acr_temp;
 
     __DSB();                                                                                   // Wait for explicit memory accesses to finish
+    RCC->CFGR &= ~RCC_CFGR_SW;
     RCC->CFGR |= RCC_CFGR_SW_PLL;                                                              // Set system clock switch register to PLL
     while((RCC->CFGR & RCC_CFGR_SWS_PLL) != RCC_CFGR_SWS_PLL)                                  // Wait for PLL to be the new system clock
         ;
