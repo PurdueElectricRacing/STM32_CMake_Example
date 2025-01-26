@@ -7,6 +7,3 @@
 [submodule "common/STM32CubeF7"]
 	path = common/STM32CubeF7
 	url = https://github.com/STMicroelectronics/STM32CubeF7.git
-[submodule "common/modules/Wiznet/W5500"]
-	path = common/modules/Wiznet/W5500
-	url = https://github.com/Wiznet/ioLibrary_Driver.git

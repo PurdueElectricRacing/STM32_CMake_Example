@@ -14,9 +14,9 @@
 
 #include <string.h>
 
-#include "common/modules/Wiznet/W5500/Ethernet/wizchip_conf.h"
-#include "common/modules/Wiznet/W5500/Ethernet/socket.h"
 #include "common/phal_F4_F7/gpio/gpio.h"
+#include "w5500/wizchip_conf.h"
+#include "w5500/socket.h"
 
 #include "buffer.h"
 #include "main.h"
