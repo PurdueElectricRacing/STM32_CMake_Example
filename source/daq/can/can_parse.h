@@ -14,7 +14,6 @@
 #include "common/queue/queue.h"
 #include "common/psched/psched.h"
 #include "common/phal_F4_F7/can/can.h"
-#include "common/daq/can_parse_base.h"
 
 // Make this match the node name within the can_config.json
 #define NODE_NAME "daq"
@@ -80,25 +79,6 @@ extern void send_fault(uint16_t id, bool latched);
 /* BEGIN AUTO EXTERN RX IRQ */
 /* END AUTO EXTERN RX IRQ */
 
-/**
- * @brief Setup queue and message filtering
- *
- * @param q_rx_can RX buffer of CAN messages
- */
-void initCANParse(void);
-
-/**
- * @brief Pull message off of rx buffer,
- *        update can_data struct,
- *        check for stale messages
- */
-void canRxUpdate(void);
-
-/**
- * @brief Process any rx message callbacks from the CAN Rx IRQ
- *
- * @param rx rx data from message just recieved
- */
-void canProcessRxIRQs(CanMsgTypeDef_t* rx);
+bool initCANFilter(void);
 
 #endif

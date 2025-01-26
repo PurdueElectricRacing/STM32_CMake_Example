@@ -11,7 +11,7 @@ extern "C" {
 *
 * Filename	: ftpd.h
 * Version	: 1.0
-* Programmer(s)	: 
+* Programmer(s)	:
 * Created	: 2003/01/28
 * Description   : Header file of FTP daemon. (AVR-GCC Compiler)
 */
@@ -36,9 +36,9 @@ extern "C" {
 #define _MAX_SS		512
 #endif
 
-#define CTRL_SOCK	2
-#define DATA_SOCK	3
-#define CTRL_SOCK1	4
+#define CTRL_SOCK	DAQ_SOCKET_FTP_CTRL0
+#define DATA_SOCK	DAQ_SOCKET_FTP_DATA
+#define CTRL_SOCK1	DAQ_SOCKET_FTP_CTRL1
 
 
 #define	IPPORT_FTPD	20	/* FTP Data port */
@@ -46,8 +46,6 @@ extern "C" {
 
 #define HOSTNAME	"PER_DAQ"
 #define VERSION		"1.0"
-
-#define FILENAME	"a.txt"
 
 /* FTP commands */
 enum ftp_cmd {

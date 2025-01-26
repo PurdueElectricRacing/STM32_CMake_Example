@@ -4,22 +4,23 @@
 *
 * Filename	: ftpd.c
 * Version	: 1.0
-* Programmer(s)	: 
+* Programmer(s)	:
 * Created	: 2003/01/28
 * Description   : FTP daemon. (AVR-GCC Compiler)
 */
 
 
-#include <stdio.h> 
-#include <ctype.h> 
+#include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include "socket.h"
 #include "ftpd.h"
-#include "main.h" // tick_ms
+#include "main.h"
 #include "daq_hub.h" // sd connection state
+#include "daq_sd.h"
 
 /* If you need this header, use it. */
 //#include "stdio_private.h"
@@ -96,7 +97,10 @@ char sizefail[] = "550 File not found\r\n";
 #define remain_time 400000
 #define connect_timeout_en 1
 #define ftp_ID 		"PER"
-#define ftp_PW 		""
+#define ftp_PW 		"PER2025"
+
+#define _FTP_DEBUG_
+#define printf debug_printf
 
 un_l2cval remote_ip;
 uint16_t  remote_port;
@@ -164,7 +168,7 @@ void ftpd_init(uint8_t * src_ip)
 		strcpy(ftp.userpassword, ftp_PW);
 		printf(" FTP PW[%d]:%s \r\n", strlen(ftp.userpassword), ftp.userpassword);
 	}
-	
+
 
 
 	local_ip.cVal[0] = src_ip[0];
@@ -172,7 +176,7 @@ void ftpd_init(uint8_t * src_ip)
 	local_ip.cVal[2] = src_ip[2];
 	local_ip.cVal[3] = src_ip[3];
 	local_port = 35000;
-	
+
 	strcpy(ftp.workingdir, "/");
 
 	socket(CTRL_SOCK, Sn_MR_TCP, IPPORT_FTP, 0x0);
@@ -192,14 +196,15 @@ uint8_t ftpd_run(uint8_t * dbuf)
 	// FILINFO fno;
 #endif
 
-	static uint32_t last_run_time;
-	if (!connect_state_control && (tick_ms - last_run_time) < 100)
+#if 0
+	if (!connect_state_control && (getTick() - last_run_time) < 100)
 	{
 		// slow down polling if no connection active
 		return ret;
 	}
-
-	last_run_time = tick_ms;
+#endif
+	static uint32_t last_run_time;
+	last_run_time = getTick();
 
 	//memset(dbuf, 0, sizeof(_FTP_BUF_SIZE));
 	////////////////////////FTP Control 1
@@ -223,7 +228,7 @@ uint8_t ftpd_run(uint8_t * dbuf)
     			strcpy(ftp.workingdir, "/");
     			sprintf((char *)dbuf, "220 %s FTP version %s ready.\r\n", HOSTNAME, VERSION);
     			ret = send(CTRL_SOCK, (uint8_t *)dbuf, strlen((const char *)dbuf));
-                
+
 #if defined(_FTP_DEBUG_)
                 printf("%d:send() [%s]\r\n",CTRL_SOCK,dbuf);
 #endif
@@ -256,11 +261,11 @@ uint8_t ftpd_run(uint8_t * dbuf)
 				con_remain_cnt1++;
 			}
 			#endif
-	
+
 #if defined(_FTP_DEBUG_)
     		//printf("ftp socket %d\r\n", CTRL_SOCK);
 #endif
-			 
+
     		if((size = getSn_RX_RSR(CTRL_SOCK)) > 0) // Don't need to check SOCKERR_BUSY because it doesn't not occur.
     		{
 #if defined(_FTP_DEBUG_)
@@ -354,7 +359,7 @@ uint8_t ftpd_run(uint8_t * dbuf)
 				strcpy(ftp.workingdir, "/");
 				sprintf((char *)dbuf, "220 %s FTP version %s ready.\r\n", HOSTNAME, VERSION);
 				ret = send(CTRL_SOCK1, (uint8_t *)dbuf, strlen((const char *)dbuf));
-				
+
 #if defined(_FTP_DEBUG_)
 				printf("%d:send() [%s]\r\n",CTRL_SOCK1,dbuf);
 #endif
@@ -387,11 +392,11 @@ uint8_t ftpd_run(uint8_t * dbuf)
 				con_remain_cnt2++;
 			}
 			#endif
-	
+
 #if defined(_FTP_DEBUG_)
 			//printf("ftp socket %d\r\n", CTRL_SOCK);
 #endif
-			
+
 			if((size = getSn_RX_RSR(CTRL_SOCK1)) > 0) // Don't need to check SOCKERR_BUSY because it doesn't not occur.
 			{
 #if defined(_FTP_DEBUG_)
@@ -471,7 +476,7 @@ uint8_t ftpd_run(uint8_t * dbuf)
 		default :
 			break;
 	}
-    
+
 	#endif
 */
 /////////////////////////////////// ftp data part
@@ -486,7 +491,7 @@ uint8_t ftpd_run(uint8_t * dbuf)
 #endif
     			connect_state_data = 1;
     		}
-	
+
     		switch(ftp.current_cmd)
     		{
     			case LIST_CMD:
@@ -520,7 +525,7 @@ uint8_t ftpd_run(uint8_t * dbuf)
 #endif
 #if defined(F_FILESYSTEM)
     				ftp.fr = f_open(&(ftp.fil), (const char *)ftp.filename, FA_READ);
-    				//print_filedsc(&(ftp.fil));
+    				print_filedsc(&(ftp.fil));
     				if(ftp.fr == FR_OK){
 						remain_filesize = f_size(&ftp.fil);
     					// remain_filesize = ftp.fil.fsize;
@@ -538,9 +543,9 @@ uint8_t ftpd_run(uint8_t * dbuf)
     						else
     							send_byte = remain_filesize;
 
-							tics[0] = tick_ms;
+							tics[0] = getTick();
     						ftp.fr = f_read(&(ftp.fil), dbuf, send_byte , &blocklen);
-							tics[1] = tick_ms;
+							tics[1] = getTick();
     						if(ftp.fr != FR_OK)
     							break;
 #if defined(_FTP_DEBUG_)
@@ -548,9 +553,9 @@ uint8_t ftpd_run(uint8_t * dbuf)
     						//printf("----->fsize:%d recv:%d len:%d \r\n", remain_filesize, send_byte, blocklen);
     						//printf("----->fn:%s data:%s \r\n", ftp.filename, dbuf);
 #endif
-							tics[2] = tick_ms;
+							tics[2] = getTick();
     						send(DATA_SOCK, dbuf, blocklen);
-							tics[3] = tick_ms;
+							tics[3] = getTick();
     						remain_filesize -= blocklen;
     					}while(remain_filesize != 0);
 #if defined(_FTP_DEBUG_)
@@ -591,7 +596,7 @@ uint8_t ftpd_run(uint8_t * dbuf)
 #endif
 #if defined(F_FILESYSTEM)
     				ftp.fr = f_open(&(ftp.fil), (const char *)ftp.filename, FA_CREATE_ALWAYS | FA_WRITE);
-    				//print_filedsc(&(ftp.fil));
+    				print_filedsc(&(ftp.fil));
     				if(ftp.fr == FR_OK){
 #if defined(_FTP_DEBUG_)
     					printf("f_open return FR_OK\r\n");
@@ -797,7 +802,7 @@ char proc_ftpd(uint8_t sn, char * buf)
 	char sendbuf[200];
 	int slen;
 	long ret;
-	
+
 
 	/* Translate first word to lower case */
 	for (cp = buf; *cp != ' ' && *cp != '\0'; cp++)
@@ -831,7 +836,7 @@ char proc_ftpd(uint8_t sn, char * buf)
 				return 0;
 		}
 	}
-	
+
 	arg = &buf[strlen(*cmdp)];
 	while(*arg == ' ') arg++;
 
@@ -1052,11 +1057,11 @@ char proc_ftpd(uint8_t sn, char * buf)
 			slen = sprintf(sendbuf, "227 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\r\n", local_ip.cVal[0], local_ip.cVal[1], local_ip.cVal[2], local_ip.cVal[3], local_port >> 8, local_port & 0x00ff);
 			send(sn, (uint8_t *)sendbuf, slen);
 
-			if(getSn_SR(DATA_SOCK) == SOCK_ESTABLISHED) 
+			if(getSn_SR(DATA_SOCK) == SOCK_ESTABLISHED)
 			{
 #if defined(_FTP_DEBUG_)
 				printf("data disconnect: %d\r\n", DATA_SOCK);
-#endif			
+#endif
 				disconnect(DATA_SOCK);
 			}
 			ftp.dsock_mode = PASSIVE_MODE;
@@ -1074,7 +1079,7 @@ char proc_ftpd(uint8_t sn, char * buf)
 			if(slen > 3)
 			{
 				tmpstr = strrchr(arg, '/');
-				if (tmpstr != NULL) 
+				if (tmpstr != NULL)
 				{
 					*tmpstr = 0;
 				}
@@ -1108,7 +1113,7 @@ char proc_ftpd(uint8_t sn, char * buf)
 			}
 			// 	// arg[slen - 3] = 0x00;
 			// 	tmpstr = strrchr(arg, '/');
-			// 	if (tmpstr != NULL) 
+			// 	if (tmpstr != NULL)
 			// 	{
 			// 		*tmpstr = 0;
 			// 	}
@@ -1199,7 +1204,7 @@ char proc_ftpd(uint8_t sn, char * buf)
 			send(sn, (uint8_t *)sendbuf, slen);
 			break;
 	}
-	
+
 	return 1;
 }
 
@@ -1208,9 +1213,9 @@ char ftplogin(uint8_t sn, char * pass)
 {
 	char sendbuf[100];
 	int slen = 0;
-	
+
 	//memset(sendbuf, 0, DATA_BUF_SIZE);
-	
+
 #if defined(_FTP_DEBUG_)
 	printf("%s logged in\r\n", ftp.username);
 #endif
@@ -1218,7 +1223,7 @@ char ftplogin(uint8_t sn, char * pass)
 	slen = sprintf(sendbuf, "230 Logged on\r\n");
 	send(sn, (uint8_t *)sendbuf, slen);
 	ftp.state = FTPS_LOGIN;
-	
+
 	return 1;
 }
 
@@ -1262,20 +1267,21 @@ int pport(char * arg)
 }
 
 #if defined(F_FILESYSTEM)
-void print_filedsc(FIL *fil)
+void print_filedsc(FIL *f)
 {
+	FFOBJID *fil = &f->obj;
 #if defined(_FTP_DEBUG_)
 	printf("File System pointer : %08X\r\n", fil->fs);
 	printf("File System mount ID : %d\r\n", fil->id);
-	printf("File status flag : %08X\r\n", fil->flag);
-	printf("File System pads : %08X\r\n", fil->err);
-	printf("File read write pointer : %08X\r\n", fil->fptr);
-	printf("File size : %08X\r\n", fil->fsize);
+	printf("File status flag : %08X\r\n", f->flag);
+	printf("File System pads : %08X\r\n", f->err);
+	printf("File read write pointer : %08X\r\n", f->fptr);
+	//printf("File size : %08X\r\n", fil->fsize);
 	printf("File start cluster : %08X\r\n", fil->sclust);
-	printf("current cluster : %08X\r\n", fil->clust);
-	printf("current data sector : %08X\r\n", fil->dsect);
-	printf("dir entry sector : %08X\r\n", fil->dir_sect);
-	printf("dir entry pointer : %08X\r\n", fil->dir_ptr);
+	printf("current cluster : %08X\r\n", f->clust);
+	printf("current data sector : %08X\r\n", f->sect);
+	printf("dir entry sector : %08X\r\n", f->dir_sect);
+	printf("dir entry pointer : %08X\r\n", f->dir_ptr);
 #endif
 }
 #endif
@@ -1295,7 +1301,7 @@ static int check_directory(char* path)
 }
 
 
-#include <stdio.h> 
+#include <stdio.h>
 static FRESULT scan_files(char* path, char *buf)
 {
 	FRESULT res;
