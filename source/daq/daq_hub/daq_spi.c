@@ -1,5 +1,5 @@
 
-#include "common/modules/Wiznet/W5500/Ethernet/wizchip_conf.h"
+#include "w5500/wizchip_conf.h"
 #include "common/phal_F4_F7/spi/spi.h"
 
 #include "daq_spi.h"
