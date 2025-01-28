@@ -291,11 +291,11 @@ void preflightChecks(void)
         }
         break;
     case 250:
-        //BMI088_powerOnAccel(&bmi_config);
+        BMI088_powerOnAccel(&bmi_config);
         break;
     case 500:
-        // if (!BMI088_initAccel(&bmi_config))
-        //     HardFault_Handler();
+        if (!BMI088_initAccel(&bmi_config))
+            HardFault_Handler();
         break;
     case 700:
         // /* Pack torque vectoring data into rtM_tv */
