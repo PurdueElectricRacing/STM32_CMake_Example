@@ -1,63 +1,25 @@
+#ifndef __CAN_FLAGS_H__
+#define __CAN_FLAGS_H__
+
 /*
+ * Controller Area Network Identifier structure
+ *
+ * bit 0-28      : CAN identifier (11/29 bit)
+ * bit 29        : error frame flag (0 = data frame, 1 = error frame)
+ * bit 30        : remote transmission request flag (1 = rtr frame)
+ * bit 31        : frame format flag (0 = standard 11 bit, 1 = extended 29 bit)
+ */
 
-The MIT License (MIT)
-
-Copyright (c) 2016 Hubert Denkmair
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
-#ifndef __GS_USB_H__
-#define __GS_USB_H__
-
-#define u32 uint32_t
-#define u8 uint8_t
-
-#define GSUSB_ENDPOINT_IN          0x81
-#define GSUSB_ENDPOINT_OUT         0x02
-
-
-#define GS_CAN_MODE_NORMAL                      0
-#define GS_CAN_MODE_LISTEN_ONLY                 (1<<0)
-#define GS_CAN_MODE_LOOP_BACK                   (1<<1)
-#define GS_CAN_MODE_TRIPLE_SAMPLE               (1<<2)
-#define GS_CAN_MODE_ONE_SHOT                    (1<<3)
-#define GS_CAN_MODE_HW_TIMESTAMP                (1<<4)
-
-#define GS_CAN_MODE_PAD_PKTS_TO_MAX_PKT_SIZE    (1<<7)
-
-#define GS_CAN_FEATURE_LISTEN_ONLY              (1<<0)
-#define GS_CAN_FEATURE_LOOP_BACK                (1<<1)
-#define GS_CAN_FEATURE_TRIPLE_SAMPLE            (1<<2)
-#define GS_CAN_FEATURE_ONE_SHOT                 (1<<3)
-#define GS_CAN_FEATURE_HW_TIMESTAMP             (1<<4)
-#define GS_CAN_FEATURE_IDENTIFY                 (1<<5)
-#define GS_CAN_FEATURE_USER_ID                  (1<<6)
-
-#define GS_CAN_FEATURE_PAD_PKTS_TO_MAX_PKT_SIZE (1<<7)
-
-#define GS_CAN_FLAG_OVERFLOW 1
-
+/* CAN Definitions from <linux/can.h> */
+/* special address description flags for the CAN_ID */
 #define CAN_EFF_FLAG 0x80000000U /* EFF/SFF is set in the MSB */
 #define CAN_RTR_FLAG 0x40000000U /* remote transmission request */
-#define CAN_ERR_FLAG 0x20000000U /* error message frame */
+#define CAN_ERR_FLAG 0x20000000U /* error frame */
+
+/* valid bits in CAN ID for frame formats */
+#define CAN_SFF_MASK 0x000007FFU /* standard frame format (SFF) */
+#define CAN_EFF_MASK 0x1FFFFFFFU /* extended frame format (EFF) */
+#define CAN_ERR_MASK 0x1FFFFFFFU /* omit EFF, RTR, ERR flags */
 
 #define CAN_ERR_DLC 8 /* dlc for error message frames */
 
@@ -134,104 +96,4 @@ THE SOFTWARE.
 #define CAN_ERR_TRX_CANL_SHORT_TO_GND  0x70 /* 0111 0000 */
 #define CAN_ERR_TRX_CANL_SHORT_TO_CANH 0x80 /* 1000 0000 */
 
-
-enum gs_usb_breq {
-	GS_USB_BREQ_HOST_FORMAT = 0,
-	GS_USB_BREQ_BITTIMING,
-	GS_USB_BREQ_MODE,
-	GS_USB_BREQ_BERR,
-	GS_USB_BREQ_BT_CONST,
-	GS_USB_BREQ_DEVICE_CONFIG,
-	GS_USB_BREQ_TIMESTAMP,
-	GS_USB_BREQ_IDENTIFY,
-	GS_USB_BREQ_GET_USER_ID,
-	GS_USB_BREQ_SET_USER_ID,
-};
-
-enum gs_can_mode {
-	/* reset a channel. turns it off */
-	GS_CAN_MODE_RESET = 0,
-	/* starts a channel */
-	GS_CAN_MODE_START
-};
-
-enum gs_can_state {
-	GS_CAN_STATE_ERROR_ACTIVE = 0,
-	GS_CAN_STATE_ERROR_WARNING,
-	GS_CAN_STATE_ERROR_PASSIVE,
-	GS_CAN_STATE_BUS_OFF,
-	GS_CAN_STATE_STOPPED,
-	GS_CAN_STATE_SLEEPING
-};
-
-/* data types passed between host and device */
-struct gs_host_config {
-	u32 byte_order;
-} __attribute__((__packed__));
-/* All data exchanged between host and device is exchanged in host byte order,
- * thanks to the struct gs_host_config byte_order member, which is sent first
- * to indicate the desired byte order.
- */
-
-struct gs_device_config {
-	u8 reserved1;
-	u8 reserved2;
-	u8 reserved3;
-	u8 icount;
-	u32 sw_version;
-	u32 hw_version;
-} __attribute__((__packed__));
-
-struct gs_device_mode {
-	u32 mode;
-	u32 flags;
-} __attribute__((__packed__));
-
-struct gs_device_state {
-	u32 state;
-	u32 rxerr;
-	u32 txerr;
-} __packed;
-
-struct gs_device_bittiming {
-	u32 prop_seg;
-	u32 phase_seg1;
-	u32 phase_seg2;
-	u32 sjw;
-	u32 brp;
-} __attribute__((__packed__));
-
-struct gs_device_bt_const {
-	u32 feature;
-	u32 fclk_can;
-	u32 tseg1_min;
-	u32 tseg1_max;
-	u32 tseg2_min;
-	u32 tseg2_max;
-	u32 sjw_max;
-	u32 brp_min;
-	u32 brp_max;
-	u32 brp_inc;
-} __attribute__((__packed__));
-
-struct gs_host_frame {
-	u32 echo_id;
-	u32 can_id;
-
-	u8 can_dlc;
-	u8 channel;
-	u8 flags;
-	u8 reserved;
-
-	u8 data[8];
-
-	u32 timestamp_us;
-
-} __attribute__((__packed__));
-
-struct gs_tx_context {
-	struct gs_can *dev;
-	unsigned int echo_id;
-};
-
-#endif // __GS_USB_H__
+#endif // __CAN_FLAGS_H__

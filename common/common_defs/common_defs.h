@@ -44,9 +44,8 @@
 
 /* CAN Bus Frequency */
 #define VCAN_BPS 500000 // Main vehicle CAN bus
-#define DCAN_BPS 500000 // Steering angle, DAQ, (wheel temps)
-#define MCAN_BPS 500000 // Motor CAN Bus (Main, DAQ, Inverters)
-#define CCAN_BPS 250000 // Charger CAN bus (ELCON, A_Box, Orion)
+#define MCAN_BPS 500000 // Steering angle, DAQ, (wheel temps)
+#define CCAN_BPS 500000 // Charger (ELCON, A_Box, Orion)
 
 /* Per-Node HSI RCC Trim Constants */
 #define HSI_TRIM_TORQUE_VECTOR 	15

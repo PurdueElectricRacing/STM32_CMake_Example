@@ -10,6 +10,7 @@
  */
 #include "can_parse.h"
 
+#if 0
 // prototypes
 bool initCANFilter();
 
@@ -77,7 +78,6 @@ bool initCANFilter()
     return timeout != PHAL_CAN_INIT_TIMEOUT;
 }
 
-
 void canProcessRxIRQs(CanMsgTypeDef_t* rx)
 {
     CanParsedData_t* msg_data_a;
@@ -91,3 +91,4 @@ void canProcessRxIRQs(CanMsgTypeDef_t* rx)
             __asm__("nop");
     }
 }
+#endif

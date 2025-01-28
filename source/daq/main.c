@@ -1,23 +1,19 @@
-#include "common/bootloader/bootloader_common.h"
-#include "common/phal_F4_F7/can/can.h"
 #include "common/common_defs/common_defs.h"
-#include "common/phal_F4_F7/dma/dma.h"
+#include "common/phal_F4_F7/can/can.h"
 #include "common/phal_F4_F7/gpio/gpio.h"
 #include "common/phal_F4_F7/rcc/rcc.h"
 #include "common/phal_F4_F7/rtc/rtc.h"
 #include "common/phal_F4_F7/spi/spi.h"
 #include "common/phal_F4_F7/usart/usart.h"
+#include "common/freertos/freertos.h"
 
 #include "buffer.h"
 #include "main.h"
-#include "sdio.h"
 #include "daq_hub.h"
+#include "daq_spi.h"
+#include "daq_can.h"
 #include "can_parse.h"
-#include "common/modules/Wiznet/W5500/Ethernet/wizchip_conf.h"
-#include "common/modules/Wiznet/W5500/Ethernet/socket.h"
-
-#include "ff.h"
-#include "gs_usb.h"
+#include "can_flags.h"
 
 GPIOInitConfig_t gpio_config[] = {
     // LEDs
@@ -42,26 +38,38 @@ GPIOInitConfig_t gpio_config[] = {
     GPIO_INIT_SDIO_DT1,
     GPIO_INIT_SDIO_DT2,
     GPIO_INIT_SDIO_DT3,
-
     GPIO_INIT_INPUT(SD_CD_PORT, SD_CD_PIN, GPIO_INPUT_PULL_UP),
     GPIO_INIT_INPUT(LOG_ENABLE_PORT, LOG_ENABLE_PIN, GPIO_INPUT_PULL_UP),
-    GPIO_INIT_INPUT(PWR_LOSS_PORT, PWR_LOSS_PIN, GPIO_INPUT_OPEN_DRAIN),
+    GPIO_INIT_INPUT(PWR_LOSS_PORT, PWR_LOSS_PIN, GPIO_INPUT_OPEN_DRAIN), // SPL EXTI
 
     // LTE UART
     GPIO_INIT_USART6TX_PC6,
     GPIO_INIT_USART6RX_PC7,
 
-#ifdef DISCO_BOARD
-    GPIO_INIT_CANRX_PD0,
-    GPIO_INIT_CANTX_PD1,
-#else
-    GPIO_INIT_CANRX_PA11, // VCAN
+    // CAN1
+    GPIO_INIT_CANRX_PA11,
     GPIO_INIT_CANTX_PA12,
-#endif
-#ifdef EN_CAN2
-    GPIO_INIT_CAN2RX_PB5, // MCAN
+
+    // CAN2
+    GPIO_INIT_CAN2RX_PB5,
     GPIO_INIT_CAN2TX_PB6,
-#endif
+};
+
+/* CLOCK CONFIG */
+extern uint32_t APB1ClockRateHz;
+extern uint32_t APB2ClockRateHz;
+extern uint32_t AHBClockRateHz;
+extern uint32_t PLLClockRateHz;
+
+#define TargetCoreClockrateHz 168000000
+ClockRateConfig_t clock_config = {
+    .system_source              =SYSTEM_CLOCK_SRC_PLL,
+    .pll_src                    =PLL_SRC_HSI16,
+    .vco_output_rate_target_hz  = 336000000,//288000000,
+    .system_clock_target_hz     =TargetCoreClockrateHz,
+    .ahb_clock_target_hz        =(TargetCoreClockrateHz / 1),
+    .apb1_clock_target_hz       =(TargetCoreClockrateHz / 4),
+    .apb2_clock_target_hz       =(TargetCoreClockrateHz / 4),
 };
 
 /* SPI CONFIG FOR ETHERNET MODULE */
@@ -89,37 +97,6 @@ RTC_timestamp_t start_time =
              .time_format=RTC_FORMAT_24_HOUR},
 };
 
-/* CLOCK CONFIG */
-extern uint32_t APB1ClockRateHz;
-extern uint32_t APB2ClockRateHz;
-extern uint32_t AHBClockRateHz;
-extern uint32_t PLLClockRateHz;
-
-#if 1
-#define TargetCoreClockrateHz 168000000
-ClockRateConfig_t clock_config = {
-    .system_source              =SYSTEM_CLOCK_SRC_PLL,
-    .pll_src                    =PLL_SRC_HSI16,
-    .vco_output_rate_target_hz  = 336000000,//288000000,
-    .system_clock_target_hz     =TargetCoreClockrateHz,
-    .ahb_clock_target_hz        =(TargetCoreClockrateHz / 1),
-    .apb1_clock_target_hz       =(TargetCoreClockrateHz / 4),
-    .apb2_clock_target_hz       =(TargetCoreClockrateHz / 4),
-};
-#else
-#define TargetCoreClockrateHz 16000000
-ClockRateConfig_t clock_config = {
-    .system_source              =SYSTEM_CLOCK_SRC_HSI,
-    .vco_output_rate_target_hz  =16000000,
-    .system_clock_target_hz     =TargetCoreClockrateHz,
-    .ahb_clock_target_hz        =(TargetCoreClockrateHz / 1),
-    .apb1_clock_target_hz       =(TargetCoreClockrateHz / (1)),
-    .apb2_clock_target_hz       =(TargetCoreClockrateHz / (1)),
-};
-#endif
-
-volatile uint32_t tick_ms; // Systick 1ms counter
-
 dma_init_t usart_tx_dma_config = USART6_TXDMA_CONT_CONFIG(NULL, 1);
 dma_init_t usart_rx_dma_config = USART6_RXDMA_CONT_CONFIG(NULL, 2);
 usart_init_t lte_usart_config = {
@@ -138,49 +115,34 @@ usart_init_t lte_usart_config = {
 };
 DEBUG_PRINTF_USART_DEFINE(&lte_usart_config) // use LTE uart lmao
 
-static void configure_exti(void);
-static void cs_sel(void);
-static void cs_desel(void);
-static uint8_t spi_rb(void);
-static void spi_wb(uint8_t b);
-static void spi_rb_burst(uint8_t *pBuf, uint16_t len);
-static void spi_wb_burst(uint8_t *pBuf, uint16_t len);
-bool can_parse_error_status(uint32_t err, timestamped_frame_t *frame);
-
-q_handle_t q_tx_can2_to_can1;
-q_handle_t q_rx_can_uds;
-
-volatile timestamped_frame_t rx_buffer[RX_BUFF_ITEM_COUNT];
+// Static buffer allocations
+volatile timestamped_frame_t can_rx_buffer[RX_BUFF_ITEM_COUNT];
 b_tail_t tails[RX_TAIL_COUNT];
 b_handle_t b_rx_can = {
-    .buffer=(volatile uint8_t *)rx_buffer,
+    .buffer=(volatile uint8_t *)can_rx_buffer,
     .tails=tails,
     .num_tails=RX_TAIL_COUNT,
 };
 
-tcp_can_frame_t tcp_rx_buffer[TCP_RX_BUFF_ITEM_COUNT];
-b_tail_t tcp_tails[TCP_RX_TAIL_COUNT];
-b_handle_t b_rx_tcp = {
-    .buffer=(uint8_t *)tcp_rx_buffer,
-    .tails=tcp_tails,
-    .num_tails=TCP_RX_TAIL_COUNT,
-};
+timestamped_frame_t tcp_rx_buf[TCP_RX_ITEM_COUNT];
+defineStaticQueue(q_tcp_tx, timestamped_frame_t, TCP_TX_ITEM_COUNT);
+defineStaticQueue(q_can1_rx, timestamped_frame_t, CAN1_RX_ITEM_COUNT); // CAN messages RX'd to DAQ
+defineStaticQueue(q_can2_tx, CanMsgTypeDef_t, CAN2_TX_ITEM_COUNT);
+
+SemaphoreHandle_t spi1_lock;
+
+static void configure_interrupts(void);
+bool can_parse_error_status(uint32_t err, timestamped_frame_t *frame);
+void HardFault_Handler();
 
 int main()
 {
-
+    osKernelInitialize();
     // TODO: use watchdog to recover if timed out?
     /* Data Struct init */
-    // TODO: note: using send to back to q_tx_can2_to_can1 from the interrupt handler! (i.e. DO NOT SEND FROM NORMAL CONTEXT!)
-    qConstruct(&q_tx_can2_to_can1, sizeof(CanMsgTypeDef_t));
-    qConstruct(&q_rx_can_uds, sizeof(timestamped_frame_t));
-    bConstruct(&b_rx_can, sizeof(*rx_buffer), sizeof(rx_buffer));
-    bConstruct(&b_rx_tcp, 1, sizeof(tcp_rx_buffer)); // Byte resolution for tcp receive
+    bConstruct(&b_rx_can, sizeof(*can_rx_buffer), sizeof(can_rx_buffer));
 
-    // TODO: size the buffer to handle the time it takes to write new file (last max loop time was 71ms)
-    // TODO: investigate flushing file periodically to get the loop times down
-
-    PHAL_trimHSI(HSI_TRIM_DAQ);
+    //PHAL_trimHSI(HSI_TRIM_DAQ);
     if(0 != PHAL_configureClockRates(&clock_config))
         HardFault_Handler();
 
@@ -206,111 +168,64 @@ int main()
 
     if(!PHAL_initCAN(CAN1, false, VCAN_BPS))
         HardFault_Handler();
-    NVIC_EnableIRQ(CAN1_RX0_IRQn);
     CAN1->IER |= CAN_IER_ERRIE | CAN_IER_LECIE |
                  CAN_IER_BOFIE | CAN_IER_EPVIE |
                  CAN_IER_EWGIE;
-    NVIC_EnableIRQ(CAN1_SCE_IRQn);
 
-#ifdef EN_CAN2
-    if(!PHAL_initCAN(CAN2, false, DCAN_BPS))
+    if(!PHAL_initCAN(CAN2, false, MCAN_BPS))
         HardFault_Handler();
-    NVIC_EnableIRQ(CAN2_RX0_IRQn);
-#endif
 
-    // Link SPI for ethernet driver
-    PHAL_writeGPIO(ETH_CS_PORT, ETH_CS_PIN, 1);
-    reg_wizchip_cs_cbfunc(cs_sel, cs_desel);
-    reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
-    reg_wizchip_spiburst_cbfunc(spi_rb_burst, spi_wb_burst);
+    initCANParse();
+    daq_spi_register_callbacks(); // Link SPI for ethernet driver
+    //uds_init();
+    daq_hub_init();
+    configure_interrupts();
 
-    configure_exti();
+    spi1_lock = xSemaphoreCreateMutex();
+    q_tcp_tx = createStaticQueue(q_tcp_tx, timestamped_frame_t, TCP_TX_ITEM_COUNT);
+    q_can1_rx = createStaticQueue(q_can1_rx, timestamped_frame_t, CAN1_RX_ITEM_COUNT);
+    q_can2_tx = createStaticQueue(q_can2_tx, CanMsgTypeDef_t, CAN2_TX_ITEM_COUNT);
 
-    daq_init();
+    daq_create_threads();
 
-    log_msg("Starting main loop\n");
-
-    daq_loop();
-
-    log_red("Main loop exited!\n");
+    osKernelStart();
 
     return 0;
 }
 
-static void configure_exti(void)
+static void configure_interrupts(void)
 {
     // Configure exti interupt for power loss pin (PE15)
-
     // Enable the SYSCFG clock for interrupts
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-
     SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI15_PE; // Map PE15 to EXTI 15
     EXTI->IMR |= EXTI_IMR_MR15; // Unmask EXTI15
     EXTI->FTSR |= EXTI_FTSR_TR15; // Enable the falling edge trigger (active low reset)
-
     NVIC_SetPriority(EXTI15_10_IRQn, 15); // allow other interrupts to preempt this one (especially systick and dma)
+
+    NVIC_SetPriority(CAN1_RX0_IRQn, 6); // TODO calculate priority
+    NVIC_SetPriority(CAN2_RX0_IRQn, 7);
+    NVIC_SetPriority(CAN1_SCE_IRQn, 10);
+
+    NVIC_EnableIRQ(CAN1_RX0_IRQn);
+    NVIC_EnableIRQ(CAN1_SCE_IRQn);
+    NVIC_EnableIRQ(CAN2_RX0_IRQn);
     NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
-void SysTick_Handler(void)
-{
-    tick_ms++;
-}
-
-/* SPI Callbacks for Ethernet Driver */
-
-/*
- * W5500 uses a custom framed multi-byte SPI format that requires
- * CS to be low for the entire duration of the multi-byte transaction.
- * Hence the SW CS. Since the W5500 driver pulls CS manually using this
- * callback before calling SPI_transfer, and the SPI peripheral needs to be
- * enabled before CS, we enable it here and use a special function in the PHAL
- * that doesn't pull CS/enable SPI
- */
-static void cs_sel(void)
-{
-    eth_spi_config.periph->CR1 |= SPI_CR1_SPE;
-    PHAL_writeGPIO(ETH_CS_PORT, ETH_CS_PIN, 0);
-}
-
-static void cs_desel(void)
-{
-    eth_spi_config.periph->CR1 &= ~SPI_CR1_SPE;
-    PHAL_writeGPIO(ETH_CS_PORT, ETH_CS_PIN, 1);
-}
-
-static uint8_t spi_rb(void)
-{
-    uint8_t b;
-    PHAL_SPI_transfer_noDMA_DAQW5500Only(&eth_spi_config, NULL, 0, sizeof(b), &b);
-    return b;
-}
-
-static void spi_wb(uint8_t b)
-{
-    PHAL_SPI_transfer_noDMA_DAQW5500Only(&eth_spi_config, &b, sizeof(b), 0, NULL);
-}
-
-static void spi_rb_burst(uint8_t *pBuf, uint16_t len)
-{
-    // SPI RX Burst, must block! (uses local pointer)
-    PHAL_SPI_transfer_noDMA_DAQW5500Only(&eth_spi_config, NULL, 0, len, pBuf);
-}
-
-static void spi_wb_burst(uint8_t *pBuf, uint16_t len)
-{
-    // SPI TX Burst, must block! (uses local pointer)
-    PHAL_SPI_transfer_noDMA_DAQW5500Only(&eth_spi_config, pBuf, len, 0, NULL);
-}
-
+volatile uint64_t can_hit_count = 0;
 static void can_rx_irq_handler(CAN_TypeDef * can_h)
 {
+    portBASE_TYPE xHigherPriorityTaskWoken;
+    xHigherPriorityTaskWoken = pdFALSE;
+    can_hit_count++;
+
     // TODO: track FIFO overrun and full errors
     if (can_h->RF0R & CAN_RF0R_FOVR0) // FIFO Overrun
-        can_h->RF0R &= !(CAN_RF0R_FOVR0);
+        can_h->RF0R &= ~(CAN_RF0R_FOVR0);
 
     if (can_h->RF0R & CAN_RF0R_FULL0) // FIFO Full
-        can_h->RF0R &= !(CAN_RF0R_FULL0);
+        can_h->RF0R &= ~(CAN_RF0R_FULL0);
 
     if (can_h->RF0R & CAN_RF0R_FMP0_Msk) // Release message pending
     {
@@ -318,7 +233,8 @@ static void can_rx_irq_handler(CAN_TypeDef * can_h)
         uint32_t cont;
         if (bGetHeadForWrite(&b_rx_can, (void**) &rx, &cont) == 0)
         {
-            rx->tick_ms = tick_ms;
+            rx->frame_type = DAQ_FRAME_CAN_RX; // msg generated by CAN interrupt
+            rx->tick_ms = getTick();
 
             rx->bus_id = (can_h == CAN1) ? BUS_ID_CAN1 : BUS_ID_CAN2;
 
@@ -343,7 +259,7 @@ static void can_rx_irq_handler(CAN_TypeDef * can_h)
             rx->data[6] = (uint8_t) (can_h->sFIFOMailBox[0].RDHR >> 16) & 0xFF;
             rx->data[7] = (uint8_t) (can_h->sFIFOMailBox[0].RDHR >> 24) & 0xFF;
 
-            // Pass-through to CAN1
+            // Pass-through to CAN1 // TODO filter
             if (rx->bus_id == BUS_ID_CAN2 && rx->msg_id == (ID_LWS_STANDARD))
             {
                 CanMsgTypeDef_t msg;
@@ -360,19 +276,45 @@ static void can_rx_irq_handler(CAN_TypeDef * can_h)
                 msg.Data[5] = rx->data[5];
                 msg.Data[6] = rx->data[6];
                 msg.Data[7] = rx->data[7];
-                qSendToBack(&q_tx_can2_to_can1, &msg);
+                if (xQueueSendToBackFromISR(q_can2_tx, &msg, &xHigherPriorityTaskWoken) != pdPASS)
+                {
+                    daq_catch_error();
+                }
             }
 
-            // Bootloader check
-            if (rx->msg_id == (ID_DAQ_BL_CMD | CAN_EFF_FLAG) && rx->bus_id == BUS_ID_CAN1)
+            // TODO: cannot guarantee that messages will be processed as fast as it logs, so currently keeping a separate queue for messages to be processed
+
+// Disable UDS for now
+#if 0
+            // TODO create a UDS CAN ID mask
+            if (rx->msg_id == (ID_UDS_RESPONSE_A_BOX         | CAN_EFF_FLAG) ||
+                rx->msg_id == (ID_UDS_RESPONSE_DASHBOARD     | CAN_EFF_FLAG) ||
+                rx->msg_id == (ID_UDS_RESPONSE_MAIN_MODULE   | CAN_EFF_FLAG) ||
+                rx->msg_id == (ID_UDS_RESPONSE_PDU           | CAN_EFF_FLAG) ||
+                rx->msg_id == (ID_UDS_RESPONSE_TORQUE_VECTOR | CAN_EFF_FLAG))
             {
-                qSendToBack(&q_rx_can_uds, rx);
+                if ((dh.eth_tcp_state == ETH_TCP_ESTABLISHED) && (xQueueSendToBackFromISR(q_tcp_tx, rx, &xHigherPriorityTaskWoken) != pdPASS))
+                {
+                    daq_catch_error();
+                }
             }
+
+            // Check for CAN messages intended for DAQ, which is only really UDS
+            if (rx->msg_id == (ID_UDS_COMMAND_DAQ | CAN_EFF_FLAG))
+            {
+                if (xQueueSendToBackFromISR(q_can1_rx, rx, &xHigherPriorityTaskWoken) != pdPASS)
+                {
+                    daq_catch_error();
+                }
+            }
+#endif
 
             bCommitWrite(&b_rx_can, 1);
         }
         can_h->RF0R |= (CAN_RF0R_RFOM0);
     }
+
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 void CAN1_RX0_IRQHandler()
@@ -380,16 +322,16 @@ void CAN1_RX0_IRQHandler()
     can_rx_irq_handler(CAN1);
 }
 
-#ifdef EN_CAN2
 void CAN2_RX0_IRQHandler()
 {
     can_rx_irq_handler(CAN2);
 }
-#endif
+
 //volatile uint32_t last_err_stat = 0;
 volatile uint32_t error_irq_cnt = 0;
 void CAN1_SCE_IRQHandler()
 {
+    // TODO track errors
     uint32_t err_stat;
     error_irq_cnt++;
     if (CAN1->MSR & CAN_MSR_ERRI)
@@ -401,7 +343,7 @@ void CAN1_SCE_IRQHandler()
         uint32_t cont;
         if (bGetHeadForWrite(&b_rx_can, (void**) &rx, &cont) == 0)
         {
-            rx->tick_ms = tick_ms;
+            rx->tick_ms = getTick();
             can_parse_error_status(err_stat, rx);
             bCommitWrite(&b_rx_can, 1);
         }
@@ -472,8 +414,6 @@ bool can_parse_error_status(uint32_t err, timestamped_frame_t *frame)
 
 	return true;
 }
-
-
 
 void HardFault_Handler()
 {
