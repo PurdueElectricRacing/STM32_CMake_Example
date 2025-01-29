@@ -226,7 +226,7 @@ int main(void)
     /* Task Creation */
     schedInit(APB1ClockRateHz);
     configureAnim(preflightAnimation, preflightChecks, 74, 1000);
-    //PHAL_writeGPIO(RESET_GPS_PORT, RESET_GPS_PIN, 1);
+    PHAL_writeGPIO(RESET_GPS_PORT, RESET_GPS_PIN, 1);
     // taskCreateBackground(canTxUpdate);
     // taskCreateBackground(canRxUpdate);
 
@@ -268,7 +268,7 @@ void preflightChecks(void)
         break;
     case 3:
         // GPS Initialization
-        //PHAL_writeGPIO(RESET_GPS_PORT, RESET_GPS_PIN, 1);
+        PHAL_writeGPIO(RESET_GPS_PORT, RESET_GPS_PIN, 1);
        // PHAL_usartRxDma(&huart_gps, (uint16_t *)GPSHandle.raw_message, 100, 1);
     break;
     case 5:
