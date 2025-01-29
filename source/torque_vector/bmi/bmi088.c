@@ -19,14 +19,14 @@
 
 static inline void BMI088_selectGyro(BMI088_Handle_t *bmi);
 static inline void BMI088_selectAccel(BMI088_Handle_t *bmi);
-
 bool BMI088_init(BMI088_Handle_t *bmi)
 {
     bmi->accel_ready = false;
     /* Gyro initilization  */
     BMI088_selectGyro(bmi);
-    if (PHAL_SPI_readByte(bmi->spi, BMI088_GYRO_CHIP_ID_ADDR, true) != BMI088_GYRO_CHIP_ID)
+    if (PHAL_SPI_readByte(bmi->spi, BMI088_GYRO_CHIP_ID_ADDR, true) != BMI088_GYRO_CHIP_ID) {
         return false;
+    }
 
     PHAL_SPI_writeByte(bmi->spi, BMI088_GYRO_BANDWIDTH_ADDR, bmi->gyro_datarate);
     PHAL_SPI_writeByte(bmi->spi, BMI088_GYRO_RANGE_ADDR, bmi->gyro_range);
