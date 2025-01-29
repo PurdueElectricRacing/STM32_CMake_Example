@@ -90,7 +90,7 @@ typedef struct {
  *  return value of 0 means all clocks were sucessfully configured.
  */
 uint8_t PHAL_configureClockRates(ClockRateConfig_t* config);
-
+bool PHAL_configureHSESystemClock();
 /**
  * @brief Configure PLL VCO Clock rate
  * The VCO clock is the input clock for the different PLL outputs.
