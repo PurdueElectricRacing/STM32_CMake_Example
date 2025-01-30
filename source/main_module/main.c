@@ -23,6 +23,7 @@
 #include "main.h"
 
 GPIOInitConfig_t gpio_config[] = {
+#if 0
     // Internal Status Indicators
     GPIO_INIT_OUTPUT(ERR_LED_GPIO_Port, ERR_LED_Pin, GPIO_OUTPUT_LOW_SPEED),
     GPIO_INIT_OUTPUT(CONN_LED_GPIO_Port, CONN_LED_Pin, GPIO_OUTPUT_LOW_SPEED),
@@ -82,6 +83,14 @@ GPIOInitConfig_t gpio_config[] = {
     GPIO_INIT_OUTPUT(THERM_MUX_S1_GPIO_Port, THERM_MUX_S1_Pin, GPIO_OUTPUT_LOW_SPEED),
     GPIO_INIT_OUTPUT(THERM_MUX_S2_GPIO_Port, THERM_MUX_S2_Pin, GPIO_OUTPUT_LOW_SPEED),
     GPIO_INIT_ANALOG(THERM_MUX_D_GPIO_Port, THERM_MUX_D_Pin)
+#endif
+    // CAN
+    GPIO_INIT_CANRX_PA11,
+    GPIO_INIT_CANTX_PA12,
+
+    GPIO_INIT_CAN2RX_PB12,
+    GPIO_INIT_CAN2TX_PB13,
+    GPIO_INIT_OUTPUT(GPIOD, 13, GPIO_OUTPUT_LOW_SPEED), // F4 disco
 };
 
 /* USART Configuration */
@@ -218,6 +227,8 @@ void send_fault(uint16_t, bool);
 extern void HardFault_Handler();
 void interpretLoadSensor(void);
 float voltToForce(uint16_t load_read);
+void sendCan(void);
+void heartBeatLED2(void);
 
 q_handle_t q_tx_usart_l;
 q_handle_t q_tx_usart_r;
@@ -226,6 +237,7 @@ uint16_t num_failed_msgs_r;
 uint16_t num_failed_msgs_l;
 
 int main(void){
+#if 0
     /* Data Struct Initialization */
     qConstruct(&q_tx_usart_l, MC_MAX_TX_LENGTH);
     qConstruct(&q_tx_usart_r, MC_MAX_TX_LENGTH);
@@ -270,8 +282,49 @@ int main(void){
     // SEND_LWS_CONFIG(0x03, 0, 0); // start new
 
     schedStart();
+#endif
+    if(0 != PHAL_configureClockRates(&clock_config))
+    {
+        HardFault_Handler();
+    }
+    if(!PHAL_initGPIO(gpio_config, sizeof(gpio_config)/sizeof(GPIOInitConfig_t)))
+    {
+        HardFault_Handler();
+    }
+    schedInit(APB1ClockRateHz);
+
+    if(!PHAL_initCAN(CAN1, false, 500000)) // 500K
+    {
+        HardFault_Handler();
+    }
+    NVIC_EnableIRQ(CAN1_RX0_IRQn);
+
+#if 0
+    if(!PHAL_initCAN(CAN2, false, 500000)) // 500K
+    {
+        HardFault_Handler();
+    }
+    NVIC_EnableIRQ(CAN2_RX0_IRQn);
+#endif
+
+    initCANParse();
+
+    taskCreate(sendCan, 1); // 15ms
+    taskCreateBackground(canTxUpdate);
+    taskCreateBackground(canRxUpdate);
+    schedStart();
 
     return 0;
+}
+
+void sendCan(void)
+{
+    SEND_DAQ_RESPONSE_MAIN_MODULE(0xAAAAAAAAAAAAAAAAUL); // 0b1010
+}
+
+void heartBeatLED2(void)
+{
+    PHAL_toggleGPIO(GPIOD, 13);
 }
 
 void preflightChecks(void) {
