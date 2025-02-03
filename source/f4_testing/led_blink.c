@@ -42,7 +42,8 @@ volatile uint32_t tick_ms; // Systick 1ms counter
 
 #define TargetCoreClockrateHz 16000000
 ClockRateConfig_t clock_config = {
-    .system_source              =SYSTEM_CLOCK_SRC_HSI,
+    .use_hse                    =false,
+    .use_pll                    =false,
     .vco_output_rate_target_hz  =160000000,
     .system_clock_target_hz     =TargetCoreClockrateHz,
     .ahb_clock_target_hz        =(TargetCoreClockrateHz / 1),
