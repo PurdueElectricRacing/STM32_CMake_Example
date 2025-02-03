@@ -22,26 +22,6 @@ uint8_t PHAL_configureClockRates(ClockRateConfig_t* config)
     // Nonzero Bit Encoded Error Code Indicates Error
     uint8_t ret_code = 0;
 
-    // Configure clock rates based off an indicated system source in the config
-    // switch(config->system_source)
-    // {
-    //     // Configure System Clock from Phase Locked Loop
-    //     case SYSTEM_CLOCK_SRC_PLL:
-    //         ret_code |= (!PHAL_configurePLLVCO(config->pll_src, config->vco_output_rate_target_hz)) << 5;
-    //         ret_code |= (!PHAL_configurePLLSystemClock(config->system_clock_target_hz)) << 4;
-    //         break;
-    //     // Configure System Clock from High Speed External Oscillator (not supported currently in F4 HAL)
-    //     case SYSTEM_CLOCK_SRC_HSE:
-    //         return 0xFF;
-    //     // Configure System Clock from the High Speed Internal Oscillator
-    //     case SYSTEM_CLOCK_SRC_HSI:
-    //         ret_code |= (!PHAL_configureHSISystemClock()) << 3;                                // Call HSI configure subroutine
-    //         config->system_clock_target_hz = 16000000;                                         // Set System Clock Target in Clock Config
-    //         break;
-    //     default:
-    //         return 0xFF;                                                                       // Invalid System Source
-    // }
-
     if (config->use_hse) {
         ret_code |= (!PHAL_configureHSESystemClock()) << 6;
         

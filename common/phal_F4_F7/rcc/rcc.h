@@ -65,7 +65,6 @@ typedef enum {
 } PLLSrc_t;
 
 typedef struct {
-    // SystemClockSrc_t system_source;     /* System Core Clock source */
     bool use_hse;                       /* Use HSE or not */
     bool use_pll;                       /* Use PLL or not */
     uint32_t  system_clock_target_hz;   /* System Core Clock rate */
@@ -73,7 +72,7 @@ typedef struct {
     uint32_t  apb1_clock_target_hz;     /* APB1 clock rate target */
     uint32_t  apb2_clock_target_hz;     /* APB2 clock rate target */
 
-    /* Only used for system_source == PLL */
+    /* Only used for use_pll == true */
     PLLSrc_t pll_src;                   /* Input source for PLL VCO */
     uint32_t vco_output_rate_target_hz; /* VCO output target rate */
     uint32_t msi_output_rate_target_hz; /* Use if pll_src == MSI */
