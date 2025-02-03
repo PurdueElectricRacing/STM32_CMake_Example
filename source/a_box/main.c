@@ -45,10 +45,16 @@ GPIOInitConfig_t gpio_config[] = {
    GPIO_INIT_OUTPUT(MUX_B_Port, MUX_B_Pin, GPIO_OUTPUT_LOW_SPEED),
    GPIO_INIT_OUTPUT(MUX_C_Port, MUX_C_Pin, GPIO_OUTPUT_LOW_SPEED),
    GPIO_INIT_OUTPUT(MUX_D_Port, MUX_D_Pin, GPIO_OUTPUT_LOW_SPEED),
-   GPIO_INIT_ANALOG(TMU_1_Port, TMU_1_Pin),
-   GPIO_INIT_ANALOG(TMU_2_Port, TMU_2_Pin),
-   GPIO_INIT_ANALOG(TMU_3_Port, TMU_3_Pin),
-   GPIO_INIT_ANALOG(TMU_4_Port, TMU_4_Pin),
+   GPIO_INIT_ANALOG(TMU_1_1_Port, TMU_1_1_Pin),
+   GPIO_INIT_ANALOG(TMU_1_2_Port, TMU_1_2_Pin),
+   GPIO_INIT_ANALOG(TMU_2_1_Port, TMU_2_1_Pin),
+   GPIO_INIT_ANALOG(TMU_2_2_Port, TMU_2_2_Pin),
+   GPIO_INIT_ANALOG(TMU_3_1_Port, TMU_3_1_Pin),
+   GPIO_INIT_ANALOG(TMU_3_2_Port, TMU_3_2_Pin),
+   GPIO_INIT_ANALOG(TMU_4_1_Port, TMU_4_1_Pin),
+   GPIO_INIT_ANALOG(TMU_4_2_Port, TMU_4_2_Pin),
+   GPIO_INIT_ANALOG(TMU_5_1_Port, TMU_5_1_Pin),
+   GPIO_INIT_ANALOG(TMU_5_2_Port, TMU_5_2_Pin),
 
    // Board Temp Measurement
    GPIO_INIT_ANALOG(BOARD_TEMP_Port, BOARD_TEMP_Pin),
@@ -112,12 +118,18 @@ ADCInitConfig_t adc_config = {
 
 volatile ADCReadings_t adc_readings;
 ADCChannelConfig_t adc_channel_config[] = {
-    {.channel=TMU_1_ADC_CHANNEL,    .rank=1,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
-    {.channel=TMU_2_ADC_CHANNEL,    .rank=2,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
-    {.channel=TMU_3_ADC_CHANNEL,    .rank=3,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
-    {.channel=TMU_4_ADC_CHANNEL,    .rank=4,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
-    {.channel=I_SENSE_CH1_ADC_CHANNEL,    .rank=5,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
-    {.channel=I_SENSE_CH2_ADC_CHANNEL,    .rank=6,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_1_1_ADC_CHANNEL,    .rank=1,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_1_2_ADC_CHANNEL,    .rank=2,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_2_1_ADC_CHANNEL,    .rank=3,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_2_2_ADC_CHANNEL,    .rank=4,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_3_1_ADC_CHANNEL,    .rank=5,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_3_2_ADC_CHANNEL,    .rank=6,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_4_1_ADC_CHANNEL,    .rank=7,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_4_2_ADC_CHANNEL,    .rank=8,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_5_1_ADC_CHANNEL,    .rank=9,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=TMU_5_2_ADC_CHANNEL,    .rank=10,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=I_SENSE_CH1_ADC_CHANNEL,    .rank=11,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
+    {.channel=I_SENSE_CH2_ADC_CHANNEL,    .rank=12,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
 };
 dma_init_t adc_dma_config = ADC1_DMA_CONT_CONFIG((uint32_t) &adc_readings,
             sizeof(adc_readings) / sizeof(adc_readings.tmu_1), 0b01);

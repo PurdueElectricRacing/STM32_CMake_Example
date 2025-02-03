@@ -47,7 +47,7 @@
 #define ERROR_LED_Pin           (15)
 
 
-//TMU Mux Input Pins
+// TMU Mux Input Pins
 #define MUX_A_Port  (GPIOC)
 #define MUX_A_Pin   (9)
 #define MUX_B_Port  (GPIOC)
@@ -57,15 +57,28 @@
 #define MUX_D_Port  (GPIOC)
 #define MUX_D_Pin   (6)
 
-//TMU Mux Output Pins
-#define TMU_1_Port (GPIOC)
-#define TMU_1_Pin (0)
-#define TMU_2_Port (GPIOC)
-#define TMU_2_Pin (1)
-#define TMU_3_Port (GPIOC)
-#define TMU_3_Pin (2)
-#define TMU_4_Port (GPIOC)
-#define TMU_4_Pin (3)
+// TMU Mux Output Pins
+#define TMU_1_1_Port (GPIOA)
+#define TMU_1_1_Pin (2)
+#define TMU_1_2_Port (GPIOA)
+#define TMU_1_2_Pin (3)
+#define TMU_2_1_Port (GPIOA)
+#define TMU_2_1_Pin (4)
+#define TMU_2_2_Port (GPIOA)
+#define TMU_2_2_Pin (5)
+#define TMU_3_1_Port (GPIOA)
+#define TMU_3_1_Pin (6)
+#define TMU_3_2_Port (GPIOA)
+#define TMU_3_2_Pin (7)
+
+#define TMU_4_1_Port (GPIOC)
+#define TMU_4_1_Pin (0)
+#define TMU_4_2_Port (GPIOC)
+#define TMU_4_2_Pin (1)
+#define TMU_5_1_Port (GPIOC)
+#define TMU_5_1_Pin (2)
+#define TMU_5_2_Port (GPIOC)
+#define TMU_5_2_Pin (3)
 
 // Board Temp
 #define BOARD_TEMP_Port (GPIOB)
@@ -73,15 +86,22 @@
 
 // 5V Monitoring
 #define VSENSE_5V_Port (GPIOA)
-#define VSENSE_5V_Pin (7)
-#define VSENSE_5V_ADC_CHNL  (7)
+#define VSENSE_5V_Pin (8)
+#define VSENSE_5V_ADC_CHNL  (7) // not sure if channel has changed
 
-// ADC Channels
+// ADC Channels - Ref (see additional functions): https://www.st.com/resource/en/datasheet/dm00037051.pdf#page=48 
 // TMU
-#define TMU_1_ADC_CHANNEL (10)
-#define TMU_2_ADC_CHANNEL (11)
-#define TMU_3_ADC_CHANNEL (12)
-#define TMU_4_ADC_CHANNEL (13)
+#define TMU_1_1_ADC_CHANNEL (2) // ADC123
+#define TMU_1_2_ADC_CHANNEL (3) // ADC123
+#define TMU_2_1_ADC_CHANNEL (4) // ADC12
+#define TMU_2_2_ADC_CHANNEL (5) // ADC12
+#define TMU_3_1_ADC_CHANNEL (6) // ADC12
+#define TMU_3_2_ADC_CHANNEL (7) // ADC12
+
+#define TMU_4_1_ADC_CHANNEL (10) // ADC123 
+#define TMU_4_2_ADC_CHANNEL (11) // ADC123
+#define TMU_5_1_ADC_CHANNEL (12) // ADC123
+#define TMU_5_2_ADC_CHANNEL (13) // ADC123
 // Current Sense
 #define I_SENSE_CH1_ADC_CHANNEL (0)
 #define I_SENSE_CH2_ADC_CHANNEL (1)
