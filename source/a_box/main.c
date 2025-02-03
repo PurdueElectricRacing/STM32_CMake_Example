@@ -132,7 +132,7 @@ ADCChannelConfig_t adc_channel_config[] = {
     {.channel=I_SENSE_CH2_ADC_CHANNEL,    .rank=12,  .sampling_time=ADC_CHN_SMP_CYCLES_480},
 };
 dma_init_t adc_dma_config = ADC1_DMA_CONT_CONFIG((uint32_t) &adc_readings,
-            sizeof(adc_readings) / sizeof(adc_readings.tmu_1), 0b01);
+            sizeof(adc_readings) / sizeof(adc_readings.tmu_1_1), 0b01);
 
 int main (void)
 {

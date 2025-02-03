@@ -112,15 +112,21 @@
 #define R1_ISENSE 1000
 #define R2_ISENSE 2000
 
-typedef struct 
+typedef struct
 {
     // Do not modify this struct unless
     // you modify the ADC DMA config
     // in main.c to match
-    uint16_t tmu_1;
-    uint16_t tmu_2;
-    uint16_t tmu_3;
-    uint16_t tmu_4;
+    uint16_t tmu_1_1;
+    uint16_t tmu_1_2;
+    uint16_t tmu_2_1;
+    uint16_t tmu_2_2;
+    uint16_t tmu_3_1;
+    uint16_t tmu_3_2;
+    uint16_t tmu_4_1;
+    uint16_t tmu_4_2;
+    uint16_t tmu_5_1;
+    uint16_t tmu_5_2;
     // CAN I DO THIS??
     uint16_t isense_ch1;
     uint16_t isense_ch2;
