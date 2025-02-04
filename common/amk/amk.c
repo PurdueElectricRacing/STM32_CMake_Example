@@ -87,7 +87,7 @@ void amkSetTorque(amk_motor_t* motor, int16_t torque_setpoint)
 
 static void amkGetData(amk_motor_t* motor)
 {
-    if (!can_data.AMK_Actual_Values_1.stale) {
+    if (!can_data.INV1_Actual_Values_1.stale) {
         // motor->status.AMK_bSystemReady = can_data.AMK_Actual_Values_1.AMK_Status_bSystemReady;
         // motor->status.AMK_bError = can_data.AMK_Actual_Values_1.AMK_Status_bError;
         // motor->status.AMK_bWarn = can_data.AMK_Actual_Values_1.AMK_Status_bWarn;
@@ -123,7 +123,7 @@ static void amkGetData(amk_motor_t* motor)
 
 static void motorSendSetpoints(amk_motor_t* motor)
 {
-    SEND_AMK_SETPOINTS_1(motor->control.AMK_bReserve1,
+    SEND_INV1_SETPOINTS_1(motor->control.AMK_bReserve1,
                          motor->control.AMK_bInverterOn,
                          motor->control.AMK_bDcOn,
                          motor->control.AMK_bEnable,

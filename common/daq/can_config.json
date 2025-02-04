@@ -197,7 +197,7 @@
                             "msg_pgn": 14
                         },
                         {
-                            "msg_name": "AMK_Setpoints_1",
+                            "msg_name": "INV1_Setpoints_1",
                             "msg_desc": "Contains status word and setpoints",
                             "signals": [
                                 {"sig_name": "AMK_Control_bReserve", "sig_desc": "Control word: RESERVED", "type":"uint8_t", "length":8},
@@ -226,7 +226,7 @@
                         {"msg_name": "throttle_vcu"},
                         {"msg_name": "throttle_vcu_equal"},
                         {
-                            "msg_name": "AMK_Actual_Values_1",
+                            "msg_name": "INV1_Actual_Values_1",
                             "msg_desc": "Contains the status word and actual values",
                             "signals": [
                                 {"sig_name": "AMK_Status_bReserve", "sig_desc": "Status word: RESERVED", "type":"uint8_t", "length":8},
@@ -247,7 +247,7 @@
                             "is_normal": true
                         },
                         {
-                            "msg_name": "AMK_Actual_Values_2",
+                            "msg_name": "INV1_Actual_Values_2",
                             "msg_desc": "Contains actual values",
                             "signals": [
                                 {"sig_name": "AMK_TempMotor", "sig_desc": "Motor Temperature", "type":"int16_t", "unit": "C", "scale": 0.1},
@@ -1050,11 +1050,72 @@
                     ]
                 },
                 {
+                    "node_name": "Inverter2",
+                    "node_ssa": 58,
+                    "tx": [
+                        {
+                            "msg_name": "INV2_Actual_Values_1",
+                            "msg_desc": "Contains the status word and actual values",
+                            "signals": [
+                                {"sig_name": "AMK_Status_bReserve", "sig_desc": "Status word: RESERVED", "type":"uint8_t", "length":8},
+                                {"sig_name": "AMK_Status_bSystemReady", "sig_desc": "Status word: system ready", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Status_bError", "sig_desc": "Status word: error", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Status_bWarn", "sig_desc": "Status word: warning", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Status_bQuitDcOn", "sig_desc": "Status word: HV activation ACK", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Status_bDcOn", "sig_desc": "Status word: HV activation level", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Status_bQuitInverterOn", "sig_desc": "Status word: Controller enable ACK", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Status_bInverterOn", "sig_desc": "Status word: Controller enable level", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Status_bDerating", "sig_desc": "Status word: torque limit activation", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_ActualVelocity", "sig_desc": "Actual speed value", "type":"int16_t", "unit":"rpm"},
+                                {"sig_name": "AMK_TorqueCurrent", "sig_desc": "Raw data for calculating actual torque current", "type":"int16_t"},
+                                {"sig_name": "AMK_MagnetizingCurrent", "sig_desc": "Raw data for calculating actual magnetizing current", "type":"int16_t"}
+                            ],
+                            "msg_period": 5,
+                            "msg_id_override": "0x284",
+                            "is_normal": true
+                        },
+                        {
+                            "msg_name": "INV2_Actual_Values_2",
+                            "msg_desc": "Contains actual values",
+                            "signals": [
+                                {"sig_name": "AMK_TempMotor", "sig_desc": "Motor Temperature", "type":"int16_t", "unit": "C", "scale": 0.1},
+                                {"sig_name": "AMK_TempInverter", "sig_desc": "Cold Plate Temperature", "type":"int16_t", "unit": "C", "scale": 0.1},
+                                {"sig_name": "AMK_ErrorInfo", "sig_desc": "Diagnostic Number", "type":"uint16_t"},
+                                {"sig_name": "AMK_TempIGBT", "sig_desc": "IGBT Temperature", "type":"uint16_t", "unit": "C", "scale": 0.1}
+                            ],
+                            "msg_period": 5,
+                            "msg_id_override": "0x286",
+                            "is_normal": true
+                        }
+                    ],
+                    "rx": [
+                        {
+                            "msg_name": "INV2_Setpoints_1",
+                            "msg_desc": "Contains status word and setpoints",
+                            "signals": [
+                                {"sig_name": "AMK_Control_bReserve", "sig_desc": "Control word: RESERVED", "type":"uint8_t", "length":8},
+                                {"sig_name": "AMK_Control_bInverterOn", "sig_desc": "Control word: controller enable", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Control_bDcOn", "sig_desc": "Control word: HV activation", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Control_bEnable", "sig_desc": "Control word: driver enable", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Control_bErrorReset", "sig_desc": "Control word: remove error", "type":"uint8_t", "length":1},
+                                {"sig_name": "AMK_Control_bReserve2", "sig_desc": "Control word: RESERVED", "type":"uint8_t", "length":4},
+                                {"sig_name": "AMK_TargetVelocity", "sig_desc": "Speed setpoint", "type":"int16_t", "unit": "rpm"},
+                                {"sig_name": "AMK_TorqueLimitPositiv", "sig_desc": "Positive torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1},
+                                {"sig_name": "AMK_TorqueLimitNegativ", "sig_desc": "Negative torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1}
+                            ],
+                            "msg_period": 5,
+                            "msg_id_override": "0x185",
+                            "is_normal": true
+
+                        }
+                    ]
+                },
+                {
                     "node_name": "Inverter1",
                     "node_ssa": 63,
                     "tx": [
                         {
-                            "msg_name": "AMK_Actual_Values_1",
+                            "msg_name": "INV1_Actual_Values_1",
                             "msg_desc": "Contains the status word and actual values",
                             "signals": [
                                 {"sig_name": "AMK_Status_bReserve", "sig_desc": "Status word: RESERVED", "type":"uint8_t", "length":8},
@@ -1075,7 +1136,7 @@
                             "is_normal": true
                         },
                         {
-                            "msg_name": "AMK_Actual_Values_2",
+                            "msg_name": "INV1_Actual_Values_2",
                             "msg_desc": "Contains actual values",
                             "signals": [
                                 {"sig_name": "AMK_TempMotor", "sig_desc": "Motor Temperature", "type":"int16_t", "unit": "C", "scale": 0.1},
@@ -1090,7 +1151,7 @@
                     ],
                     "rx": [
                         {
-                            "msg_name": "AMK_Setpoints_1",
+                            "msg_name": "INV1_Setpoints_1",
                             "msg_desc": "Contains status word and setpoints",
                             "signals": [
                                 {"sig_name": "AMK_Control_bReserve", "sig_desc": "Control word: RESERVED", "type":"uint8_t", "length":8},

@@ -91,29 +91,29 @@ void canRxUpdate(void)
                 can_data.throttle_vcu_equal.stale = 0;
                 can_data.throttle_vcu_equal.last_rx = sched.os_ticks;
                 break;
-            case ID_AMK_ACTUAL_VALUES_1:
-                can_data.AMK_Actual_Values_1.AMK_Status_bReserve = msg_data_a->AMK_Actual_Values_1.AMK_Status_bReserve;
-                can_data.AMK_Actual_Values_1.AMK_Status_bSystemReady = msg_data_a->AMK_Actual_Values_1.AMK_Status_bSystemReady;
-                can_data.AMK_Actual_Values_1.AMK_Status_bError = msg_data_a->AMK_Actual_Values_1.AMK_Status_bError;
-                can_data.AMK_Actual_Values_1.AMK_Status_bWarn = msg_data_a->AMK_Actual_Values_1.AMK_Status_bWarn;
-                can_data.AMK_Actual_Values_1.AMK_Status_bQuitDcOn = msg_data_a->AMK_Actual_Values_1.AMK_Status_bQuitDcOn;
-                can_data.AMK_Actual_Values_1.AMK_Status_bDcOn = msg_data_a->AMK_Actual_Values_1.AMK_Status_bDcOn;
-                can_data.AMK_Actual_Values_1.AMK_Status_bQuitInverterOn = msg_data_a->AMK_Actual_Values_1.AMK_Status_bQuitInverterOn;
-                can_data.AMK_Actual_Values_1.AMK_Status_bInverterOn = msg_data_a->AMK_Actual_Values_1.AMK_Status_bInverterOn;
-                can_data.AMK_Actual_Values_1.AMK_Status_bDerating = msg_data_a->AMK_Actual_Values_1.AMK_Status_bDerating;
-                can_data.AMK_Actual_Values_1.AMK_ActualVelocity = (int16_t) msg_data_a->AMK_Actual_Values_1.AMK_ActualVelocity;
-                can_data.AMK_Actual_Values_1.AMK_TorqueCurrent = (int16_t) msg_data_a->AMK_Actual_Values_1.AMK_TorqueCurrent;
-                can_data.AMK_Actual_Values_1.AMK_MagnetizingCurrent = (int16_t) msg_data_a->AMK_Actual_Values_1.AMK_MagnetizingCurrent;
-                can_data.AMK_Actual_Values_1.stale = 0;
-                can_data.AMK_Actual_Values_1.last_rx = sched.os_ticks;
+            case ID_INV1_ACTUAL_VALUES_1:
+                can_data.INV1_Actual_Values_1.AMK_Status_bReserve = msg_data_a->INV1_Actual_Values_1.AMK_Status_bReserve;
+                can_data.INV1_Actual_Values_1.AMK_Status_bSystemReady = msg_data_a->INV1_Actual_Values_1.AMK_Status_bSystemReady;
+                can_data.INV1_Actual_Values_1.AMK_Status_bError = msg_data_a->INV1_Actual_Values_1.AMK_Status_bError;
+                can_data.INV1_Actual_Values_1.AMK_Status_bWarn = msg_data_a->INV1_Actual_Values_1.AMK_Status_bWarn;
+                can_data.INV1_Actual_Values_1.AMK_Status_bQuitDcOn = msg_data_a->INV1_Actual_Values_1.AMK_Status_bQuitDcOn;
+                can_data.INV1_Actual_Values_1.AMK_Status_bDcOn = msg_data_a->INV1_Actual_Values_1.AMK_Status_bDcOn;
+                can_data.INV1_Actual_Values_1.AMK_Status_bQuitInverterOn = msg_data_a->INV1_Actual_Values_1.AMK_Status_bQuitInverterOn;
+                can_data.INV1_Actual_Values_1.AMK_Status_bInverterOn = msg_data_a->INV1_Actual_Values_1.AMK_Status_bInverterOn;
+                can_data.INV1_Actual_Values_1.AMK_Status_bDerating = msg_data_a->INV1_Actual_Values_1.AMK_Status_bDerating;
+                can_data.INV1_Actual_Values_1.AMK_ActualVelocity = (int16_t) msg_data_a->INV1_Actual_Values_1.AMK_ActualVelocity;
+                can_data.INV1_Actual_Values_1.AMK_TorqueCurrent = (int16_t) msg_data_a->INV1_Actual_Values_1.AMK_TorqueCurrent;
+                can_data.INV1_Actual_Values_1.AMK_MagnetizingCurrent = (int16_t) msg_data_a->INV1_Actual_Values_1.AMK_MagnetizingCurrent;
+                can_data.INV1_Actual_Values_1.stale = 0;
+                can_data.INV1_Actual_Values_1.last_rx = sched.os_ticks;
                 break;
-            case ID_AMK_ACTUAL_VALUES_2:
-                can_data.AMK_Actual_Values_2.AMK_TempMotor = (int16_t) msg_data_a->AMK_Actual_Values_2.AMK_TempMotor;
-                can_data.AMK_Actual_Values_2.AMK_TempInverter = (int16_t) msg_data_a->AMK_Actual_Values_2.AMK_TempInverter;
-                can_data.AMK_Actual_Values_2.AMK_ErrorInfo = msg_data_a->AMK_Actual_Values_2.AMK_ErrorInfo;
-                can_data.AMK_Actual_Values_2.AMK_TempIGBT = msg_data_a->AMK_Actual_Values_2.AMK_TempIGBT;
-                can_data.AMK_Actual_Values_2.stale = 0;
-                can_data.AMK_Actual_Values_2.last_rx = sched.os_ticks;
+            case ID_INV1_ACTUAL_VALUES_2:
+                can_data.INV1_Actual_Values_2.AMK_TempMotor = (int16_t) msg_data_a->INV1_Actual_Values_2.AMK_TempMotor;
+                can_data.INV1_Actual_Values_2.AMK_TempInverter = (int16_t) msg_data_a->INV1_Actual_Values_2.AMK_TempInverter;
+                can_data.INV1_Actual_Values_2.AMK_ErrorInfo = msg_data_a->INV1_Actual_Values_2.AMK_ErrorInfo;
+                can_data.INV1_Actual_Values_2.AMK_TempIGBT = msg_data_a->INV1_Actual_Values_2.AMK_TempIGBT;
+                can_data.INV1_Actual_Values_2.stale = 0;
+                can_data.INV1_Actual_Values_2.last_rx = sched.os_ticks;
                 break;
             case ID_FAULT_SYNC_PDU:
                 can_data.fault_sync_pdu.idx = msg_data_a->fault_sync_pdu.idx;
@@ -181,12 +181,12 @@ void canRxUpdate(void)
     CHECK_STALE(can_data.throttle_vcu_equal.stale,
                 sched.os_ticks, can_data.throttle_vcu_equal.last_rx,
                 UP_THROTTLE_VCU_EQUAL);
-    CHECK_STALE(can_data.AMK_Actual_Values_1.stale,
-                sched.os_ticks, can_data.AMK_Actual_Values_1.last_rx,
-                UP_AMK_ACTUAL_VALUES_1);
-    CHECK_STALE(can_data.AMK_Actual_Values_2.stale,
-                sched.os_ticks, can_data.AMK_Actual_Values_2.last_rx,
-                UP_AMK_ACTUAL_VALUES_2);
+    CHECK_STALE(can_data.INV1_Actual_Values_1.stale,
+                sched.os_ticks, can_data.INV1_Actual_Values_1.last_rx,
+                UP_INV1_ACTUAL_VALUES_1);
+    CHECK_STALE(can_data.INV1_Actual_Values_2.stale,
+                sched.os_ticks, can_data.INV1_Actual_Values_2.last_rx,
+                UP_INV1_ACTUAL_VALUES_2);
     /* END AUTO STALE CHECKS */
 }
 
@@ -218,9 +218,9 @@ bool initCANFilter()
     CAN1->sFilterRegister[3].FR2 = (ID_THROTTLE_VCU << 3) | 4;
     CAN1->FA1R |= (1 << 4);    // configure bank 4
     CAN1->sFilterRegister[4].FR1 = (ID_THROTTLE_VCU_EQUAL << 3) | 4;
-    CAN1->sFilterRegister[4].FR2 = (ID_AMK_ACTUAL_VALUES_1 << 3) | 4;
+    CAN1->sFilterRegister[4].FR2 = (ID_INV1_ACTUAL_VALUES_1 << 21);
     CAN1->FA1R |= (1 << 5);    // configure bank 5
-    CAN1->sFilterRegister[5].FR1 = (ID_AMK_ACTUAL_VALUES_2 << 3) | 4;
+    CAN1->sFilterRegister[5].FR1 = (ID_INV1_ACTUAL_VALUES_2 << 21);
     CAN1->sFilterRegister[5].FR2 = (ID_FAULT_SYNC_PDU << 3) | 4;
     CAN1->FA1R |= (1 << 6);    // configure bank 6
     CAN1->sFilterRegister[6].FR1 = (ID_FAULT_SYNC_DASHBOARD << 3) | 4;

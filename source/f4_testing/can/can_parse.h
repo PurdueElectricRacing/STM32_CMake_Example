@@ -30,44 +30,44 @@ typedef union {
 
 // Message ID definitions
 /* BEGIN AUTO ID DEFS */
-#define ID_AMK_ACTUAL_VALUES_1 0x283
-#define ID_AMK_ACTUAL_VALUES_2 0x285
-#define ID_AMK_SETPOINTS_1 0x184
+#define ID_INV1_ACTUAL_VALUES_1 0x283
+#define ID_INV1_ACTUAL_VALUES_2 0x285
+#define ID_INV1_SETPOINTS_1 0x184
 /* END AUTO ID DEFS */
 
 // Message DLC definitions
 /* BEGIN AUTO DLC DEFS */
-#define DLC_AMK_ACTUAL_VALUES_1 8
-#define DLC_AMK_ACTUAL_VALUES_2 8
-#define DLC_AMK_SETPOINTS_1 8
+#define DLC_INV1_ACTUAL_VALUES_1 8
+#define DLC_INV1_ACTUAL_VALUES_2 8
+#define DLC_INV1_SETPOINTS_1 8
 /* END AUTO DLC DEFS */
 
 // Message sending macros
 /* BEGIN AUTO SEND MACROS */
-#define SEND_AMK_ACTUAL_VALUES_1(AMK_Status_bReserve_, AMK_Status_bSystemReady_, AMK_Status_bError_, AMK_Status_bWarn_, AMK_Status_bQuitDcOn_, AMK_Status_bDcOn_, AMK_Status_bQuitInverterOn_, AMK_Status_bInverterOn_, AMK_Status_bDerating_, AMK_ActualVelocity_, AMK_TorqueCurrent_, AMK_MagnetizingCurrent_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_AMK_ACTUAL_VALUES_1, .DLC=DLC_AMK_ACTUAL_VALUES_1, .IDE=1};\
+#define SEND_INV1_ACTUAL_VALUES_1(AMK_Status_bReserve_, AMK_Status_bSystemReady_, AMK_Status_bError_, AMK_Status_bWarn_, AMK_Status_bQuitDcOn_, AMK_Status_bDcOn_, AMK_Status_bQuitInverterOn_, AMK_Status_bInverterOn_, AMK_Status_bDerating_, AMK_ActualVelocity_, AMK_TorqueCurrent_, AMK_MagnetizingCurrent_) do {\
+        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_INV1_ACTUAL_VALUES_1, .DLC=DLC_INV1_ACTUAL_VALUES_1, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bReserve = AMK_Status_bReserve_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bSystemReady = AMK_Status_bSystemReady_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bError = AMK_Status_bError_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bWarn = AMK_Status_bWarn_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bQuitDcOn = AMK_Status_bQuitDcOn_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bDcOn = AMK_Status_bDcOn_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bQuitInverterOn = AMK_Status_bQuitInverterOn_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bInverterOn = AMK_Status_bInverterOn_;\
-        data_a->AMK_Actual_Values_1.AMK_Status_bDerating = AMK_Status_bDerating_;\
-        data_a->AMK_Actual_Values_1.AMK_ActualVelocity = AMK_ActualVelocity_;\
-        data_a->AMK_Actual_Values_1.AMK_TorqueCurrent = AMK_TorqueCurrent_;\
-        data_a->AMK_Actual_Values_1.AMK_MagnetizingCurrent = AMK_MagnetizingCurrent_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bReserve = AMK_Status_bReserve_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bSystemReady = AMK_Status_bSystemReady_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bError = AMK_Status_bError_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bWarn = AMK_Status_bWarn_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bQuitDcOn = AMK_Status_bQuitDcOn_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bDcOn = AMK_Status_bDcOn_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bQuitInverterOn = AMK_Status_bQuitInverterOn_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bInverterOn = AMK_Status_bInverterOn_;\
+        data_a->INV1_Actual_Values_1.AMK_Status_bDerating = AMK_Status_bDerating_;\
+        data_a->INV1_Actual_Values_1.AMK_ActualVelocity = AMK_ActualVelocity_;\
+        data_a->INV1_Actual_Values_1.AMK_TorqueCurrent = AMK_TorqueCurrent_;\
+        data_a->INV1_Actual_Values_1.AMK_MagnetizingCurrent = AMK_MagnetizingCurrent_;\
         canTxSendToBack(&msg);\
     } while(0)
-#define SEND_AMK_ACTUAL_VALUES_2(AMK_TempMotor_, AMK_TempInverter_, AMK_ErrorInfo_, AMK_TempIGBT_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_AMK_ACTUAL_VALUES_2, .DLC=DLC_AMK_ACTUAL_VALUES_2, .IDE=1};\
+#define SEND_INV1_ACTUAL_VALUES_2(AMK_TempMotor_, AMK_TempInverter_, AMK_ErrorInfo_, AMK_TempIGBT_) do {\
+        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_INV1_ACTUAL_VALUES_2, .DLC=DLC_INV1_ACTUAL_VALUES_2, .IDE=1};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
-        data_a->AMK_Actual_Values_2.AMK_TempMotor = AMK_TempMotor_;\
-        data_a->AMK_Actual_Values_2.AMK_TempInverter = AMK_TempInverter_;\
-        data_a->AMK_Actual_Values_2.AMK_ErrorInfo = AMK_ErrorInfo_;\
-        data_a->AMK_Actual_Values_2.AMK_TempIGBT = AMK_TempIGBT_;\
+        data_a->INV1_Actual_Values_2.AMK_TempMotor = AMK_TempMotor_;\
+        data_a->INV1_Actual_Values_2.AMK_TempInverter = AMK_TempInverter_;\
+        data_a->INV1_Actual_Values_2.AMK_ErrorInfo = AMK_ErrorInfo_;\
+        data_a->INV1_Actual_Values_2.AMK_TempIGBT = AMK_TempIGBT_;\
         canTxSendToBack(&msg);\
     } while(0)
 /* END AUTO SEND MACROS */
@@ -75,7 +75,7 @@ typedef union {
 // Stale Checking
 #define STALE_THRESH 30 / 2 // 5 / 2 would be 250% of period
 /* BEGIN AUTO UP DEFS (Update Period)*/
-#define UP_AMK_SETPOINTS_1 5
+#define UP_INV1_SETPOINTS_1 5
 /* END AUTO UP DEFS */
 
 #define CHECK_STALE(stale, curr, last, period) if(!stale && \
@@ -100,13 +100,13 @@ typedef union {
         uint64_t AMK_ActualVelocity: 16;
         uint64_t AMK_TorqueCurrent: 16;
         uint64_t AMK_MagnetizingCurrent: 16;
-    } AMK_Actual_Values_1;
+    } INV1_Actual_Values_1;
     struct {
         uint64_t AMK_TempMotor: 16;
         uint64_t AMK_TempInverter: 16;
         uint64_t AMK_ErrorInfo: 16;
         uint64_t AMK_TempIGBT: 16;
-    } AMK_Actual_Values_2;
+    } INV1_Actual_Values_2;
     struct {
         uint64_t AMK_Control_bReserve: 8;
         uint64_t AMK_Control_bInverterOn: 1;
@@ -117,7 +117,7 @@ typedef union {
         uint64_t AMK_TargetVelocity: 16;
         uint64_t AMK_TorqueLimitPositiv: 16;
         uint64_t AMK_TorqueLimitNegativ: 16;
-    } AMK_Setpoints_1;
+    } INV1_Setpoints_1;
     uint8_t raw_data[8];
 } __attribute__((packed)) CanParsedData_t;
 /* END AUTO MESSAGE STRUCTURE */
@@ -138,7 +138,7 @@ typedef struct {
         int16_t AMK_TorqueLimitNegativ;
         uint8_t stale;
         uint32_t last_rx;
-    } AMK_Setpoints_1;
+    } INV1_Setpoints_1;
 } can_data_t;
 /* END AUTO CAN DATA STRUCTURE */
 

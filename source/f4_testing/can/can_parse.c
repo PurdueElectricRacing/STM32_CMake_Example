@@ -34,18 +34,18 @@ void canRxUpdate(void)
         /* BEGIN AUTO CASES */
         switch(msg_header.ExtId)
         {
-            case ID_AMK_SETPOINTS_1:
-                can_data.AMK_Setpoints_1.AMK_Control_bReserve = msg_data_a->AMK_Setpoints_1.AMK_Control_bReserve;
-                can_data.AMK_Setpoints_1.AMK_Control_bInverterOn = msg_data_a->AMK_Setpoints_1.AMK_Control_bInverterOn;
-                can_data.AMK_Setpoints_1.AMK_Control_bDcOn = msg_data_a->AMK_Setpoints_1.AMK_Control_bDcOn;
-                can_data.AMK_Setpoints_1.AMK_Control_bEnable = msg_data_a->AMK_Setpoints_1.AMK_Control_bEnable;
-                can_data.AMK_Setpoints_1.AMK_Control_bErrorReset = msg_data_a->AMK_Setpoints_1.AMK_Control_bErrorReset;
-                can_data.AMK_Setpoints_1.AMK_Control_bReserve2 = msg_data_a->AMK_Setpoints_1.AMK_Control_bReserve2;
-                can_data.AMK_Setpoints_1.AMK_TargetVelocity = (int16_t) msg_data_a->AMK_Setpoints_1.AMK_TargetVelocity;
-                can_data.AMK_Setpoints_1.AMK_TorqueLimitPositiv = (int16_t) msg_data_a->AMK_Setpoints_1.AMK_TorqueLimitPositiv;
-                can_data.AMK_Setpoints_1.AMK_TorqueLimitNegativ = (int16_t) msg_data_a->AMK_Setpoints_1.AMK_TorqueLimitNegativ;
-                can_data.AMK_Setpoints_1.stale = 0;
-                can_data.AMK_Setpoints_1.last_rx = sched.os_ticks;
+            case ID_INV1_SETPOINTS_1:
+                can_data.INV1_Setpoints_1.AMK_Control_bReserve = msg_data_a->INV1_Setpoints_1.AMK_Control_bReserve;
+                can_data.INV1_Setpoints_1.AMK_Control_bInverterOn = msg_data_a->INV1_Setpoints_1.AMK_Control_bInverterOn;
+                can_data.INV1_Setpoints_1.AMK_Control_bDcOn = msg_data_a->INV1_Setpoints_1.AMK_Control_bDcOn;
+                can_data.INV1_Setpoints_1.AMK_Control_bEnable = msg_data_a->INV1_Setpoints_1.AMK_Control_bEnable;
+                can_data.INV1_Setpoints_1.AMK_Control_bErrorReset = msg_data_a->INV1_Setpoints_1.AMK_Control_bErrorReset;
+                can_data.INV1_Setpoints_1.AMK_Control_bReserve2 = msg_data_a->INV1_Setpoints_1.AMK_Control_bReserve2;
+                can_data.INV1_Setpoints_1.AMK_TargetVelocity = (int16_t) msg_data_a->INV1_Setpoints_1.AMK_TargetVelocity;
+                can_data.INV1_Setpoints_1.AMK_TorqueLimitPositiv = (int16_t) msg_data_a->INV1_Setpoints_1.AMK_TorqueLimitPositiv;
+                can_data.INV1_Setpoints_1.AMK_TorqueLimitNegativ = (int16_t) msg_data_a->INV1_Setpoints_1.AMK_TorqueLimitNegativ;
+                can_data.INV1_Setpoints_1.stale = 0;
+                can_data.INV1_Setpoints_1.last_rx = sched.os_ticks;
                 break;
             default:
                 __asm__("nop");
@@ -54,9 +54,9 @@ void canRxUpdate(void)
     }
 
     /* BEGIN AUTO STALE CHECKS */
-    CHECK_STALE(can_data.AMK_Setpoints_1.stale,
-                sched.os_ticks, can_data.AMK_Setpoints_1.last_rx,
-                UP_AMK_SETPOINTS_1);
+    CHECK_STALE(can_data.INV1_Setpoints_1.stale,
+                sched.os_ticks, can_data.INV1_Setpoints_1.last_rx,
+                UP_INV1_SETPOINTS_1);
     /* END AUTO STALE CHECKS */
 }
 
@@ -75,7 +75,7 @@ bool initCANFilter()
 
     /* BEGIN AUTO FILTER */
     CAN1->FA1R |= (1 << 0);    // configure bank 0
-    CAN1->sFilterRegister[0].FR1 = (ID_AMK_SETPOINTS_1 << 3) | 4;
+    CAN1->sFilterRegister[0].FR1 = (ID_INV1_SETPOINTS_1 << 21);
     /* END AUTO FILTER */
 
     CAN1->FMR  &= ~CAN_FMR_FINIT;             // Enable Filters (exit filter init mode)
