@@ -211,7 +211,8 @@
                                 {"sig_name": "AMK_TorqueLimitNegativ", "sig_desc": "Negative torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x184"
+                            "msg_id_override": "0x184",
+                            "is_normal": true
                         }
                     ],
                     "rx":[
@@ -242,7 +243,8 @@
                                 {"sig_name": "AMK_MagnetizingCurrent", "sig_desc": "Raw data for calculating actual magnetizing current", "type":"int16_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x283"
+                            "msg_id_override": "0x283",
+                            "is_normal": true
                         },
                         {
                             "msg_name": "AMK_Actual_Values_2",
@@ -254,7 +256,8 @@
                                 {"sig_name": "AMK_TempIGBT", "sig_desc": "IGBT Temperature", "type":"uint16_t", "unit": "C", "scale": 0.1}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x285"
+                            "msg_id_override": "0x285",
+                            "is_normal": true
                         }
                     ]
                 },
@@ -1068,7 +1071,8 @@
                                 {"sig_name": "AMK_MagnetizingCurrent", "sig_desc": "Raw data for calculating actual magnetizing current", "type":"int16_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x283"
+                            "msg_id_override": "0x283",
+                            "is_normal": true
                         },
                         {
                             "msg_name": "AMK_Actual_Values_2",
@@ -1080,7 +1084,8 @@
                                 {"sig_name": "AMK_TempIGBT", "sig_desc": "IGBT Temperature", "type":"uint16_t", "unit": "C", "scale": 0.1}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x285"
+                            "msg_id_override": "0x285",
+                            "is_normal": true
                         }
                     ],
                     "rx": [
@@ -1099,7 +1104,9 @@
                                 {"sig_name": "AMK_TorqueLimitNegativ", "sig_desc": "Negative torque limit", "type":"int16_t", "unit": "Mn", "scale": 0.1}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x184"
+                            "msg_id_override": "0x184",
+                            "is_normal": true
+
                         }
                     ]
                 },
