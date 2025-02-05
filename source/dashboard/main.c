@@ -63,9 +63,9 @@ GPIOInitConfig_t gpio_config[] = {
  GPIO_INIT_USART1RX_PA10,
 
  // Buttons/Switches
- GPIO_INIT_INPUT(B_SELECT_GPIO_Port, B_SELECT_Pin, GPIO_INPUT_OPEN_DRAIN),
- GPIO_INIT_INPUT(B_DOWN_GPIO_Port, B_DOWN_Pin, GPIO_INPUT_OPEN_DRAIN),
- GPIO_INIT_INPUT(B_UP_GPIO_Port, B_UP_Pin, GPIO_INPUT_OPEN_DRAIN),
+ GPIO_INIT_INPUT(B_SELECT_GPIO_Port, B_SELECT_Pin, GPIO_INPUT_PULL_UP),
+ GPIO_INIT_INPUT(B_DOWN_GPIO_Port, B_DOWN_Pin, GPIO_INPUT_PULL_UP),
+ GPIO_INIT_INPUT(B_UP_GPIO_Port, B_UP_Pin, GPIO_INPUT_PULL_UP),
  GPIO_INIT_INPUT(ENC_A_GPIO_Port, ENC_A_Pin, GPIO_INPUT_OPEN_DRAIN),
  GPIO_INIT_INPUT(ENC_B_GPIO_Port, ENC_B_Pin, GPIO_INPUT_OPEN_DRAIN),
  GPIO_INIT_INPUT(DAQ_SWITCH_GPIO_Port, DAQ_SWITCH_Pin, GPIO_INPUT_OPEN_DRAIN),
@@ -485,7 +485,7 @@ void encoder_ISR() {
 
     uint8_t raw_enc_a = PHAL_readGPIO(ENC_A_GPIO_Port, ENC_A_Pin);
     uint8_t raw_enc_b = PHAL_readGPIO(ENC_B_GPIO_Port, ENC_B_Pin);
-    uint8_t current_state = (raw_enc_b | (raw_enc_a << 1));
+    uint8_t current_state = (raw_enc_a | (raw_enc_b << 1));
 
     // Get direction from the state transition table
     int8_t direction = encoder_transition_table[input_state.prev_encoder_position][current_state];
