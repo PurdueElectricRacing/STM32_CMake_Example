@@ -762,7 +762,7 @@ void coolant_out_CALLBACK(CanParsedData_t* msg_data_a) {
         return;
     }
 
-    update_cooling_page();
+    //update_cooling_page();
 }
 
 void update_tv_page() {
