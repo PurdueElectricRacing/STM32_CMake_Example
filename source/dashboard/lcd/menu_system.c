@@ -1,3 +1,13 @@
+/**
+ * @file menu_system.c
+ * @brief Implementation of menu system for LCD display interface
+ * 
+ * Provides functions for managing menu navigation, element styling,
+ * and user interaction with the LCD display menu system.
+ * 
+ * @author Irving Wang (wang5952@purdue.edu)
+ */
+
 #include "menu_system.h"
 
 #include "nextion.h"
@@ -11,46 +21,68 @@
 #define COOL_GRAY 27535     // medium grey
 #define STEAM 50680         // light grey
 
-
-void style_normal(menu_element_t *element) {
-    set_background(element->object_name, STEEL);
-    set_font_color(element->object_name, WHITE);
+/**
+ * @brief Applies normal (default) styling to a menu element
+ * @param element Pointer to the menu element to be styled
+ */
+void MS_styleNormal(menu_element_t *element) {
+    NXT_setBackground(element->object_name, STEEL);
+    NXT_setFontColor(element->object_name, WHITE);
     // change to set border to indicate selected? (requires intelligent series)
     // set_border_width(element->object_name, 0);
 }
 
-void style_hover(menu_element_t *element) {
-    set_background(element->object_name, STEAM);
-    set_font_color(element->object_name, BLACK);
+/**
+ * @brief Applies hover styling effect to a menu element
+ * @param element Pointer to the menu element to be styled
+ */
+void MS_styleHover(menu_element_t *element) {
+    NXT_setBackground(element->object_name, STEAM);
+    NXT_setFontColor(element->object_name, BLACK);
     // change to set border to indicate selected? (requires intelligent series)
     // set_border_width(element->object_name, 3);
 }
 
-void style_selected(menu_element_t *element) {
-    set_background(element->object_name, RUSH);
-    set_font_color(element->object_name, WHITE);
+/**
+ * @brief Applies selected state styling to a menu element
+ * @param element Pointer to the menu element to be styled
+ */
+void MS_styleSelected(menu_element_t *element) {
+    NXT_setBackground(element->object_name, RUSH);
+    NXT_setFontColor(element->object_name, WHITE);
 }
 
-void apply_element_style(menu_element_t *element, bool is_hover) {
+/**
+ * @brief Applies visual styling to a menu element based on hover state
+ *
+ * @param element Pointer to the menu element to be styled
+ * @param is_hover Boolean indicating whether the element is being hovered
+ */
+void MS_applyElementStyle(menu_element_t *element, bool is_hover) {
     if (element->type == ELEMENT_LIST && element->current_value == 1) {
         return; // Skip styling for special list element case
     }
     
     if (is_hover) {
-        style_hover(element);
+        MS_styleHover(element);
     } else {
-        style_normal(element);
+        MS_styleNormal(element);
     }
 }
 
-void menu_move_up(menu_page_t *page) {
+/**
+ * @brief Moves menu selection up or increments selected element value
+ *
+ * @param page Pointer to the menu page structure
+ */
+void MS_moveUp(menu_page_t *page) {
     if (page->is_element_selected) {
-        menu_increment_value(&page->elements[page->current_index]);
+        MS_incrementValue(&page->elements[page->current_index]);
         return;
     }
 
     // Clear current element styling
-    apply_element_style(&page->elements[page->current_index], false);
+    MS_applyElementStyle(&page->elements[page->current_index], false);
 
     // Move to previous element
     if (page->current_index == 0) {
@@ -60,32 +92,42 @@ void menu_move_up(menu_page_t *page) {
     }
 
     // Style new element
-    apply_element_style(&page->elements[page->current_index], true);
+    MS_applyElementStyle(&page->elements[page->current_index], true);
 }
 
-void menu_move_down(menu_page_t *page) {
+/**
+ * @brief Moves menu selection down or increments selected element value
+ *
+ * @param page Pointer to the menu page structure
+ */
+void MS_moveDown(menu_page_t *page) {
     if (page->is_element_selected) {
-        menu_decrement_value(&page->elements[page->current_index]);
+        MS_decrementValue(&page->elements[page->current_index]);
         return;
     }
 
     // Clear current element styling
-    apply_element_style(&page->elements[page->current_index], false);
+    MS_applyElementStyle(&page->elements[page->current_index], false);
 
     // Move to next element
     page->current_index = (page->current_index + 1) % page->num_elements;
 
     // Style new element
-    apply_element_style(&page->elements[page->current_index], true);
+    MS_applyElementStyle(&page->elements[page->current_index], true);
 }
 
-void menu_select(menu_page_t *page) {
+/**
+ * @brief Handles menu element selection and actions
+ *
+ * @param page Pointer to the menu page
+ */
+void MS_select(menu_page_t *page) {
     menu_element_t* current = &page->elements[page->current_index];
 
     if (page->is_element_selected) {
         // Deselect element
         page->is_element_selected = false;
-        style_hover(current);
+        MS_styleHover(current);
         
         // Call onChange if defined
         if (current->on_change != NULL) {
@@ -106,18 +148,18 @@ void menu_select(menu_page_t *page) {
             for (uint8_t i = 0; i < page->num_elements; i++) {
                 if (page->elements[i].type == ELEMENT_LIST) {
                     page->elements[i].current_value = 0;
-                    style_normal(&page->elements[i]);
+                    MS_styleNormal(&page->elements[i]);
                 }
             }
             current->current_value = 1;
             if (current->on_change != NULL) {
                 current->on_change();
             }
-            style_selected(current);
+            MS_styleSelected(current);
             break;
         case ELEMENT_OPTION:
             current->current_value ^= 1;
-            set_value(current->object_name, current->current_value);
+            NXT_setValue(current->object_name, current->current_value);
             if (current->on_change != NULL) {
                 current->on_change();
             }
@@ -125,14 +167,22 @@ void menu_select(menu_page_t *page) {
         case ELEMENT_FLT: // Fall through
         case ELEMENT_VAL:
             page->is_element_selected = true;
-            style_selected(current);
+            MS_styleSelected(current);
             break;
         default:
             break;
     }
 }
 
-void menu_increment_value(menu_element_t *element) {
+/**
+ * @brief Increments the value of a menu element and updates its display
+ * 
+ * If incrementing would exceed max_value, wraps around to min_value.
+ * Updates display based on element type (float or integer value).
+ *
+ * @param element Pointer to the menu element to increment
+ */
+void MS_incrementValue(menu_element_t *element) {
     if (element->current_value + element->increment <= element->max_value) {
         element->current_value += element->increment;
     } else {
@@ -141,17 +191,25 @@ void menu_increment_value(menu_element_t *element) {
 
     switch (element->type) {
         case ELEMENT_FLT:
-            set_value(element->object_name, element->current_value);
+            NXT_setValue(element->object_name, element->current_value);
             break;
         case ELEMENT_VAL:
-            set_textf(element->object_name, "%d", element->current_value);
+            NXT_setTextf(element->object_name, "%d", element->current_value);
             break;
         default:
             break;
     }
 }
 
-void menu_decrement_value(menu_element_t *element) {
+/**
+ * @brief Decrements the value of a menu element and updates its display
+ * 
+ * If decrementing would exceed min_value, wraps around to max_value.
+ * Updates display based on element type (float or integer value).
+ *
+ * @param element Pointer to the menu element to decrement
+ */
+void MS_decrementValue(menu_element_t *element) {
     if (element->current_value >= element->increment + element->min_value) {
         element->current_value -= element->increment;
     } else {
@@ -160,34 +218,39 @@ void menu_decrement_value(menu_element_t *element) {
 
     switch (element->type) {
         case ELEMENT_FLT:
-            set_value(element->object_name, element->current_value);
+            NXT_setValue(element->object_name, element->current_value);
             break;
         case ELEMENT_VAL:
-            set_textf(element->object_name, "%d", element->current_value);
+            NXT_setTextf(element->object_name, "%d", element->current_value);
             break;
         default:
             break;
     }
 }
 
-void menu_refresh_page(menu_page_t *page) {
+/**
+ * @brief Refreshes the menu page by resetting selection state and updating all elements
+ * 
+ * @param page Pointer to the menu page to refresh
+ */
+void MS_refreshPage(menu_page_t *page) {
     page->is_element_selected = false;
     page->current_index = 0;
-    int list_index = menu_list_get_selected(page);
+    int list_index = MS_listGetSelected(page);
     for (uint8_t i = 0; i < page->num_elements; i++) {
         menu_element_t *curr_element = &page->elements[i];
         switch (curr_element->type) {
             case ELEMENT_LIST:
                 if (i == list_index) {  // nothing happens if -1
-                    style_selected(curr_element);
+                    MS_styleSelected(curr_element);
                 }
                 break;
             case ELEMENT_VAL:
-                set_textf(curr_element->object_name, "%d", curr_element->current_value);
+                NXT_setTextf(curr_element->object_name, "%d", curr_element->current_value);
                 break;
             case ELEMENT_FLT: // Fall through
             case ELEMENT_OPTION:
-                set_value(curr_element->object_name, curr_element->current_value);
+                NXT_setValue(curr_element->object_name, curr_element->current_value);
                 break;
             default:
                 break;
@@ -195,7 +258,13 @@ void menu_refresh_page(menu_page_t *page) {
     }
 }
 
-int menu_list_get_selected(menu_page_t *page) {
+/**
+ * @brief Gets the index of the selected element in a menu page
+ *
+ * @param page Pointer to the menu page structure
+ * @return Index of the selected element, -1 if no element is selected
+ */
+int MS_listGetSelected(menu_page_t *page) {
     for (uint8_t i = 0; i < page->num_elements; i++) {
         if (page->elements[i].current_value) {
             return i;
