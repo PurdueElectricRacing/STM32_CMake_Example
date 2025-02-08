@@ -6,6 +6,7 @@
 #define mySTR(x) myXSTR(x)
 #define __FREERTOS_PATH(x,y) mySTR(myIDENT(x)y)
 #define _FREERTOS_PATH(y) __FREERTOS_PATH(_FREERTOS_DIR, y)
+
 #if defined(STM32F407xx)
 #define _FREERTOS_DIR common/STM32CubeF4/Middlewares/Third_Party/FreeRTOS/Source/
 #elif defined(STM32F732xx)
@@ -13,8 +14,10 @@
 #else
 #error "Unsupported MCU arch"
 #endif
+
 #include _FREERTOS_PATH(include/FreeRTOS.h)
 #include _FREERTOS_PATH(CMSIS_RTOS_V2/cmsis_os2.h)
+
 #include _FREERTOS_PATH(include/atomic.h)
 #include _FREERTOS_PATH(include/list.h)
 #include _FREERTOS_PATH(include/queue.h)
