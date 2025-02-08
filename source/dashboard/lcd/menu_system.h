@@ -1,3 +1,13 @@
+/**
+ * @file menu_system.h
+ * @brief Implementation of menu system for LCD display interface
+ * 
+ * Provides functions for managing menu navigation, element styling,
+ * and user interaction with the LCD display menu system.
+ * 
+ * @author Irving Wang (wang5952@purdue.edu)
+ */
+
 #ifndef MENU_SYSTEM_H
 #define MENU_SYSTEM_H
 
@@ -43,20 +53,20 @@ typedef struct {
 } menu_page_t;
 
 // Style functions
-void style_normal(menu_element_t* element);
-void style_hover(menu_element_t* element);
-void style_selected(menu_element_t* element);
+void MS_styleNormal(menu_element_t* element);
+void MS_styleHover(menu_element_t* element);
+void MS_styleSelected(menu_element_t* element);
 
 // Navigation functions
-void menu_move_up(menu_page_t* page);
-void menu_move_down(menu_page_t* page);
-void menu_select(menu_page_t* page);
+void MS_moveUp(menu_page_t* page);
+void MS_moveDown(menu_page_t* page);
+void MS_select(menu_page_t* page);
 
 // Value modification functions
-void menu_increment_value(menu_element_t* element);
-void menu_decrement_value(menu_element_t* element);
+void MS_incrementValue(menu_element_t* element);
+void MS_decrementValue(menu_element_t* element);
 
-void menu_refresh_page(menu_page_t *page);
-int menu_list_get_selected(menu_page_t *page);
+void MS_refreshPage(menu_page_t *page);
+int MS_listGetSelected(menu_page_t *page);
 
 #endif // MENU_SYSTEM_H

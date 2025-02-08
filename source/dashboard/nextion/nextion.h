@@ -1,3 +1,18 @@
+/**
+ * @file nextion.h
+ * @brief Nextion display driver interface
+ * 
+ * Interface for controlling Nextion display modules through serial communication.
+ * 
+ * @author Matthew Flanagan (matthewdavidflanagan@outlook.com)
+ * @author Luke Oxley (lcoxley@purdue.edu)
+ * @author Irving Wang (wang5952@purdue.edu)
+ * 
+ * Original implementation by Matthew Flanagan
+ * Converted for current use by Luke Oxley
+ * Expanded by Irving Wang
+ */
+
 #ifndef __NEXTION_H__
 #define __NEXTION_H__
 
@@ -31,15 +46,17 @@
 #define NXT_BAUD             "bauds="
 
 // Function Prototypes
-void set_float(char* obj_name, char* param, float num, uint8_t precision);
-void set_value(char* obj_name, uint16_t val);
-void set_background(char* obj_name, uint16_t val);
-void set_font_color(char* obj_name, uint16_t val);
-void set_border_width(char* obj_name, uint16_t val);
-void set_text(char* obj_name, char* text);
-void set_textf(char* obj_name, const char* format, ...);
-void set_page(char* page_name);
-void set_brightness(uint8_t brightness);
-void set_baud(uint32_t baud);
+void NXT_setFloat(char* obj_name, char* param, float num, uint8_t precision);
+void NXT_setValue(char* obj_name, uint16_t val);
+void NXT_setBackground(char* obj_name, uint16_t val);
+void NXT_setFontColor(char* obj_name, uint16_t val);
+void NXT_setBorderWidth(char* obj_name, uint16_t val);
+void NXT_setText(char* obj_name, char* text);
+void NXT_setTextf(char* obj_name, const char* format, ...);
+void NXT_setPage(char* page_name);
+
+// Configuration Functions
+void NXT_setBrightness(uint8_t brightness);
+void NXT_setBaud(uint32_t baud);
 
 #endif

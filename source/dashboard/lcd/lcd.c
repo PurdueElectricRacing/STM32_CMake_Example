@@ -315,8 +315,8 @@ void initLCD() {
     curr_page = PAGE_RACE;
     prev_page = PAGE_PREFLIGHT;
     errorText = 0;
-    set_baud(115200);
-    set_brightness(100);
+    NXT_setBaud(115200);
+    NXT_setBrightness(100);
 
     readPedalProfiles();
     profile_page.saved = true;
@@ -325,6 +325,13 @@ void initLCD() {
     updatePage();
 }
 
+/**
+ * @brief Updates LCD display page based on encoder position
+ * 
+ * Key behaviors:
+ * - Updates current page based on encoder for non-error pages
+ * - Maintains display of error pages when active
+ */
 void updatePage() {
     // Only update the encoder if we are on a "selectable" page
     bool is_error_page = (curr_page == PAGE_ERROR) || (curr_page == PAGE_WARNING) || (curr_page == PAGE_FATAL);
@@ -347,43 +354,43 @@ void updatePage() {
     // Set the page on display
     switch (curr_page) {
         case PAGE_RACE:
-            set_page(RACE_STRING);
+            NXT_setPage(RACE_STRING);
             break;
         case PAGE_COOLING:
-            set_page(COOLING_STRING);
+            NXT_setPage(COOLING_STRING);
             break;
         case PAGE_TVSETTINGS:
-            set_page(TVSETTINGS_STRING);
+            NXT_setPage(TVSETTINGS_STRING);
             break;
         case PAGE_FAULTS:
-            set_page(FAULT_STRING);
+            NXT_setPage(FAULT_STRING);
             break;
         case PAGE_SDCINFO:
-            set_page(SDCINFO_STRING);
+            NXT_setPage(SDCINFO_STRING);
             break;
         case PAGE_DRIVER:
-            set_page(DRIVER_STRING);
+            NXT_setPage(DRIVER_STRING);
             break;
         case PAGE_PROFILES:
-            set_page(DRIVER_CONFIG_STRING);
+            NXT_setPage(DRIVER_CONFIG_STRING);
             break;
         case PAGE_LOGGING:
-            set_page(LOGGING_STRING);
+            NXT_setPage(LOGGING_STRING);
             break;
         case PAGE_APPS:
-            set_page(APPS_STRING);
+            NXT_setPage(APPS_STRING);
             break;
         case PAGE_WARNING:
-            set_page(WARN_STRING);
-            set_text(ERR_TXT, errorText);
+            NXT_setPage(WARN_STRING);
+            NXT_setText(ERR_TXT, errorText);
             return;
         case PAGE_ERROR:
-            set_page(ERR_STRING);
-            set_text(ERR_TXT, errorText);
+            NXT_setPage(ERR_STRING);
+            NXT_setText(ERR_TXT, errorText);
             return;
         case PAGE_FATAL:
-            set_page(FATAL_STRING);
-            set_text(ERR_TXT, errorText);
+            NXT_setPage(FATAL_STRING);
+            NXT_setText(ERR_TXT, errorText);
             return;
     }
 
@@ -411,39 +418,47 @@ void selectItem() {
     }
 }
 
+/**
+ * @brief Updates the LCD display with current pedal telemetry data when on APPS page
+ *
+ * Updates brake and throttle bars, raw ADC values, deviation percentages, and status
+ * indicators for brake and throttle pedals. Also displays fault statuses if detected.
+ *
+ * @note Only executes when current page is PAGE_APPS
+ */
 void update_apps_telemetry() {
     if (curr_page != PAGE_APPS) {
         return;
     }
 
-    set_value(BRK_BAR, 0); // todo brake bar
-    set_value(THROT_BAR, (int) ((filtered_pedals / 4095.0) * 100));
+    NXT_setValue(BRK_BAR, 0); // todo brake bar
+    NXT_setValue(THROT_BAR, (int) ((filtered_pedals / 4095.0) * 100));
 
-    set_textf(APPS_BRAKE1_VAL, "%d",raw_adc_values.b1);
-    set_textf(APPS_BRAKE2_VAL, "%d",raw_adc_values.b2);
-    set_textf(APPS_THROTTLE1_VAL, "%d",raw_adc_values.t1);
-    set_textf(APPS_THROTTLE2_VAL, "%d",raw_adc_values.t2);
+    NXT_setTextf(APPS_BRAKE1_VAL, "%d",raw_adc_values.b1);
+    NXT_setTextf(APPS_BRAKE2_VAL, "%d",raw_adc_values.b2);
+    NXT_setTextf(APPS_THROTTLE1_VAL, "%d",raw_adc_values.t1);
+    NXT_setTextf(APPS_THROTTLE2_VAL, "%d",raw_adc_values.t2);
 
     uint16_t brake_diff = ABS(raw_adc_values.b1 - raw_adc_values.b2);
     uint16_t brake_dev = (brake_diff * 1000) / 4095.0;
-    set_value(APPS_BRAKE_DEV_VAL, brake_dev);
+    NXT_setValue(APPS_BRAKE_DEV_VAL, brake_dev);
 
     uint16_t throttle_diff = ABS(raw_adc_values.t1 - raw_adc_values.t2);
     uint16_t throttle_dev = (throttle_diff * 1000) / 4095.0;
-    set_value(APPS_THROTTLE_DEV_VAL, throttle_dev);
+    NXT_setValue(APPS_THROTTLE_DEV_VAL, throttle_dev);
 
     if (checkFault(ID_IMPLAUS_DETECTED_FAULT)) {
-        set_text(APPS_STATUS, "IMP Detected");
-        set_font_color(APPS_STATUS, RED);
+        NXT_setText(APPS_STATUS, "IMP Detected");
+        NXT_setFontColor(APPS_STATUS, RED);
     } else if (checkFault(ID_APPS_WIRING_T1_FAULT)) {
-        set_text(APPS_STATUS, "T1 Wiring");
-        set_font_color(APPS_STATUS, RED);
+        NXT_setText(APPS_STATUS, "T1 Wiring");
+        NXT_setFontColor(APPS_STATUS, RED);
     } else if (checkFault(ID_APPS_WIRING_T2_FAULT)) {
-        set_text(APPS_STATUS, "T2 Wiring");
-        set_font_color(APPS_STATUS, RED);
+        NXT_setText(APPS_STATUS, "T2 Wiring");
+        NXT_setFontColor(APPS_STATUS, RED);
     } else {
-        set_text(APPS_STATUS, "CLEAR");
-        set_font_color(APPS_STATUS, GREEN);
+        NXT_setText(APPS_STATUS, "CLEAR");
+        NXT_setFontColor(APPS_STATUS, GREEN);
     }
 }
 
@@ -455,18 +470,40 @@ void updateTelemetryPages() {
     }
 }
 
+
+/**
+ * @brief Sends TV parameters to TV using current values from tv_elements array
+ * 
+ * The parameter order is manually synced between the Nextion objects and CAN config.
+ */
 void sendTVParameters() {
     SEND_DASHBOARD_TV_PARAMETERS(tv_elements[3].current_value, tv_elements[2].current_value, tv_elements[0].current_value, tv_elements[1].current_value);
 }
 
+/**
+ * @brief Sends Cooling parameters to PDU using current values from cooling_elements array.
+ * 
+ * The parameter order is manually synced between the Nextion objects and CAN config.
+ */
 void sendCoolingParameters() {
     SEND_COOLING_DRIVER_REQUEST(cooling_elements[1].current_value, cooling_elements[0].current_value, 0, cooling_elements[3].current_value, cooling_elements[2].current_value);
 }
 
+/**
+ * @brief Sends Logging parameters to DAQ using current values from logging_elements array.
+ * 
+ * The parameter order is manually synced between the Nextion objects and CAN config.
+ */
 void sendLoggingParameters() {
     SEND_DASHBOARD_START_LOGGING(logging_elements[0].current_value);
 }
 
+/**
+ * @brief Updates fault messages on LCD screen based on priority and timing
+ *
+ * Manages fault display rotation, processes new faults from queue, and updates
+ * screen according to fault priorities and display timing requirements.
+ */
 void updateFaultDisplay() {
     if ((curr_page == PAGE_ERROR || (curr_page == PAGE_WARNING) || (curr_page == PAGE_FATAL)))
     {
@@ -589,6 +626,11 @@ void updateFaultPageIndicators() {
     setFaultIndicator(fault_buf[4], FAULT5_TXT);
 }
 
+/**
+ * @brief Updates the Shutdown Circuit (SDC) status display on the dashboard LCD
+ * 
+ * Only executes if the current page is SDC info page.
+ */
 void updateSDCDashboard() {
     static uint8_t update_group = 0U;
     if (curr_page != PAGE_SDCINFO) {
@@ -627,40 +669,40 @@ void select_error_page() {
 }
 
 void update_driver_page() {
-    menu_refresh_page(&driver_page);
+    MS_refreshPage(&driver_page);
 }
 
 void move_up_driver() {
-    menu_move_up(&driver_page);
+    MS_moveUp(&driver_page);
 }
 
 void move_down_driver() {
-    menu_move_down(&driver_page);
+    MS_moveDown(&driver_page);
 }
 
 void select_driver() {
-    menu_select(&driver_page);
+    MS_select(&driver_page);
 }
 
 void update_profile_page() {
     // Update displayed driver name
-    int driver_index = menu_list_get_selected(&driver_page);
+    int driver_index = MS_listGetSelected(&driver_page);
     if (driver_index < 0) {
         return;
     }
     
     switch (driver_index) {
         case 0:
-            set_text(PROFILE_CURRENT_TXT, DRIVER1_NAME);
+            NXT_setText(PROFILE_CURRENT_TXT, DRIVER1_NAME);
             break;
         case 1:
-            set_text(PROFILE_CURRENT_TXT, DRIVER2_NAME);
+            NXT_setText(PROFILE_CURRENT_TXT, DRIVER2_NAME);
             break;
         case 2:
-            set_text(PROFILE_CURRENT_TXT, DRIVER3_NAME);
+            NXT_setText(PROFILE_CURRENT_TXT, DRIVER3_NAME);
             break;
         case 3:
-            set_text(PROFILE_CURRENT_TXT, DRIVER4_NAME);
+            NXT_setText(PROFILE_CURRENT_TXT, DRIVER4_NAME);
             break;
     }
     
@@ -668,89 +710,97 @@ void update_profile_page() {
     profile_elements[1].current_value = driver_pedal_profiles[driver_index].throttle_travel_threshold;
 
     // Update display and styling
-    menu_refresh_page(&profile_page);
+    MS_refreshPage(&profile_page);
 }
 
 void move_up_profile() {
-    menu_move_up(&profile_page);
+    MS_moveUp(&profile_page);
     
-    // Update save status indicator
+    // Update save status indicator on any value change
     if (!profile_page.is_element_selected) {
-        set_font_color(PROFILE_STATUS_TXT, profile_page.saved ? GREEN : RED);
-        set_text(PROFILE_STATUS_TXT, profile_page.saved ? "SAVED" : "UNSAVED");
+        NXT_setFontColor(PROFILE_STATUS_TXT, profile_page.saved ? GREEN : RED);
+        NXT_setText(PROFILE_STATUS_TXT, profile_page.saved ? "SAVED" : "UNSAVED");
     }
 }
 
 void move_down_profile() {
-    menu_move_down(&profile_page);
+    MS_moveDown(&profile_page);
     
-    // Update save status indicator
+    // Update save status indicator on any value change
     if (!profile_page.is_element_selected) {
-        set_font_color(PROFILE_STATUS_TXT, profile_page.saved ? GREEN : RED);
-        set_text(PROFILE_STATUS_TXT, profile_page.saved ? "SAVED" : "UNSAVED");
+        NXT_setFontColor(PROFILE_STATUS_TXT, profile_page.saved ? GREEN : RED);
+        NXT_setText(PROFILE_STATUS_TXT, profile_page.saved ? "SAVED" : "UNSAVED");
     }
 }
 
 void select_profile() {
     // Handle other elements using menu system
-    menu_select(&profile_page);
+    MS_select(&profile_page);
     
     // Mark as unsaved when values change
     if (profile_page.is_element_selected) {
         profile_page.saved = false;
-        set_font_color(PROFILE_STATUS_TXT, RED);
-        set_text(PROFILE_STATUS_TXT, "UNSAVED");
+        NXT_setFontColor(PROFILE_STATUS_TXT, RED);
+        NXT_setText(PROFILE_STATUS_TXT, "UNSAVED");
     }
 }
 
+/**
+ * @brief Saves the current pedal profile settings to permanent memory
+ *        for the selected driver and updates the UI with the save status.
+ */
 void profile_save_button_callback() {
-    int driver_index = menu_list_get_selected(&driver_page);
+    int driver_index = MS_listGetSelected(&driver_page);
     // Save profile values
     driver_pedal_profiles[driver_index].brake_travel_threshold = profile_elements[0].current_value;
     driver_pedal_profiles[driver_index].throttle_travel_threshold = profile_elements[1].current_value;
 
     if (PROFILE_WRITE_SUCCESS != writePedalProfiles()) {
         profile_page.saved = false;
-        set_font_color(PROFILE_STATUS_TXT, RED);
-        set_text(PROFILE_STATUS_TXT, "FAILED");
+        NXT_setFontColor(PROFILE_STATUS_TXT, RED);
+        NXT_setText(PROFILE_STATUS_TXT, "FAILED");
     } else {
         profile_page.saved = true;
-        set_font_color(PROFILE_STATUS_TXT, GREEN);
-        set_text(PROFILE_STATUS_TXT, "SAVED");
+        NXT_setFontColor(PROFILE_STATUS_TXT, GREEN);
+        NXT_setText(PROFILE_STATUS_TXT, "SAVED");
     }
 }
 
 void update_cooling_page() {
-    menu_refresh_page(&cooling_page);
-    set_value(DT_FAN_BAR, cooling_elements[0].current_value);
-    set_value(B_FAN_BAR, cooling_elements[2].current_value);
+    MS_refreshPage(&cooling_page);
+    NXT_setValue(DT_FAN_BAR, cooling_elements[0].current_value);
+    NXT_setValue(B_FAN_BAR, cooling_elements[2].current_value);
 }
 
 void move_up_cooling() {
-    menu_move_up(&cooling_page);
+    MS_moveUp(&cooling_page);
 
     // Passively update the bar values
     if (cooling_page.is_element_selected) {
-        set_value(DT_FAN_BAR, cooling_elements[0].current_value);
-        set_value(B_FAN_BAR, cooling_elements[2].current_value);
+        NXT_setValue(DT_FAN_BAR, cooling_elements[0].current_value);
+        NXT_setValue(B_FAN_BAR, cooling_elements[2].current_value);
     }
 }
 
 void move_down_cooling() {
-    menu_move_down(&cooling_page);
+    MS_moveDown(&cooling_page);
 
     // Passively update the bar values
     if (cooling_page.is_element_selected) {
-        set_value(DT_FAN_BAR, cooling_elements[0].current_value);
-        set_value(B_FAN_BAR, cooling_elements[2].current_value);
+        NXT_setValue(DT_FAN_BAR, cooling_elements[0].current_value);
+        NXT_setValue(B_FAN_BAR, cooling_elements[2].current_value);
     }
 }
 
 void select_cooling() {
-    menu_select(&cooling_page);
+    MS_select(&cooling_page);
 }
 
-// Updates the status of cooling elements from the PDU 
+/**
+ * @brief Callback function for coolant_in message that updates the cooling page
+ * 
+ * @param msg_data_a Pointer to the parsed CAN message data
+ */
 void coolant_out_CALLBACK(CanParsedData_t* msg_data_a) {
     cooling_elements[0].current_value = msg_data_a->coolant_out.dt_fan;
     cooling_elements[1].current_value = msg_data_a->coolant_out.dt_pump;
@@ -761,76 +811,88 @@ void coolant_out_CALLBACK(CanParsedData_t* msg_data_a) {
         return;
     }
 
+    // not necessary to update the page, just the values
     //update_cooling_page();
 }
 
 void update_tv_page() {
-    menu_refresh_page(&tv_page);
+    MS_refreshPage(&tv_page);
 }
 
 void move_up_tv() {
-    menu_move_up(&tv_page);
+    MS_moveUp(&tv_page);
 }
 
 void move_down_tv() {
-    menu_move_down(&tv_page);
+    MS_moveDown(&tv_page);
 }
 
 void select_tv() {
-    menu_select(&tv_page);
+    MS_select(&tv_page);
     race_elements[0].current_value = tv_elements[3].current_value; // Sync TV settings
 }
 
+/**
+ * @brief Updates the display of fault messages on the LCD screen
+ *
+ * Checks fault buffer entries and displays either the corresponding fault message
+ * or "No Fault" message for each of the 5 fault text fields on screen
+ */
 void update_fault_messages() {
     if (fault_buf[0] == 0xFFFF) {
-        set_text(FAULT1_TXT, FAULT_NONE_STRING);
+        NXT_setText(FAULT1_TXT, FAULT_NONE_STRING);
     } else {
-        set_text(FAULT1_TXT, faultArray[fault_buf[0]].screen_MSG);
+        NXT_setText(FAULT1_TXT, faultArray[fault_buf[0]].screen_MSG);
     }
 
     if (fault_buf[1] == 0xFFFF) {
-        set_text(FAULT2_TXT, FAULT_NONE_STRING);
+        NXT_setText(FAULT2_TXT, FAULT_NONE_STRING);
     } else {
-        set_text(FAULT2_TXT, faultArray[fault_buf[1]].screen_MSG);
+        NXT_setText(FAULT2_TXT, faultArray[fault_buf[1]].screen_MSG);
     }
 
     if (fault_buf[2] == 0xFFFF) {
-        set_text(FAULT3_TXT, FAULT_NONE_STRING);
+        NXT_setText(FAULT3_TXT, FAULT_NONE_STRING);
     } else {
-        set_text(FAULT3_TXT, faultArray[fault_buf[2]].screen_MSG);
+        NXT_setText(FAULT3_TXT, faultArray[fault_buf[2]].screen_MSG);
     }
 
     if (fault_buf[3] == 0xFFFF) {
-        set_text(FAULT4_TXT, FAULT_NONE_STRING);
+        NXT_setText(FAULT4_TXT, FAULT_NONE_STRING);
     } else {
-        set_text(FAULT4_TXT, faultArray[fault_buf[3]].screen_MSG);
+        NXT_setText(FAULT4_TXT, faultArray[fault_buf[3]].screen_MSG);
     }
 
     if (fault_buf[4] == 0xFFFF) {
-        set_text(FAULT5_TXT, FAULT_NONE_STRING);
+        NXT_setText(FAULT5_TXT, FAULT_NONE_STRING);
     } else {
-        set_text(FAULT5_TXT, faultArray[fault_buf[4]].screen_MSG);
+        NXT_setText(FAULT5_TXT, faultArray[fault_buf[4]].screen_MSG);
     }
 }
 
 void update_faults_page() {
     update_fault_messages();
 
-    menu_refresh_page(&faults_page);
+    MS_refreshPage(&faults_page);
 }
 
 void move_up_faults() {
-    menu_move_up(&faults_page);
+    MS_moveUp(&faults_page);
 }
 
 void move_down_faults() {
-    menu_move_down(&faults_page);
+    MS_moveDown(&faults_page);
 }
 
 void select_fault() {
-    menu_select(&faults_page);
+    MS_select(&faults_page);
 }
 
+/**
+ * @brief Clears a fault from the fault buffer by removing it and shifting remaining faults
+ * 
+ * @param index Position of the fault to clear (0-4)
+ */
 void clear_fault(int index) {
     if (index < 0 || index > 4) {
         return;
@@ -851,10 +913,17 @@ void clear_fault(int index) {
     fault_buf[4] = 0xFFFF;
 }
 
+/**
+ * @brief Callback function for fault button press that clears faults
+ * 
+ * If hover index is 5, clears all faults (indices 0-4)
+ * If hover index is 0-4, clears only that specific fault
+ * Updates fault messages after clearing
+ */
 void fault_button_callback() {
     int hover_index = faults_page.current_index;
     if (hover_index == 5) {
-        for (int i = 4; i >= 0; i--) {
+        for (int i = 4; i >= 0; i--) {  // Clear all faults which are not latched
             clear_fault(i);
         }
     } else {
@@ -865,140 +934,157 @@ void fault_button_callback() {
 }
 
 void update_race_page() {
-    menu_refresh_page(&race_page);
+    MS_refreshPage(&race_page);
 }
 
+/**
+ * @brief Updates telemetry data on the race dashboard LCD display
+ *
+ * Only updates on race page. Displays 'S' for stale values.
+ */
 void update_race_telemetry() {
     if (curr_page != PAGE_RACE) {
         return;
     }
 
-    set_value(BRK_BAR, 0); // TODO BRK BAR
-    set_value(THROT_BAR, (int) ((filtered_pedals / 4095.0) * 100));
+    NXT_setValue(BRK_BAR, 0); // TODO BRK BAR
+    NXT_setValue(THROT_BAR, (int) ((filtered_pedals / 4095.0) * 100));
 
     // update the speed
     if (can_data.rear_wheel_speeds.stale) {
-        set_text(SPEED, "S");
+        NXT_setText(SPEED, "S");
     } else {
         // Vehicle Speed [m/s] = Wheel Speed [RPM] * 16 [in] * PI * 0.0254 / 60
         // set_text(SPEED, NXT_TEXT, int_to_char((uint16_t)((float)MAX(can_data.rear_wheel_speeds.left_speed_sensor, can_data.rear_wheel_speeds.right_speed_sensor) * 0.01 * 0.4474), parsed_value));
         uint16_t speed = ((float)can_data.gps_speed.gps_speed * 0.02237); // TODO macro this magic number
-        set_textf(SPEED, "%d", speed);
+        NXT_setTextf(SPEED, "%d", speed);
     }
 
     // Update the voltage and current
     if (can_data.orion_currents_volts.stale) {
-        set_text(BATT_VOLT, "S");
-        set_text(BATT_CURR, "S");
+        NXT_setText(BATT_VOLT, "S");
+        NXT_setText(BATT_CURR, "S");
     } else {
         uint16_t voltage = (can_data.orion_currents_volts.pack_voltage / 10);
-        set_textf(BATT_VOLT, "%dV", voltage);
+        NXT_setTextf(BATT_VOLT, "%dV", voltage);
 
         uint16_t current = (can_data.orion_currents_volts.pack_current / 10);
-        set_textf(BATT_CURR, "%dA", current);  // Note: Changed 'V' to 'A' for current
+        NXT_setTextf(BATT_CURR, "%dA", current);  // Note: Changed 'V' to 'A' for current
     }
 
     // Update the motor temperature
     if (can_data.rear_motor_temps.stale) {
-        set_text(MOT_TEMP, "S");
+        NXT_setText(MOT_TEMP, "S");
     } else {
         uint8_t motor_temp = MAX(can_data.rear_motor_temps.left_mot_temp, can_data.rear_motor_temps.right_mot_temp);
-        set_textf(MOT_TEMP, "%dC", motor_temp);
+        NXT_setTextf(MOT_TEMP, "%dC", motor_temp);
     }
 
     // TODO update motor controller temp
 
     // Update the battery temperature
     if (can_data.max_cell_temp.stale) {
-        set_text(BATT_TEMP, "S");
+        NXT_setText(BATT_TEMP, "S");
     } else {
         uint16_t batt_temp = can_data.max_cell_temp.max_temp / 10;
-        set_textf(BATT_TEMP, "%dC", batt_temp);
+        NXT_setTextf(BATT_TEMP, "%dC", batt_temp);
     }
 
     // Update the state of charge
     if (can_data.main_hb.stale) {
-        set_text(CAR_STAT, "S");
-        set_font_color(CAR_STAT, WHITE);
+        NXT_setText(CAR_STAT, "S");
+        NXT_setFontColor(CAR_STAT, WHITE);
     } else {
         switch(can_data.main_hb.car_state) {
             case CAR_STATE_PRECHARGING:
-                set_font_color(CAR_STAT, ORANGE);
-                set_text(CAR_STAT, "PRECHARGE");
+                NXT_setFontColor(CAR_STAT, ORANGE);
+                NXT_setText(CAR_STAT, "PRECHARGE");
                 break;
             case CAR_STATE_ENERGIZED:
-                set_font_color(CAR_STAT, ORANGE);
-                set_text(CAR_STAT, "ENERGIZED");
+                NXT_setFontColor(CAR_STAT, ORANGE);
+                NXT_setText(CAR_STAT, "ENERGIZED");
                 break;
             case CAR_STATE_IDLE:
-                set_font_color(CAR_STAT, INFO_GRAY);
-                set_text(CAR_STAT, "IDLE");
+                NXT_setFontColor(CAR_STAT, INFO_GRAY);
+                NXT_setText(CAR_STAT, "IDLE");
                 break;
             case CAR_STATE_READY2DRIVE:
-                set_font_color(CAR_STAT, GREEN);
-                set_text(CAR_STAT, "READY");
+                NXT_setFontColor(CAR_STAT, GREEN);
+                NXT_setText(CAR_STAT, "READY");
                 break;
             case CAR_STATE_ERROR:
-                set_font_color(CAR_STAT, YELLOW);
-                set_text(CAR_STAT, "ERROR");
+                NXT_setFontColor(CAR_STAT, YELLOW);
+                NXT_setText(CAR_STAT, "ERROR");
                 break;
             case CAR_STATE_FATAL:
-                set_font_color(CAR_STAT, RED);
-                set_text(CAR_STAT, "FATAL");
+                NXT_setFontColor(CAR_STAT, RED);
+                NXT_setText(CAR_STAT, "FATAL");
                 break;
         }
     }
 }
 
 void select_race() {
-    menu_select(&race_page);
+    MS_select(&race_page);
     tv_elements[3].current_value = race_elements[0].current_value; // Sync TV settings
 }
 
 void update_logging_page() {
-    menu_refresh_page(&logging_page);
+    MS_refreshPage(&logging_page);
 
     if (logging_elements[0].current_value == 1) {
-        set_text(LOGGING_STATUS_TXT, "DAQ ON");
-        set_font_color(LOGGING_STATUS_TXT, GREEN);
+        NXT_setText(LOGGING_STATUS_TXT, "DAQ ON");
+        NXT_setFontColor(LOGGING_STATUS_TXT, GREEN);
     } else {
-        set_text(LOGGING_STATUS_TXT, "DAQ OFF");
-        set_font_color(LOGGING_STATUS_TXT, RED);
+        NXT_setText(LOGGING_STATUS_TXT, "DAQ OFF");
+        NXT_setFontColor(LOGGING_STATUS_TXT, RED);
     }
 }
 
 void select_logging() {
-    menu_select(&logging_page);
+    MS_select(&logging_page);
 
     if (logging_elements[0].current_value == 1) {
-        set_text(LOGGING_STATUS_TXT, "DAQ ON");
-        set_font_color(LOGGING_STATUS_TXT, GREEN);
+        NXT_setText(LOGGING_STATUS_TXT, "DAQ ON");
+        NXT_setFontColor(LOGGING_STATUS_TXT, GREEN);
     } else {
-        set_text(LOGGING_STATUS_TXT, "DAQ OFF");
-        set_font_color(LOGGING_STATUS_TXT, RED);
+        NXT_setText(LOGGING_STATUS_TXT, "DAQ OFF");
+        NXT_setFontColor(LOGGING_STATUS_TXT, RED);
     }
 }
 
+/**
+ * @brief Sets the color of a fault indicator element based on fault status
+ * 
+ * @param fault The fault code to check (0xFFFF indicates no fault)
+ * @param element Pointer to the display element to be colored
+ */
 void setFaultIndicator(uint16_t fault, char *element) {
     if (fault == 0xFFFF) {
-        set_font_color(element, WHITE);
+        NXT_setFontColor(element, WHITE);
         return;
     }
     
     if (checkFault(fault)) {
-        set_font_color(element, RED);
+        NXT_setFontColor(element, RED);
     } else {
-        set_font_color(element, GREEN);
+        NXT_setFontColor(element, GREEN);
     }
 }
 
+/**
+ * @brief Updates the background color of an LCD element based on status
+ *
+ * @param status Boolean indicating if element should be marked as active (1) or inactive (0)
+ * @param element Pointer to the LCD element to update
+ */
 void updateSDCStatus(uint8_t status, char *element) {
     if (status)
     {
-        set_background(element, GREEN);
+        NXT_setBackground(element, GREEN);
     }
     else
     {
-        set_background(element, RED);
+        NXT_setBackground(element, RED);
     }
 }

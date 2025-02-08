@@ -219,6 +219,11 @@ int main(void){
     return 0;
 }
 
+/**
+ * @brief Performs sequential initialization and setup of system peripherals and modules.
+ *
+ * @note Called repeatedly until preflight is registered as complete
+ */
 void preflightChecks(void) {
     static uint8_t state;
 
@@ -271,6 +276,12 @@ void preflightChecks(void) {
     }
 }
 
+/**
+ * @brief Processes and sends shock potentiometer readings
+ * 
+ * Converts raw ADC values from left and right shock potentiometers into parsed displacement values
+ * and sends them through CAN bus. Values are scaled linearly and adjusted for droop.
+ */
 void send_shockpots()
 {
     uint16_t shock_l = raw_adc_values.shock_left;
@@ -355,6 +366,12 @@ void interpretLoadSensor(void) {
     SEND_LOAD_SENSOR_READINGS_DASH(force_load_l, force_load_r);
 }
 
+/**
+ * @brief Updates system LED indicators and CAN stats
+ * 
+ * Controls heartbeat, connection, precharge, IMD and BMS status LEDs.
+ * Handles periodic CAN statistics transmission.
+ */
 void heartBeatLED()
 {
     static uint8_t imd_prev_latched;
@@ -475,6 +492,15 @@ void zeroEncoder() {
     input_state.encoder_position = 0;
 }
 
+/**
+ * @brief ISR for rotary encoder state changes
+ * 
+ * Updates encoder position based on Gray code transitions:
+ * - CW increments position with LCD page wrapping
+ * - CCW decrements with wrapping
+ * 
+ * @note Called on encoder pin state changes
+ */
 void encoder_ISR() {
     // [prev_state][current_state] = direction (1 = CW, -1 = CCW, 0 = no movement)
     static const int8_t encoder_transition_table[ENC_NUM_STATES][ENC_NUM_STATES] = {
@@ -486,7 +512,7 @@ void encoder_ISR() {
 
     uint8_t raw_enc_a = PHAL_readGPIO(ENC_A_GPIO_Port, ENC_A_Pin);
     uint8_t raw_enc_b = PHAL_readGPIO(ENC_B_GPIO_Port, ENC_B_Pin);
-    uint8_t current_state = (raw_enc_a | (raw_enc_b << 1));
+    uint8_t current_state = (raw_enc_a | (raw_enc_b << 1)); // enc_a and enc_b are flipped to reverse direction
 
     // Get direction from the state transition table
     int8_t direction = encoder_transition_table[input_state.prev_encoder_position][current_state];
@@ -504,7 +530,11 @@ void encoder_ISR() {
     input_state.prev_encoder_position = current_state;
 }
 
-// Handle Dashboard User Inputs periodically
+/**
+ * @brief Processes dashboard button flags and triggers corresponding actions
+ *
+ * Meant to be called periodically.
+ */
 void handleDashboardInputs()
 {
     if (input_state.up_button) {
@@ -590,6 +620,13 @@ void dashboard_bl_cmd_CALLBACK(CanParsedData_t *msg_data_a)
         Bootloader_ResetForFirmwareDownload();
 }
 
+/**
+ * @brief Reads ADC values and sends scaled voltage data for different voltage rails
+ * 
+ * Converts raw ADC values to actual voltages using voltage divider calculations
+ * for 3.3V, 5V, 12V and 24V rails. Scales values by 100 before sending.
+ * Resistor values must be manually updated if hardware changes.
+ */
 void sendVoltageData()
 {
     float adc_to_voltage = ADC_REF_VOLTAGE / 4095.0;
