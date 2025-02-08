@@ -11,7 +11,7 @@
  *  on LCD so they know when to turn on the HV to start the precharging.
  *  Not sure if I need that
  */
-
+static void motorSendSetpoints(amk_motor_t* motor);
 /* NOTE: As of now this is just setting everything to 0, but it may make sense
  * to have it in case something changes down the line while I learn more, so
  * this may end up being deleted if everything just inits to 0 */
@@ -56,7 +56,7 @@ void amkPeriodic(amk_motor_t* motor)
         break;
     }
 
-    //motor->sendSetpoints();
+    motorSendSetpoints(motor);
 }
 
 /* Sets the torque setpoint from -1000% to 1000% of nominal torque.
@@ -88,17 +88,17 @@ void amkSetTorque(amk_motor_t* motor, int16_t torque_setpoint)
 static void amkGetData(amk_motor_t* motor)
 {
     if (!can_data.INV1_Actual_Values_1.stale) {
-        // motor->status.AMK_bSystemReady = can_data.AMK_Actual_Values_1.AMK_Status_bSystemReady;
-        // motor->status.AMK_bError = can_data.AMK_Actual_Values_1.AMK_Status_bError;
-        // motor->status.AMK_bWarn = can_data.AMK_Actual_Values_1.AMK_Status_bWarn;
-        // motor->status.AMK_bQuitDcOn = can_data.AMK_Actual_Values_1.AMK_Status_bQuitDcOn;
-        // motor->status.AMK_bDcOn = can_data.AMK_Actual_Values_1.AMK_Status_bDcOn;
-        // motor->status.AMK_bQuitInverterOn = can_data.AMK_Actual_Values_1.AMK_Status_bQuitInverterOn;
-        // motor->status.AMK_bInverterOn = can_data.AMK_Actual_Values_1.AMK_Status_bInverterOn;
-        // motor->status.AMK_bDerating = can_data.AMK_Actual_Values_1.AMK_Status_bDerating;
-        //
-        // motor->actual_torque = can_data.AMK_Actual_Values_1.AMK_ActualTorque;
-        // motor->serial_num = can_data.AMK_Actual_Values_1.AMK_MotorSerialNumber;
+        motor->status.AMK_bSystemReady = can_data.INV1_Actual_Values_1.AMK_Status_bSystemReady;
+        motor->status.AMK_bError = can_data.INV1_Actual_Values_1.AMK_Status_bError;
+        motor->status.AMK_bWarn = can_data.INV1_Actual_Values_1.AMK_Status_bWarn;
+        motor->status.AMK_bQuitDcOn = can_data.INV1_Actual_Values_1.AMK_Status_bQuitDcOn;
+        motor->status.AMK_bDcOn = can_data.INV1_Actual_Values_1.AMK_Status_bDcOn;
+        motor->status.AMK_bQuitInverterOn = can_data.INV1_Actual_Values_1.AMK_Status_bQuitInverterOn;
+        motor->status.AMK_bInverterOn = can_data.INV1_Actual_Values_1.AMK_Status_bInverterOn;
+        motor->status.AMK_bDerating = can_data.INV1_Actual_Values_1.AMK_Status_bDerating;
+        
+        motor->actual_torque = can_data.INV1_Actual_Values_1.AMK_ActualVelocity;
+        //motor->serial_num = can_data.INV1_Actual_Values_1.INV1_MotorSerialNumber;
     } else {
         setFault(motor->stale_fault_id, true);
     }
@@ -182,8 +182,8 @@ static void amkRunning(amk_motor_t* motor)
         if (motor->status.AMK_bError) {
             motor->states.running_state = AMK_RUNNING_ERROR;
         }
-        // amkSetTorque(motor, 100);
-
+        amkSetTorque(motor, 5);
+        
         break;
     case AMK_RUNNING_ERROR:
         setFault(motor->error_fault_id, true);
