@@ -123,8 +123,6 @@
 #define AUX_HP_IMON_ADC_CHNL        (13)
 
 // Shutdown Circuit (SDC) Switch (High Power)
-#define SDC_CTRL_GPIO_Port          (GPIOD)
-#define SDC_CTRL_Pin                (13)
 #define SDC_IMON_GPIO_Port          (GPIOA)
 #define SDC_IMON_Pin                (0)
 #define SDC_IMON_ADC_CHNL           (0)
@@ -156,8 +154,6 @@
 #define MAIN_CS_ADC_CHNL            (12)
 
 // Dashboard Switch (Low Power)
-#define DASH_CTRL_GPIO_Port         (GPIOA)
-#define DASH_CTRL_Pin               (9)
 #define DASH_NFLT_GPIO_Port         (GPIOA)
 #define DASH_NFLT_Pin               (8)
 #define DASH_CS_GPIO_Port           (GPIOC)
@@ -165,8 +161,6 @@
 #define DASH_CS_ADC_CHNL            (11)
 
 // Accumulator (ABox) Switch (Low Power)
-#define ABOX_CTRL_GPIO_Port         (GPIOA)
-#define ABOX_CTRL_Pin               (11)
 #define ABOX_NFLT_GPIO_Port         (GPIOA)
 #define ABOX_NFLT_Pin               (10)
 #define ABOX_CS_GPIO_Port           (GPIOC)
@@ -192,8 +186,6 @@
 #define NCRIT_5V_NFLT_Pin           (5)
 
 // DAQ Switch (5V)
-#define DAQ_CTRL_GPIO_Port          (GPIOE)
-#define DAQ_CTRL_Pin                (4)
 #define DAQ_NFLT_GPIO_Port          (GPIOE)
 #define DAQ_NFLT_Pin                (3)
 

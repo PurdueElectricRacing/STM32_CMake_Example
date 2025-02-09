@@ -100,7 +100,7 @@ void setSwitch(switches_t auto_switch_enum, bool state) {
             LED_control(LED_PUMP_2, state);
             break;
         case SW_SDC:
-            PHAL_writeGPIO(SDC_CTRL_GPIO_Port, SDC_CTRL_Pin, state);
+            // NoToggle switch (always on)
             LED_control(LED_SDC, state);
             break;
         case SW_AUX:
@@ -136,14 +136,13 @@ void setSwitch(switches_t auto_switch_enum, bool state) {
             LED_control(LED_5V_NCRIT, state);
             break;
         case SW_DAQ:
-            PHAL_writeGPIO(DAQ_CTRL_GPIO_Port, DAQ_CTRL_Pin, state);
+            // NoToggle switch (always on)
             LED_control(LED_DAQ, state);
             break;
         case SW_FAN_5V:
             PHAL_writeGPIO(FAN_5V_CTRL_GPIO_Port, FAN_5V_CTRL_Pin, state);
             LED_control(LED_5V_FAN, state);
             break;
-
     }
 }
 
@@ -156,9 +155,6 @@ bool getSwitchStatus(switches_t auto_switch_enum) {
             break;
         case SW_PUMP_2:
             status = PHAL_readGPIO(PUMP_2_CTRL_GPIO_Port, PUMP_2_CTRL_Pin);
-            break;
-        case SW_SDC:
-            status = PHAL_readGPIO(SDC_CTRL_GPIO_Port, SDC_CTRL_Pin);
             break;
         case SW_AUX:
             status = PHAL_readGPIO(AUX_HP_CTRL_GPIO_Port, AUX_HP_CTRL_Pin);
@@ -178,12 +174,11 @@ bool getSwitchStatus(switches_t auto_switch_enum) {
         case SW_NCRIT_5V:
             status = PHAL_readGPIO(NCRIT_5V_CTRL_GPIO_Port, NCRIT_5V_CTRL_Pin);
             break;
-        case SW_DAQ:
-            status = PHAL_readGPIO(DAQ_CTRL_GPIO_Port, DAQ_CTRL_Pin);
-            break;
         case SW_FAN_5V:
             status = PHAL_readGPIO(FAN_5V_CTRL_GPIO_Port, FAN_5V_CTRL_Pin);
             break;
+        default:
+            status = 1;  // Non-controllable switches are always on
     }
 
     return status;
