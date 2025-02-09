@@ -26,49 +26,49 @@ extern dashboard_input_state_t input_state; // Global dashboard input states
 
 
 // Driver Page Functions
-void update_driver_page();
-void move_up_driver();
-void move_down_driver();
-void select_driver();
+void driverPageUpdate();
+void driverMoveUp();
+void driverMoveDown();
+void driverSelect();
 
 // Profile Page Functions
-void update_profile_page();
-void move_up_profile();
-void move_down_profile();
-void select_profile();
-void profile_save_button_callback();
+void profilePageUpdate();
+void profileMoveUp();
+void profileMoveDown();
+void profileSelect();
+void profileSaveButton_CALLBACK();
 
 // Cooling Page Functions
-void update_cooling_page();
-void move_up_cooling();
-void move_down_cooling();
-void select_cooling();
+void coolingPageUpdate();
+void coolingMoveUp();
+void coolingMoveDown();
+void coolingSelect();
 
 // TV Page Functions
-void update_tv_page();
-void move_up_tv();
-void move_down_tv();
-void select_tv();
+void tvPageUpdate();
+void tvMoveUp();
+void tvMoveDown();
+void tvSelect();
 
 // Faults Page Functions
-void update_faults_page();
-void move_up_faults();
-void move_down_faults();
-void select_fault();
-void update_fault_messages();
-void fault_button_callback();
+void faultsPageUpdate();
+void faultsMoveUp();
+void faultsMoveDown();
+void faultsSelect();
+void updateFaultMessages();
+void faultsClearButton_CALLBACK();
 
 // Race Page Functions
-void update_race_telemetry();
-void update_race_page();
-void select_race();
+void raceTelemetryUpdate();
+void racePageUpdate();
+void raceSelect();
 
 // Warning/Error/Fatal Page Functions
-void select_error_page();
+void errorPageSelect();
 
 // DAQ Logging Page Functions
-void update_logging_page();
-void select_logging();
+void loggingPageUpdate();
+void loggingSelect();
 
 // Utility Functions
 void updateSDCStatus(uint8_t status, char *element);
@@ -76,19 +76,19 @@ void setFaultIndicator(uint16_t fault, char *element);
 
 // Page handlers array stored in flash
 const page_handler_t page_handlers[] = { // Order must match page_t enum
-    [PAGE_RACE]      = {update_race_page, NULL, NULL, select_race}, // No move handlers
-    [PAGE_COOLING]   = {update_cooling_page, move_up_cooling, move_down_cooling, select_cooling},
-    [PAGE_TVSETTINGS]= {update_tv_page, move_up_tv, move_down_tv, select_tv},
-    [PAGE_FAULTS]    = {update_faults_page, move_up_faults, move_down_faults, select_fault},
+    [PAGE_RACE]      = {racePageUpdate, NULL, NULL, raceSelect}, // No move handlers
+    [PAGE_COOLING]   = {coolingPageUpdate, coolingMoveUp, coolingMoveDown, coolingSelect},
+    [PAGE_TVSETTINGS]= {tvPageUpdate, tvMoveUp, tvMoveDown, tvSelect},
+    [PAGE_FAULTS]    = {faultsPageUpdate, faultsMoveUp, faultsMoveDown, faultsSelect},
     [PAGE_SDCINFO]   = {NULL, NULL, NULL, NULL},  // SDCINFO is passive
-    [PAGE_DRIVER]    = {update_driver_page, move_up_driver, move_down_driver, select_driver},
-    [PAGE_PROFILES]  = {update_profile_page, move_up_profile, move_down_profile, select_profile},
-    [PAGE_LOGGING]   = {update_logging_page, NULL, NULL, select_logging},
+    [PAGE_DRIVER]    = {driverPageUpdate, driverMoveUp, driverMoveDown, driverSelect},
+    [PAGE_PROFILES]  = {profilePageUpdate, profileMoveUp, profileMoveDown, profileSelect},
+    [PAGE_LOGGING]   = {loggingPageUpdate, NULL, NULL, loggingSelect},
     [PAGE_APPS]      = {NULL, NULL, NULL, NULL}, // Apps is passive
     [PAGE_PREFLIGHT] = {NULL, NULL, NULL, NULL}, // Preflight is passive
-    [PAGE_WARNING]   = {NULL, NULL, NULL, select_error_page}, // Error pages share a select handler
-    [PAGE_ERROR]     = {NULL, NULL, NULL, select_error_page},  
-    [PAGE_FATAL]     = {NULL, NULL, NULL, select_error_page}
+    [PAGE_WARNING]   = {NULL, NULL, NULL, errorPageSelect}, // Error pages share a select handler
+    [PAGE_ERROR]     = {NULL, NULL, NULL, errorPageSelect},  
+    [PAGE_FATAL]     = {NULL, NULL, NULL, errorPageSelect}
 };
 
 menu_element_t race_elements[] = {
@@ -195,32 +195,32 @@ menu_element_t faults_elements[] = {
     {
         .type = ELEMENT_BUTTON,
         .object_name = FAULT1_BUTTON,
-        .on_change = fault_button_callback // clear fault
+        .on_change = faultsClearButton_CALLBACK // clear fault
     },
     {
         .type = ELEMENT_BUTTON,
         .object_name = FAULT2_BUTTON,
-        .on_change = fault_button_callback // clear fault
+        .on_change = faultsClearButton_CALLBACK // clear fault
     },
     {
         .type = ELEMENT_BUTTON,
         .object_name = FAULT3_BUTTON,
-        .on_change = fault_button_callback // clear fault
+        .on_change = faultsClearButton_CALLBACK // clear fault
     },
     {
         .type = ELEMENT_BUTTON,
         .object_name = FAULT4_BUTTON,
-        .on_change = fault_button_callback // clear fault
+        .on_change = faultsClearButton_CALLBACK // clear fault
     },
     {
         .type = ELEMENT_BUTTON,
         .object_name = FAULT5_BUTTON,
-        .on_change = fault_button_callback // clear fault
+        .on_change = faultsClearButton_CALLBACK // clear fault
     },
     {
         .type = ELEMENT_BUTTON,
         .object_name = CLEAR_BUTTON,
-        .on_change = fault_button_callback // clear all faults
+        .on_change = faultsClearButton_CALLBACK // clear all faults
     }
 };
 
@@ -282,7 +282,7 @@ menu_element_t profile_elements[] = {
     {
         .type = ELEMENT_BUTTON,
         .object_name = PROFILE_SAVE_BUTTON,
-        .on_change = profile_save_button_callback
+        .on_change = profileSaveButton_CALLBACK
     }
 };
 
@@ -427,7 +427,7 @@ void selectItem() {
  *
  * @note Only executes when current page is PAGE_APPS
  */
-void update_apps_telemetry() {
+void updateAppsTelemetry() {
     if (curr_page != PAGE_APPS) {
         return;
     }
@@ -465,9 +465,9 @@ void update_apps_telemetry() {
 
 void updateTelemetryPages() {
     if (curr_page == PAGE_RACE) {
-        update_race_telemetry();
+        raceTelemetryUpdate();
     } else {
-        update_apps_telemetry();
+        updateAppsTelemetry();
     }
 }
 
@@ -661,7 +661,7 @@ void updateSDCDashboard() {
 
 // ! Helper function definitions
 
-void select_error_page() {
+void errorPageSelect() {
     fault_time_displayed = 0;   // Reset fault timer first
     curr_page = prev_page;      // Return to previous page 
     prev_page = PAGE_PREFLIGHT; // so select item doesnt't break
@@ -669,23 +669,23 @@ void select_error_page() {
     return;
 }
 
-void update_driver_page() {
+void driverPageUpdate() {
     MS_refreshPage(&driver_page);
 }
 
-void move_up_driver() {
+void driverMoveUp() {
     MS_moveUp(&driver_page);
 }
 
-void move_down_driver() {
+void driverMoveDown() {
     MS_moveDown(&driver_page);
 }
 
-void select_driver() {
+void driverSelect() {
     MS_select(&driver_page);
 }
 
-void update_profile_page() {
+void profilePageUpdate() {
     // Update displayed driver name
     int driver_index = MS_listGetSelected(&driver_page);
     if (driver_index < 0) {
@@ -714,7 +714,7 @@ void update_profile_page() {
     MS_refreshPage(&profile_page);
 }
 
-void move_up_profile() {
+void profileMoveUp() {
     MS_moveUp(&profile_page);
     
     // Update save status indicator on any value change
@@ -724,7 +724,7 @@ void move_up_profile() {
     }
 }
 
-void move_down_profile() {
+void profileMoveDown() {
     MS_moveDown(&profile_page);
     
     // Update save status indicator on any value change
@@ -734,7 +734,7 @@ void move_down_profile() {
     }
 }
 
-void select_profile() {
+void profileSelect() {
     // Handle other elements using menu system
     MS_select(&profile_page);
     
@@ -750,7 +750,7 @@ void select_profile() {
  * @brief Saves the current pedal profile settings to permanent memory
  *        for the selected driver and updates the UI with the save status.
  */
-void profile_save_button_callback() {
+void profileSaveButton_CALLBACK() {
     int driver_index = MS_listGetSelected(&driver_page);
     // Save profile values
     driver_pedal_profiles[driver_index].brake_travel_threshold = profile_elements[0].current_value;
@@ -767,13 +767,13 @@ void profile_save_button_callback() {
     }
 }
 
-void update_cooling_page() {
+void coolingPageUpdate() {
     MS_refreshPage(&cooling_page);
     NXT_setValue(DT_FAN_BAR, cooling_elements[0].current_value);
     NXT_setValue(B_FAN_BAR, cooling_elements[2].current_value);
 }
 
-void move_up_cooling() {
+void coolingMoveUp() {
     MS_moveUp(&cooling_page);
 
     // Passively update the bar values
@@ -783,7 +783,7 @@ void move_up_cooling() {
     }
 }
 
-void move_down_cooling() {
+void coolingMoveDown() {
     MS_moveDown(&cooling_page);
 
     // Passively update the bar values
@@ -793,7 +793,7 @@ void move_down_cooling() {
     }
 }
 
-void select_cooling() {
+void coolingSelect() {
     MS_select(&cooling_page);
 }
 
@@ -816,19 +816,19 @@ void coolant_out_CALLBACK(CanParsedData_t* msg_data_a) {
     //update_cooling_page();
 }
 
-void update_tv_page() {
+void tvPageUpdate() {
     MS_refreshPage(&tv_page);
 }
 
-void move_up_tv() {
+void tvMoveUp() {
     MS_moveUp(&tv_page);
 }
 
-void move_down_tv() {
+void tvMoveDown() {
     MS_moveDown(&tv_page);
 }
 
-void select_tv() {
+void tvSelect() {
     MS_select(&tv_page);
     race_elements[0].current_value = tv_elements[3].current_value; // Sync TV settings
 }
@@ -839,7 +839,7 @@ void select_tv() {
  * Checks fault buffer entries and displays either the corresponding fault message
  * or "No Fault" message for each of the 5 fault text fields on screen
  */
-void update_fault_messages() {
+void updateFaultMessages() {
     if (fault_buf[0] == 0xFFFF) {
         NXT_setText(FAULT1_TXT, FAULT_NONE_STRING);
     } else {
@@ -871,21 +871,21 @@ void update_fault_messages() {
     }
 }
 
-void update_faults_page() {
-    update_fault_messages();
+void faultsPageUpdate() {
+    updateFaultMessages();
 
     MS_refreshPage(&faults_page);
 }
 
-void move_up_faults() {
+void faultsMoveUp() {
     MS_moveUp(&faults_page);
 }
 
-void move_down_faults() {
+void faultsMoveDown() {
     MS_moveDown(&faults_page);
 }
 
-void select_fault() {
+void faultsSelect() {
     MS_select(&faults_page);
 }
 
@@ -894,7 +894,7 @@ void select_fault() {
  * 
  * @param index Position of the fault to clear (0-4)
  */
-void clear_fault(int index) {
+void clearFault(int index) {
     if (index < 0 || index > 4) {
         return;
     }
@@ -921,20 +921,20 @@ void clear_fault(int index) {
  * If hover index is 0-4, clears only that specific fault
  * Updates fault messages after clearing
  */
-void fault_button_callback() {
+void faultsClearButton_CALLBACK() {
     int hover_index = faults_page.current_index;
     if (hover_index == 5) {
         for (int i = 4; i >= 0; i--) {  // Clear all faults which are not latched
-            clear_fault(i);
+            clearFault(i);
         }
     } else {
-        clear_fault(hover_index);
+        clearFault(hover_index);
     }
 
-    update_fault_messages();
+    updateFaultMessages();
 }
 
-void update_race_page() {
+void racePageUpdate() {
     MS_refreshPage(&race_page);
 }
 
@@ -943,7 +943,7 @@ void update_race_page() {
  *
  * Only updates on race page. Displays 'S' for stale values.
  */
-void update_race_telemetry() {
+void raceTelemetryUpdate() {
     if (curr_page != PAGE_RACE) {
         return;
     }
@@ -1025,12 +1025,12 @@ void update_race_telemetry() {
     }
 }
 
-void select_race() {
+void raceSelect() {
     MS_select(&race_page);
     tv_elements[3].current_value = race_elements[0].current_value; // Sync TV settings
 }
 
-void update_logging_page() {
+void loggingPageUpdate() {
     MS_refreshPage(&logging_page);
 
     if (logging_elements[0].current_value == 1) {
@@ -1042,7 +1042,7 @@ void update_logging_page() {
     }
 }
 
-void select_logging() {
+void loggingSelect() {
     MS_select(&logging_page);
 
     if (logging_elements[0].current_value == 1) {
