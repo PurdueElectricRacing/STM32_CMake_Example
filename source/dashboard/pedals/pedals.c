@@ -94,36 +94,36 @@ void pedalsPeriodic(void)
     SEND_FILT_THROTTLE_BRAKE(t1, b1);
 }
 
-static const uint32_t* PROFILE_FLASH_START = (uint32_t*)ADDR_FLASH_SECTOR_3;
-static volatile uint32_t* profile_current_address;
+// static const uint32_t* PROFILE_FLASH_START = (uint32_t*)ADDR_FLASH_SECTOR_3;
+// static volatile uint32_t* profile_current_address;
 
 // TODO move to main
 int writePedalProfiles() { // TODO switch to EEPROM
-    profile_current_address = (volatile uint32_t*)PROFILE_FLASH_START;
+    // profile_current_address = (volatile uint32_t*)PROFILE_FLASH_START;
 
-     // !! This will cause a crash if watchdog is enabled !!
-    if (FLASH_OK != PHAL_flashErasePage(PROFILES_START_SECTOR)) {
-        return PROFILE_WRITE_FAIL;
-    }
+    //  // !! This will cause a crash if watchdog is enabled !!
+    // if (FLASH_OK != PHAL_flashErasePage(PROFILES_START_SECTOR)) {
+    //     return PROFILE_WRITE_FAIL;
+    // }
 
-    for (uint8_t i = 0; i < NUM_PROFILES; ++i) {
-        if (FLASH_OK != PHAL_flashWriteU32((uint32_t)profile_current_address, 
-                                         *(uint32_t*)&driver_pedal_profiles[i])) {
-            return PROFILE_WRITE_FAIL;
-        }
-        profile_current_address++;
-    }
+    // for (uint8_t i = 0; i < NUM_PROFILES; ++i) {
+    //     if (FLASH_OK != PHAL_flashWriteU32((uint32_t)profile_current_address, 
+    //                                      *(uint32_t*)&driver_pedal_profiles[i])) {
+    //         return PROFILE_WRITE_FAIL;
+    //     }
+    //     profile_current_address++;
+    // }
 
     return PROFILE_WRITE_SUCCESS;
 }
 
 void readPedalProfiles() {
-    uint32_t read_address = ADDR_FLASH_SECTOR_3;
+    // uint32_t read_address = ADDR_FLASH_SECTOR_3;
 
-    for (uint8_t i = 0; i < NUM_PROFILES; ++i) {
-        uint32_t *data = (uint32_t *)&driver_pedal_profiles[i];
-        *data = *((uint32_t *)read_address);
+    // for (uint8_t i = 0; i < NUM_PROFILES; ++i) {
+    //     uint32_t *data = (uint32_t *)&driver_pedal_profiles[i];
+    //     *data = *((uint32_t *)read_address);
 
-        read_address += sizeof(driver_pedal_profile_t);
-    }
+    //     read_address += sizeof(driver_pedal_profile_t);
+    // }
 }
