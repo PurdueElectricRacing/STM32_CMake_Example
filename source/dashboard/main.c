@@ -243,32 +243,20 @@ void preflightChecks(void) {
             }
             break;
         case 2:
-            if (false == PHAL_initADC(ADC1, &adc_config, adc_channel_config, sizeof(adc_channel_config)/sizeof(ADCChannelConfig_t)))
-            {
-                HardFault_Handler();
-            }
-            if (false == PHAL_initDMA(&adc_dma_config))
-            {
-                HardFault_Handler();
-            }
-            PHAL_startTxfer(&adc_dma_config);
-            PHAL_startADC(ADC1);
-            break;
-        case 3:
             /* Module Initialization */
             initCANParse();
             if (daqInit(&q_tx_can1_s[2]))
                 HardFault_Handler();
             break;
-        case 4:
+        case 3:
             enableInterrupts();
+            break;
+        case 4:
+            // Zero Rotary Encoder
+            zeroEncoder();
             break;
         case 5:
             initLCD();
-            break;
-        case 6:
-            // Zero Rotary Encoder
-            zeroEncoder();
             break;
         default:
             registerPreflightComplete(1);
@@ -480,8 +468,13 @@ void EXTI15_10_IRQHandler() {
 }
 
 
-// Call initially to ensure the LCD is initialized to the proper value -
-// should be replaced with the struct prev page stuff eventually
+/**
+ * @brief Initialize encoder to zero position
+ * 
+ * Reads initial encoder state from GPIO pins and sets position to zero.
+ *
+ * @note Without this function, the encoder cannot track the first direction
+ */
 void zeroEncoder() {
     // Collect initial raw reading from encoder
     uint8_t raw_enc_a = PHAL_readGPIO(ENC_A_GPIO_Port, ENC_A_Pin);
