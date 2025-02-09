@@ -199,8 +199,9 @@ extern uint32_t PLLClockRateHz;
 
 #define TargetCoreClockrateHz 144000000
 ClockRateConfig_t clock_config = {
-    .system_source              =SYSTEM_CLOCK_SRC_PLL,
-    .pll_src                    =PLL_SRC_HSI16,
+    .use_hse                    =true,
+    .use_pll                    =true,
+    .pll_src                    =PLL_SRC_HSE,
     .vco_output_rate_target_hz  =288000000,
     .system_clock_target_hz     =TargetCoreClockrateHz,
     .ahb_clock_target_hz        =(TargetCoreClockrateHz / 1),

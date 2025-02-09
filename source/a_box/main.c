@@ -65,11 +65,12 @@ GPIOInitConfig_t gpio_config[] = {
 
 #define TargetCoreClockrateHz 16000000
 ClockRateConfig_t clock_config = {
-   .system_source              =SYSTEM_CLOCK_SRC_HSI,
-   .system_clock_target_hz     =TargetCoreClockrateHz,
-   .ahb_clock_target_hz        =(TargetCoreClockrateHz / 1),
-   .apb1_clock_target_hz       =(TargetCoreClockrateHz / (1)),
-   .apb2_clock_target_hz       =(TargetCoreClockrateHz / (1)),
+    .use_hse                    =true,
+    .use_pll                    =false,
+    .system_clock_target_hz     =TargetCoreClockrateHz,
+    .ahb_clock_target_hz        =(TargetCoreClockrateHz / 1),
+    .apb1_clock_target_hz       =(TargetCoreClockrateHz / (1)),
+    .apb2_clock_target_hz       =(TargetCoreClockrateHz / (1)),
 };
 
 

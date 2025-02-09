@@ -24,6 +24,8 @@
 #error "Please define a MCU arch"
 #endif
 
+#define HSE_CLOCK_RATE_HZ (16000000)
+
 #define HSE_CLOCK_RATE_HZ_INVALID (1) /* High Speed External oscilator value */
 #ifndef HSE_CLOCK_RATE_HZ
 #define HSE_CLOCK_RATE_HZ HSE_CLOCK_RATE_HZ_INVALID /* Define this in order to configure clocks to use the HSE clock */
@@ -59,23 +61,18 @@
 
 typedef enum {
     PLL_SRC_HSI16,
+    PLL_SRC_HSE
 } PLLSrc_t;
 
-
-typedef enum {
-    SYSTEM_CLOCK_SRC_PLL,
-    SYSTEM_CLOCK_SRC_HSI,
-    SYSTEM_CLOCK_SRC_HSE,
-} SystemClockSrc_t;
-
 typedef struct {
-    SystemClockSrc_t system_source;     /* System Core Clock source */
+    bool use_hse;                       /* Use HSE or not */
+    bool use_pll;                       /* Use PLL or not */
     uint32_t  system_clock_target_hz;   /* System Core Clock rate */
     uint32_t  ahb_clock_target_hz;      /* AHB clock rate target */
     uint32_t  apb1_clock_target_hz;     /* APB1 clock rate target */
     uint32_t  apb2_clock_target_hz;     /* APB2 clock rate target */
 
-    /* Only used for system_source == PLL */
+    /* Only used for use_pll == true */
     PLLSrc_t pll_src;                   /* Input source for PLL VCO */
     uint32_t vco_output_rate_target_hz; /* VCO output target rate */
     uint32_t msi_output_rate_target_hz; /* Use if pll_src == MSI */
@@ -121,6 +118,15 @@ bool PHAL_configurePLLSystemClock(uint32_t system_clock_target_hz);
  * @return false
  */
 bool PHAL_configureHSISystemClock();
+
+/**
+ * @brief Configure HSE CLK as the System Clock.
+ * SHOULD BE DONE BEFORE ANY OF THE AHB OR APB CLOCKS ARE CHANGED
+ *
+ * @return true Successfully configured HSE clock as system clock
+ * @return false
+ */
+bool PHAL_configureHSESystemClock();
 
 /**
  * @brief Configure AHB Clock rate by modifying the AHB prescaler value.
