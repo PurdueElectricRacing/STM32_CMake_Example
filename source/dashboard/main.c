@@ -249,11 +249,11 @@ void preflightChecks(void) {
                 HardFault_Handler();
             break;
         case 3:
-            enableInterrupts();
-            break;
-        case 4:
             // Zero Rotary Encoder
             zeroEncoder();
+            break;
+        case 4:
+            enableInterrupts();
             break;
         case 5:
             initLCD();
