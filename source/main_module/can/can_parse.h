@@ -260,7 +260,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_INVA_SETPOINTS(AMK_Control_bReserve_, AMK_Control_bInverterOn_, AMK_Control_bDcOn_, AMK_Control_bEnable_, AMK_Control_bErrorReset_, AMK_Control_bReserve2_, AMK_TorqueSetpoint_, AMK_PositiveTorqueLimit_, AMK_NegativeTorqueLimit_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_INVA_SETPOINTS, .DLC=DLC_INVA_SETPOINTS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN1, .StdId=ID_INVA_SETPOINTS, .DLC=DLC_INVA_SETPOINTS, .IDE=0};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->INVA_Setpoints.AMK_Control_bReserve = AMK_Control_bReserve_;\
         data_a->INVA_Setpoints.AMK_Control_bInverterOn = AMK_Control_bInverterOn_;\
@@ -274,7 +274,7 @@ typedef union {
         canTxSendToBack(&msg);\
     } while(0)
 #define SEND_INVB_SETPOINTS(AMK_Control_bReserve_, AMK_Control_bInverterOn_, AMK_Control_bDcOn_, AMK_Control_bEnable_, AMK_Control_bErrorReset_, AMK_Control_bReserve2_, AMK_TorqueSetpoint_, AMK_PositiveTorqueLimit_, AMK_NegativeTorqueLimit_) do {\
-        CanMsgTypeDef_t msg = {.Bus=CAN1, .ExtId=ID_INVB_SETPOINTS, .DLC=DLC_INVB_SETPOINTS, .IDE=1};\
+        CanMsgTypeDef_t msg = {.Bus=CAN1, .StdId=ID_INVB_SETPOINTS, .DLC=DLC_INVB_SETPOINTS, .IDE=0};\
         CanParsedData_t* data_a = (CanParsedData_t *) &msg.Data;\
         data_a->INVB_Setpoints.AMK_Control_bReserve = AMK_Control_bReserve_;\
         data_a->INVB_Setpoints.AMK_Control_bInverterOn = AMK_Control_bInverterOn_;\

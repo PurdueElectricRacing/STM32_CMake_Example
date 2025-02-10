@@ -33,7 +33,7 @@ NS_ :
 
 BS_:
 
-BU_: Main_Module a_box OrionBMS torque_vector Dashboard Steering PDU daq bootloader InverterA InverterB BITSTREAM Charger DAQ TEST_NODE TEST_NODE_2 DAQ
+BU_: Main_Module a_box OrionBMS torque_vector Dashboard Steering PDU daq bootloader InverterA InverterB BITSTREAM Charger DAQ Main_Module TEST_NODE TEST_NODE_2 DAQ
 
 
 BO_ 2348816641 main_hb: 2 Main_Module
@@ -124,7 +124,7 @@ BO_ 2214593409 rear_wheel_speeds: 8 Main_Module
  SG_ right_speed_mc : 16|16@1+ (1,0) [0|0] "RPM" Vector__XXX
  SG_ left_speed_mc : 0|16@1+ (1,0) [0|0] "RPM" Vector__XXX
 
-BO_ 392 INVA_Setpoints: 8 Main_Module
+BO_ 2147484040 INVA_Setpoints: 8 Main_Module
  SG_ AMK_NegativeTorqueLimit : 48|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
  SG_ AMK_PositiveTorqueLimit : 32|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
  SG_ AMK_TorqueSetpoint : 16|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
@@ -135,7 +135,7 @@ BO_ 392 INVA_Setpoints: 8 Main_Module
  SG_ AMK_Control_bInverterOn : 8|1@1+ (1,0) [0|0] "" Vector__XXX
  SG_ AMK_Control_bReserve : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 393 INVB_Setpoints: 8 Main_Module
+BO_ 2147484041 INVB_Setpoints: 8 Main_Module
  SG_ AMK_NegativeTorqueLimit : 48|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
  SG_ AMK_PositiveTorqueLimit : 32|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
  SG_ AMK_TorqueSetpoint : 16|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
@@ -498,7 +498,7 @@ BO_ 2217793084 daq_bl_resp: 5 bootloader
  SG_ data : 8|32@1+ (1,0) [0|0] "" Vector__XXX
  SG_ cmd : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 642 INVA_Actual_Values_1: 8 InverterA
+BO_ 2147484290 INVA_Actual_Values_1: 8 InverterA
  SG_ AMK_MotorSerialNumber : 32|32@1+ (1,0) [0|0] "" Vector__XXX
  SG_ AMK_ActualTorque : 16|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
  SG_ AMK_Status_bDerating : 15|1@1+ (1,0) [0|0] "" Vector__XXX
@@ -511,30 +511,30 @@ BO_ 642 INVA_Actual_Values_1: 8 InverterA
  SG_ AMK_Status_bSystemReady : 8|1@1+ (1,0) [0|0] "" Vector__XXX
  SG_ AMK_Status_bReserve : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 644 INVA_Actual_Values_2: 6 InverterA
+BO_ 2147484292 INVA_Actual_Values_2: 6 InverterA
  SG_ AMK_SystemReset : 32|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ AMK_DCBusVoltage : 16|16@1+ (1,0) [0|0] "V" Vector__XXX
  SG_ AMK_ActualSpeed : 0|16@1- (1,0) [0|0] "rpm" Vector__XXX
 
-BO_ 646 INVA_Temperatures_1: 6 InverterA
+BO_ 2147484294 INVA_Temperatures_1: 6 InverterA
  SG_ AMK_IGBTTemp : 32|16@1- (0.1,0) [0|0] "C" Vector__XXX
  SG_ AMK_InverterTemp : 16|16@1- (0.1,0) [0|0] "C" Vector__XXX
  SG_ AMK_MotorTemp : 0|16@1- (0.1,0) [0|0] "C" Vector__XXX
 
-BO_ 648 INVA_Temperatures_2: 6 InverterA
+BO_ 2147484296 INVA_Temperatures_2: 6 InverterA
  SG_ AMK_TempSensorMotor : 32|16@1+ (0.1,0) [0|0] "C" Vector__XXX
  SG_ AMK_ExternalTemp : 16|16@1- (0.1,0) [0|0] "C" Vector__XXX
  SG_ AMK_InternalTemp : 0|16@1- (0.1,0) [0|0] "C" Vector__XXX
 
-BO_ 656 INVA_Error_1: 8 InverterA
+BO_ 2147484304 INVA_Error_1: 8 InverterA
  SG_ AMK_ErrorInfo1 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
  SG_ AMK_DiagnosticNumber : 0|32@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 658 INVA_Error_2: 8 InverterA
+BO_ 2147484306 INVA_Error_2: 8 InverterA
  SG_ AMK_ErrorInfo3 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
  SG_ AMK_ErrorInfo2 : 0|32@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 660 INVA_Overload: 4 InverterA
+BO_ 2147484308 INVA_Overload: 4 InverterA
  SG_ AMK_DisplayOverloadMotor : 16|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ AMK_DisplayOverloadInverter : 0|16@1+ (1,0) [0|0] "" Vector__XXX
 
@@ -830,26 +830,26 @@ CM_ SG_ 2214593409 right_speed_sensor "";
 CM_ SG_ 2214593409 left_speed_sensor "";
 CM_ SG_ 2214593409 right_speed_mc "";
 CM_ SG_ 2214593409 left_speed_mc "";
-CM_ BO_ 392 "Contains control word and setpoints";
-CM_ SG_ 392 AMK_NegativeTorqueLimit "Negative Torque Limit";
-CM_ SG_ 392 AMK_PositiveTorqueLimit "Positive Torque Limit";
-CM_ SG_ 392 AMK_TorqueSetpoint "Torque setpoint";
-CM_ SG_ 392 AMK_Control_bReserve2 "Control word: RESERVED";
-CM_ SG_ 392 AMK_Control_bErrorReset "Control word: remove error";
-CM_ SG_ 392 AMK_Control_bEnable "Control word: driver enable";
-CM_ SG_ 392 AMK_Control_bDcOn "Control word: HV activation";
-CM_ SG_ 392 AMK_Control_bInverterOn "Control word: controller enable";
-CM_ SG_ 392 AMK_Control_bReserve "Control word: RESERVED";
-CM_ BO_ 393 "Contains control word and setpoints";
-CM_ SG_ 393 AMK_NegativeTorqueLimit "Negative Torque Limit";
-CM_ SG_ 393 AMK_PositiveTorqueLimit "Positive Torque Limit";
-CM_ SG_ 393 AMK_TorqueSetpoint "Torque setpoint";
-CM_ SG_ 393 AMK_Control_bReserve2 "Control word: RESERVED";
-CM_ SG_ 393 AMK_Control_bErrorReset "Control word: remove error";
-CM_ SG_ 393 AMK_Control_bEnable "Control word: driver enable";
-CM_ SG_ 393 AMK_Control_bDcOn "Control word: HV activation";
-CM_ SG_ 393 AMK_Control_bInverterOn "Control word: controller enable";
-CM_ SG_ 393 AMK_Control_bReserve "Control word: RESERVED";
+CM_ BO_ 2147484040 "Contains control word and setpoints";
+CM_ SG_ 2147484040 AMK_NegativeTorqueLimit "Negative Torque Limit";
+CM_ SG_ 2147484040 AMK_PositiveTorqueLimit "Positive Torque Limit";
+CM_ SG_ 2147484040 AMK_TorqueSetpoint "Torque setpoint";
+CM_ SG_ 2147484040 AMK_Control_bReserve2 "Control word: RESERVED";
+CM_ SG_ 2147484040 AMK_Control_bErrorReset "Control word: remove error";
+CM_ SG_ 2147484040 AMK_Control_bEnable "Control word: driver enable";
+CM_ SG_ 2147484040 AMK_Control_bDcOn "Control word: HV activation";
+CM_ SG_ 2147484040 AMK_Control_bInverterOn "Control word: controller enable";
+CM_ SG_ 2147484040 AMK_Control_bReserve "Control word: RESERVED";
+CM_ BO_ 2147484041 "Contains control word and setpoints";
+CM_ SG_ 2147484041 AMK_NegativeTorqueLimit "Negative Torque Limit";
+CM_ SG_ 2147484041 AMK_PositiveTorqueLimit "Positive Torque Limit";
+CM_ SG_ 2147484041 AMK_TorqueSetpoint "Torque setpoint";
+CM_ SG_ 2147484041 AMK_Control_bReserve2 "Control word: RESERVED";
+CM_ SG_ 2147484041 AMK_Control_bErrorReset "Control word: remove error";
+CM_ SG_ 2147484041 AMK_Control_bEnable "Control word: driver enable";
+CM_ SG_ 2147484041 AMK_Control_bDcOn "Control word: HV activation";
+CM_ SG_ 2147484041 AMK_Control_bInverterOn "Control word: controller enable";
+CM_ SG_ 2147484041 AMK_Control_bReserve "Control word: RESERVED";
 CM_ BO_ 2148059649 "Fault status message";
 CM_ SG_ 2148059649 latched "";
 CM_ SG_ 2148059649 idx "";
@@ -1137,39 +1137,39 @@ CM_ SG_ 2217793020 cmd "";
 CM_ BO_ 2217793084 "DAQ Bootloader response";
 CM_ SG_ 2217793084 data "";
 CM_ SG_ 2217793084 cmd "";
-CM_ BO_ 642 "Contains the status word and actual values";
-CM_ SG_ 642 AMK_MotorSerialNumber "Serial number of the motor";
-CM_ SG_ 642 AMK_ActualTorque "Actual torque value";
-CM_ SG_ 642 AMK_Status_bDerating "Status word: torque limit activation";
-CM_ SG_ 642 AMK_Status_bInverterOn "Status word: Controller enable level";
-CM_ SG_ 642 AMK_Status_bQuitInverterOn "Status word: Controller enable ACK";
-CM_ SG_ 642 AMK_Status_bDcOn "Status word: HV activation level";
-CM_ SG_ 642 AMK_Status_bQuitDcOn "Status word: HV activation ACK";
-CM_ SG_ 642 AMK_Status_bWarn "Status word: warning";
-CM_ SG_ 642 AMK_Status_bError "Status word: error";
-CM_ SG_ 642 AMK_Status_bSystemReady "Status word: system ready";
-CM_ SG_ 642 AMK_Status_bReserve "Status word: RESERVED";
-CM_ BO_ 644 "Contains actual values";
-CM_ SG_ 644 AMK_SystemReset "System reset";
-CM_ SG_ 644 AMK_DCBusVoltage "Voltage of the DC bus";
-CM_ SG_ 644 AMK_ActualSpeed "Actual speed value";
-CM_ BO_ 646 "Contains temperatures";
-CM_ SG_ 646 AMK_IGBTTemp "IGBT temperature";
-CM_ SG_ 646 AMK_InverterTemp "Inverter cold plate temperature";
-CM_ SG_ 646 AMK_MotorTemp "Motor temperature";
-CM_ BO_ 648 "Contains temperatures";
-CM_ SG_ 648 AMK_TempSensorMotor "???";
-CM_ SG_ 648 AMK_ExternalTemp "External temperature";
-CM_ SG_ 648 AMK_InternalTemp "Internal temperature";
-CM_ BO_ 656 "All error information";
-CM_ SG_ 656 AMK_ErrorInfo1 "Error info";
-CM_ SG_ 656 AMK_DiagnosticNumber "Error number";
-CM_ BO_ 658 "All error information";
-CM_ SG_ 658 AMK_ErrorInfo3 "Error info";
-CM_ SG_ 658 AMK_ErrorInfo2 "Error info";
-CM_ BO_ 660 "Display overload info";
-CM_ SG_ 660 AMK_DisplayOverloadMotor "";
-CM_ SG_ 660 AMK_DisplayOverloadInverter "";
+CM_ BO_ 2147484290 "Contains the status word and actual values";
+CM_ SG_ 2147484290 AMK_MotorSerialNumber "Serial number of the motor";
+CM_ SG_ 2147484290 AMK_ActualTorque "Actual torque value";
+CM_ SG_ 2147484290 AMK_Status_bDerating "Status word: torque limit activation";
+CM_ SG_ 2147484290 AMK_Status_bInverterOn "Status word: Controller enable level";
+CM_ SG_ 2147484290 AMK_Status_bQuitInverterOn "Status word: Controller enable ACK";
+CM_ SG_ 2147484290 AMK_Status_bDcOn "Status word: HV activation level";
+CM_ SG_ 2147484290 AMK_Status_bQuitDcOn "Status word: HV activation ACK";
+CM_ SG_ 2147484290 AMK_Status_bWarn "Status word: warning";
+CM_ SG_ 2147484290 AMK_Status_bError "Status word: error";
+CM_ SG_ 2147484290 AMK_Status_bSystemReady "Status word: system ready";
+CM_ SG_ 2147484290 AMK_Status_bReserve "Status word: RESERVED";
+CM_ BO_ 2147484292 "Contains actual values";
+CM_ SG_ 2147484292 AMK_SystemReset "System reset";
+CM_ SG_ 2147484292 AMK_DCBusVoltage "Voltage of the DC bus";
+CM_ SG_ 2147484292 AMK_ActualSpeed "Actual speed value";
+CM_ BO_ 2147484294 "Contains temperatures";
+CM_ SG_ 2147484294 AMK_IGBTTemp "IGBT temperature";
+CM_ SG_ 2147484294 AMK_InverterTemp "Inverter cold plate temperature";
+CM_ SG_ 2147484294 AMK_MotorTemp "Motor temperature";
+CM_ BO_ 2147484296 "Contains temperatures";
+CM_ SG_ 2147484296 AMK_TempSensorMotor "???";
+CM_ SG_ 2147484296 AMK_ExternalTemp "External temperature";
+CM_ SG_ 2147484296 AMK_InternalTemp "Internal temperature";
+CM_ BO_ 2147484304 "All error information";
+CM_ SG_ 2147484304 AMK_ErrorInfo1 "Error info";
+CM_ SG_ 2147484304 AMK_DiagnosticNumber "Error number";
+CM_ BO_ 2147484306 "All error information";
+CM_ SG_ 2147484306 AMK_ErrorInfo3 "Error info";
+CM_ SG_ 2147484306 AMK_ErrorInfo2 "Error info";
+CM_ BO_ 2147484308 "Display overload info";
+CM_ SG_ 2147484308 AMK_DisplayOverloadMotor "";
+CM_ SG_ 2147484308 AMK_DisplayOverloadInverter "";
 CM_ BO_ 643 "Contains the status word and actual values";
 CM_ SG_ 643 AMK_MotorSerialNumber "Serial number of the motor";
 CM_ SG_ 643 AMK_ActualTorque "Actual torque value";

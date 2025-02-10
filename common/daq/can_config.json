@@ -218,7 +218,7 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x188",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVB_Setpoints",
@@ -236,7 +236,7 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x189",
-                            "is_normal":true
+                            "is_standard_id":true
                         }
                     ],
                     "rx":[
@@ -1070,7 +1070,7 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x282",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVA_Actual_Values_2",
@@ -1082,7 +1082,7 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x284",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVA_Temperatures_1",
@@ -1094,7 +1094,7 @@
                             ],
                             "msg_period": 20,
                             "msg_id_override": "0x286",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVA_Temperatures_2",
@@ -1106,7 +1106,7 @@
                             ],
                             "msg_period": 20,
                             "msg_id_override": "0x288",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVA_Error_1",
@@ -1117,7 +1117,7 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x290",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVA_Error_2",
@@ -1128,7 +1128,7 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x292",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVA_Overload",
@@ -1139,7 +1139,7 @@
                             ],
                             "msg_period": 5,
                             "msg_id_override": "0x294",
-                            "is_normal":true
+                            "is_standard_id":true
                         }
                     ],
                     "rx": [

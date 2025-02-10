@@ -55,13 +55,24 @@ void amkPeriodic(amk_motor_t* motor)
             setFault(motor->error_fault_id, true);
             resetAmk(motor);
         }
+        else
+        {
+            motor->control.AMK_bInverterOn = true;
+            motor->control.AMK_bEnable = true;
+            motor->torque_setpoint = 100;
+            motor->torque_limit_positive = 100;
+            motor->torque_limit_negative = -1;
+        }
+
         break;
     case AMK_STATE_DEINIT:
         turnAmkOff(motor);
         break;
     }
 
-    SEND_INVA_SETPOINTS(motor->control.AMK_bReserve1, motor->control.AMK_bInverterOn, motor->control.AMK_bDcOn, motor->control.AMK_bEnable, motor->control.AMK_bErrorReset, motor->control.AMK_bErrorReset, motor->torque_setpoint, motor->torque_limit_positive, motor->torque_limit_negative);
+    SEND_INVA_SETPOINTS(motor->control.AMK_bReserve1, motor->control.AMK_bInverterOn, motor->control.AMK_bDcOn,
+        motor->control.AMK_bEnable, motor->control.AMK_bErrorReset,
+        motor->control.AMK_bReserve2, motor->torque_setpoint, motor->torque_limit_positive, motor->torque_limit_negative);
 
     // motor->sendSetpoints();
 }

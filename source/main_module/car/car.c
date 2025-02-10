@@ -480,14 +480,14 @@ void parseMCDataPeriodic(void)
     static uint32_t last_tmp_t;
     if (sched.os_ticks - last_tmp_t >= 500)
     {
-        SEND_REAR_MOTOR_TEMPS(
-                                (uint8_t) car.motor_l.motor_temp,
-                                (uint8_t) car.motor_r.motor_temp,
-                                (uint8_t) car.motor_l.inverter_temp,
-                                (uint8_t) car.motor_r.inverter_temp,
-                                (uint8_t) car.motor_l.igbt_temp,
-                                (uint8_t) car.motor_r.igbt_temp);
-        SEND_NUM_MC_SKIPS(num_failed_msgs_r, num_failed_msgs_l);
+        //SEND_REAR_MOTOR_TEMPS(
+                                // (uint8_t) car.motor_l.motor_temp,
+                                // (uint8_t) car.motor_r.motor_temp,
+                                // (uint8_t) car.motor_l.inverter_temp,
+                                // (uint8_t) car.motor_r.inverter_temp,
+                                // (uint8_t) car.motor_l.igbt_temp,
+                                // (uint8_t) car.motor_r.igbt_temp);
+        //SEND_NUM_MC_SKIPS(num_failed_msgs_r, num_failed_msgs_l);
         last_tmp_t = sched.os_ticks;
     }
 }
@@ -502,7 +502,7 @@ void send_shockpots()
     shock_l_parsed = -1 * ((POT_MAX_DIST - (int16_t)((shock_l / (POT_VOLT_MIN_L - POT_VOLT_MAX_L)) * POT_MAX_DIST)) - POT_DIST_DROOP_L);
     shock_r_parsed = -1 * ((POT_MAX_DIST - (int16_t)((shock_r / (POT_VOLT_MIN_R - POT_VOLT_MAX_R)) * POT_MAX_DIST)) - POT_DIST_DROOP_R);
 
-    SEND_SHOCK_REAR(shock_l_parsed, shock_r_parsed);
+    //SEND_SHOCK_REAR(shock_l_parsed, shock_r_parsed);
 }
 
 /**
@@ -610,8 +610,8 @@ void calibrateSteeringAngle(uint8_t *success)
     // Reset calibration with CCW = 5h
     // Start a new calibration with CCW = 3h
     // The sensor can then be used immediately
-    SEND_LWS_CONFIG(0x05, 0, 0); // reset cal
-    SEND_LWS_CONFIG(0x03, 0, 0); // start new
+    //SEND_LWS_CONFIG(0x05, 0, 0); // reset cal
+    //SEND_LWS_CONFIG(0x03, 0, 0); // start new
     *success = 1;
 }
 
@@ -851,9 +851,9 @@ void monitorSDCPeriodic()
     {
         index = 0;
         // sdc_mux = sdc_nodes_raw;
-        SEND_SDC_STATUS(sdc_mux.imd_stat, sdc_mux.bms_stat, sdc_mux.bspd_stat, sdc_mux.bots_stat,
-                sdc_mux.inertia_stat, sdc_mux.c_stop_stat, sdc_mux.main_stat, sdc_mux.r_stop_stat, sdc_mux.l_stop_stat,
-                sdc_mux.hvd_stat, sdc_mux.r_hub_stat, sdc_mux.tsms_stat, sdc_mux.pchg_out_stat);
+        //SEND_SDC_STATUS(sdc_mux.imd_stat, sdc_mux.bms_stat, sdc_mux.bspd_stat, sdc_mux.bots_stat,
+                // sdc_mux.inertia_stat, sdc_mux.c_stop_stat, sdc_mux.main_stat, sdc_mux.r_stop_stat, sdc_mux.l_stop_stat,
+                // sdc_mux.hvd_stat, sdc_mux.r_hub_stat, sdc_mux.tsms_stat, sdc_mux.pchg_out_stat);
     }
 
     PHAL_writeGPIO(SDC_MUX_S0_GPIO_Port, SDC_MUX_S0_Pin, (index & 0x01));
