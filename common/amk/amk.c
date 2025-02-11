@@ -116,10 +116,7 @@ void amkPeriodic(amk_motor_t* motor)
             /* System error */
             if (motor->status.AMK_bError)
             {
-                // Make sure this is latching else it will set every time you
-                // step through the reset function
                 setFault(motor->error_fault_id, true);
-                amkReset(motor);
                 motor->state = AMK_STATE_OFF;
             }
             
