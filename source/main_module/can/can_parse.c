@@ -101,6 +101,114 @@ void canRxUpdate(void)
                     can_data.throttle_vcu_equal.stale = 0;
                     can_data.throttle_vcu_equal.last_rx = sched.os_ticks;
                     break;
+                case ID_INVA_CRIT:
+                    can_data.INVA_CRIT.AMK_ActualSpeed = (int16_t) msg_data_a->INVA_CRIT.AMK_ActualSpeed;
+                    can_data.INVA_CRIT.AMK_ActualTorque = (int16_t) msg_data_a->INVA_CRIT.AMK_ActualTorque;
+                    can_data.INVA_CRIT.AMK_DisplayOverloadInverter = msg_data_a->INVA_CRIT.AMK_DisplayOverloadInverter;
+                    can_data.INVA_CRIT.AMK_DisplayOverloadMotor = msg_data_a->INVA_CRIT.AMK_DisplayOverloadMotor;
+                    can_data.INVA_CRIT.stale = 0;
+                    can_data.INVA_CRIT.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVA_INFO:
+                    can_data.INVA_INFO.AMK_Status_bReserve = msg_data_a->INVA_INFO.AMK_Status_bReserve;
+                    can_data.INVA_INFO.AMK_Status_bSystemReady = msg_data_a->INVA_INFO.AMK_Status_bSystemReady;
+                    can_data.INVA_INFO.AMK_Status_bError = msg_data_a->INVA_INFO.AMK_Status_bError;
+                    can_data.INVA_INFO.AMK_Status_bWarn = msg_data_a->INVA_INFO.AMK_Status_bWarn;
+                    can_data.INVA_INFO.AMK_Status_bQuitDcOn = msg_data_a->INVA_INFO.AMK_Status_bQuitDcOn;
+                    can_data.INVA_INFO.AMK_Status_bDcOn = msg_data_a->INVA_INFO.AMK_Status_bDcOn;
+                    can_data.INVA_INFO.AMK_Status_bQuitInverterOn = msg_data_a->INVA_INFO.AMK_Status_bQuitInverterOn;
+                    can_data.INVA_INFO.AMK_Status_bInverterOn = msg_data_a->INVA_INFO.AMK_Status_bInverterOn;
+                    can_data.INVA_INFO.AMK_Status_bDerating = msg_data_a->INVA_INFO.AMK_Status_bDerating;
+                    can_data.INVA_INFO.AMK_DCBusVoltage = msg_data_a->INVA_INFO.AMK_DCBusVoltage;
+                    can_data.INVA_INFO.stale = 0;
+                    can_data.INVA_INFO.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVA_TEMPS:
+                    can_data.INVA_TEMPS.AMK_MotorTemp = (int16_t) msg_data_a->INVA_TEMPS.AMK_MotorTemp;
+                    can_data.INVA_TEMPS.AMK_InverterTemp = (int16_t) msg_data_a->INVA_TEMPS.AMK_InverterTemp;
+                    can_data.INVA_TEMPS.AMK_IGBTTemp = (int16_t) msg_data_a->INVA_TEMPS.AMK_IGBTTemp;
+                    can_data.INVA_TEMPS.stale = 0;
+                    can_data.INVA_TEMPS.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVA_SET:
+                    can_data.INVA_SET.AMK_Control_bReserve = msg_data_a->INVA_SET.AMK_Control_bReserve;
+                    can_data.INVA_SET.AMK_Control_bInverterOn = msg_data_a->INVA_SET.AMK_Control_bInverterOn;
+                    can_data.INVA_SET.AMK_Control_bDcOn = msg_data_a->INVA_SET.AMK_Control_bDcOn;
+                    can_data.INVA_SET.AMK_Control_bEnable = msg_data_a->INVA_SET.AMK_Control_bEnable;
+                    can_data.INVA_SET.AMK_Control_bErrorReset = msg_data_a->INVA_SET.AMK_Control_bErrorReset;
+                    can_data.INVA_SET.AMK_Control_bReserve2 = msg_data_a->INVA_SET.AMK_Control_bReserve2;
+                    can_data.INVA_SET.AMK_TorqueSetpoint = (int16_t) msg_data_a->INVA_SET.AMK_TorqueSetpoint;
+                    can_data.INVA_SET.AMK_PositiveTorqueLimit = (int16_t) msg_data_a->INVA_SET.AMK_PositiveTorqueLimit;
+                    can_data.INVA_SET.AMK_NegativeTorqueLimit = (int16_t) msg_data_a->INVA_SET.AMK_NegativeTorqueLimit;
+                    can_data.INVA_SET.stale = 0;
+                    can_data.INVA_SET.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVA_ERR_1:
+                    can_data.INVA_ERR_1.AMK_DiagnosticNumber = msg_data_a->INVA_ERR_1.AMK_DiagnosticNumber;
+                    can_data.INVA_ERR_1.AMK_ErrorInfo1 = msg_data_a->INVA_ERR_1.AMK_ErrorInfo1;
+                    can_data.INVA_ERR_1.stale = 0;
+                    can_data.INVA_ERR_1.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVA_ERR_2:
+                    can_data.INVA_ERR_2.AMK_ErrorInfo2 = msg_data_a->INVA_ERR_2.AMK_ErrorInfo2;
+                    can_data.INVA_ERR_2.AMK_ErrorInfo3 = msg_data_a->INVA_ERR_2.AMK_ErrorInfo3;
+                    can_data.INVA_ERR_2.stale = 0;
+                    can_data.INVA_ERR_2.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVB_CRIT:
+                    can_data.INVB_CRIT.AMK_ActualSpeed = (int16_t) msg_data_a->INVB_CRIT.AMK_ActualSpeed;
+                    can_data.INVB_CRIT.AMK_ActualTorque = (int16_t) msg_data_a->INVB_CRIT.AMK_ActualTorque;
+                    can_data.INVB_CRIT.AMK_DisplayOverloadInverter = msg_data_a->INVB_CRIT.AMK_DisplayOverloadInverter;
+                    can_data.INVB_CRIT.AMK_DisplayOverloadMotor = msg_data_a->INVB_CRIT.AMK_DisplayOverloadMotor;
+                    can_data.INVB_CRIT.stale = 0;
+                    can_data.INVB_CRIT.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVB_INFO:
+                    can_data.INVB_INFO.AMK_Status_bReserve = msg_data_a->INVB_INFO.AMK_Status_bReserve;
+                    can_data.INVB_INFO.AMK_Status_bSystemReady = msg_data_a->INVB_INFO.AMK_Status_bSystemReady;
+                    can_data.INVB_INFO.AMK_Status_bError = msg_data_a->INVB_INFO.AMK_Status_bError;
+                    can_data.INVB_INFO.AMK_Status_bWarn = msg_data_a->INVB_INFO.AMK_Status_bWarn;
+                    can_data.INVB_INFO.AMK_Status_bQuitDcOn = msg_data_a->INVB_INFO.AMK_Status_bQuitDcOn;
+                    can_data.INVB_INFO.AMK_Status_bDcOn = msg_data_a->INVB_INFO.AMK_Status_bDcOn;
+                    can_data.INVB_INFO.AMK_Status_bQuitInverterOn = msg_data_a->INVB_INFO.AMK_Status_bQuitInverterOn;
+                    can_data.INVB_INFO.AMK_Status_bInverterOn = msg_data_a->INVB_INFO.AMK_Status_bInverterOn;
+                    can_data.INVB_INFO.AMK_Status_bDerating = msg_data_a->INVB_INFO.AMK_Status_bDerating;
+                    can_data.INVB_INFO.AMK_DCBusVoltage = msg_data_a->INVB_INFO.AMK_DCBusVoltage;
+                    can_data.INVB_INFO.stale = 0;
+                    can_data.INVB_INFO.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVB_TEMPS:
+                    can_data.INVB_TEMPS.AMK_MotorTemp = (int16_t) msg_data_a->INVB_TEMPS.AMK_MotorTemp;
+                    can_data.INVB_TEMPS.AMK_InverterTemp = (int16_t) msg_data_a->INVB_TEMPS.AMK_InverterTemp;
+                    can_data.INVB_TEMPS.AMK_IGBTTemp = (int16_t) msg_data_a->INVB_TEMPS.AMK_IGBTTemp;
+                    can_data.INVB_TEMPS.stale = 0;
+                    can_data.INVB_TEMPS.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVB_SET:
+                    can_data.INVB_SET.AMK_Control_bReserve = msg_data_a->INVB_SET.AMK_Control_bReserve;
+                    can_data.INVB_SET.AMK_Control_bInverterOn = msg_data_a->INVB_SET.AMK_Control_bInverterOn;
+                    can_data.INVB_SET.AMK_Control_bDcOn = msg_data_a->INVB_SET.AMK_Control_bDcOn;
+                    can_data.INVB_SET.AMK_Control_bEnable = msg_data_a->INVB_SET.AMK_Control_bEnable;
+                    can_data.INVB_SET.AMK_Control_bErrorReset = msg_data_a->INVB_SET.AMK_Control_bErrorReset;
+                    can_data.INVB_SET.AMK_Control_bReserve2 = msg_data_a->INVB_SET.AMK_Control_bReserve2;
+                    can_data.INVB_SET.AMK_TorqueSetpoint = (int16_t) msg_data_a->INVB_SET.AMK_TorqueSetpoint;
+                    can_data.INVB_SET.AMK_PositiveTorqueLimit = (int16_t) msg_data_a->INVB_SET.AMK_PositiveTorqueLimit;
+                    can_data.INVB_SET.AMK_NegativeTorqueLimit = (int16_t) msg_data_a->INVB_SET.AMK_NegativeTorqueLimit;
+                    can_data.INVB_SET.stale = 0;
+                    can_data.INVB_SET.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVB_ERR_1:
+                    can_data.INVB_ERR_1.AMK_DiagnosticNumber = msg_data_a->INVB_ERR_1.AMK_DiagnosticNumber;
+                    can_data.INVB_ERR_1.AMK_ErrorInfo1 = msg_data_a->INVB_ERR_1.AMK_ErrorInfo1;
+                    can_data.INVB_ERR_1.stale = 0;
+                    can_data.INVB_ERR_1.last_rx = sched.os_ticks;
+                    break;
+                case ID_INVB_ERR_2:
+                    can_data.INVB_ERR_2.AMK_ErrorInfo2 = msg_data_a->INVB_ERR_2.AMK_ErrorInfo2;
+                    can_data.INVB_ERR_2.AMK_ErrorInfo3 = msg_data_a->INVB_ERR_2.AMK_ErrorInfo3;
+                    can_data.INVB_ERR_2.stale = 0;
+                    can_data.INVB_ERR_2.last_rx = sched.os_ticks;
+                    break;
                 case ID_FAULT_SYNC_PDU:
                     can_data.fault_sync_pdu.idx = msg_data_a->fault_sync_pdu.idx;
                     can_data.fault_sync_pdu.latched = msg_data_a->fault_sync_pdu.latched;
@@ -168,6 +276,42 @@ void canRxUpdate(void)
     CHECK_STALE(can_data.throttle_vcu_equal.stale,
                 sched.os_ticks, can_data.throttle_vcu_equal.last_rx,
                 UP_THROTTLE_VCU_EQUAL);
+    CHECK_STALE(can_data.INVA_CRIT.stale,
+                sched.os_ticks, can_data.INVA_CRIT.last_rx,
+                UP_INVA_CRIT);
+    CHECK_STALE(can_data.INVA_INFO.stale,
+                sched.os_ticks, can_data.INVA_INFO.last_rx,
+                UP_INVA_INFO);
+    CHECK_STALE(can_data.INVA_TEMPS.stale,
+                sched.os_ticks, can_data.INVA_TEMPS.last_rx,
+                UP_INVA_TEMPS);
+    CHECK_STALE(can_data.INVA_SET.stale,
+                sched.os_ticks, can_data.INVA_SET.last_rx,
+                UP_INVA_SET);
+    CHECK_STALE(can_data.INVA_ERR_1.stale,
+                sched.os_ticks, can_data.INVA_ERR_1.last_rx,
+                UP_INVA_ERR_1);
+    CHECK_STALE(can_data.INVA_ERR_2.stale,
+                sched.os_ticks, can_data.INVA_ERR_2.last_rx,
+                UP_INVA_ERR_2);
+    CHECK_STALE(can_data.INVB_CRIT.stale,
+                sched.os_ticks, can_data.INVB_CRIT.last_rx,
+                UP_INVB_CRIT);
+    CHECK_STALE(can_data.INVB_INFO.stale,
+                sched.os_ticks, can_data.INVB_INFO.last_rx,
+                UP_INVB_INFO);
+    CHECK_STALE(can_data.INVB_TEMPS.stale,
+                sched.os_ticks, can_data.INVB_TEMPS.last_rx,
+                UP_INVB_TEMPS);
+    CHECK_STALE(can_data.INVB_SET.stale,
+                sched.os_ticks, can_data.INVB_SET.last_rx,
+                UP_INVB_SET);
+    CHECK_STALE(can_data.INVB_ERR_1.stale,
+                sched.os_ticks, can_data.INVB_ERR_1.last_rx,
+                UP_INVB_ERR_1);
+    CHECK_STALE(can_data.INVB_ERR_2.stale,
+                sched.os_ticks, can_data.INVB_ERR_2.last_rx,
+                UP_INVB_ERR_2);
     /* END AUTO STALE CHECKS */
 }
 
@@ -199,18 +343,36 @@ bool initCANFilter()
     CAN1->sFilterRegister[3].FR2 = (ID_THROTTLE_VCU << 3) | 4;
     CAN1->FA1R |= (1 << 4);    // configure bank 4
     CAN1->sFilterRegister[4].FR1 = (ID_THROTTLE_VCU_EQUAL << 3) | 4;
-    CAN1->sFilterRegister[4].FR2 = (ID_FAULT_SYNC_PDU << 3) | 4;
+    CAN1->sFilterRegister[4].FR2 = (ID_INVA_CRIT << 21);
     CAN1->FA1R |= (1 << 5);    // configure bank 5
-    CAN1->sFilterRegister[5].FR1 = (ID_FAULT_SYNC_DASHBOARD << 3) | 4;
-    CAN1->sFilterRegister[5].FR2 = (ID_FAULT_SYNC_A_BOX << 3) | 4;
+    CAN1->sFilterRegister[5].FR1 = (ID_INVA_INFO << 21);
+    CAN1->sFilterRegister[5].FR2 = (ID_INVA_TEMPS << 21);
     CAN1->FA1R |= (1 << 6);    // configure bank 6
-    CAN1->sFilterRegister[6].FR1 = (ID_FAULT_SYNC_TORQUE_VECTOR << 3) | 4;
-    CAN1->sFilterRegister[6].FR2 = (ID_FAULT_SYNC_TEST_NODE << 3) | 4;
+    CAN1->sFilterRegister[6].FR1 = (ID_INVA_SET << 21);
+    CAN1->sFilterRegister[6].FR2 = (ID_INVA_ERR_1 << 21);
     CAN1->FA1R |= (1 << 7);    // configure bank 7
-    CAN1->sFilterRegister[7].FR1 = (ID_SET_FAULT << 3) | 4;
-    CAN1->sFilterRegister[7].FR2 = (ID_RETURN_FAULT_CONTROL << 3) | 4;
+    CAN1->sFilterRegister[7].FR1 = (ID_INVA_ERR_2 << 21);
+    CAN1->sFilterRegister[7].FR2 = (ID_INVB_CRIT << 21);
     CAN1->FA1R |= (1 << 8);    // configure bank 8
-    CAN1->sFilterRegister[8].FR1 = (ID_DAQ_COMMAND_MAIN_MODULE << 3) | 4;
+    CAN1->sFilterRegister[8].FR1 = (ID_INVB_INFO << 21);
+    CAN1->sFilterRegister[8].FR2 = (ID_INVB_TEMPS << 21);
+    CAN1->FA1R |= (1 << 9);    // configure bank 9
+    CAN1->sFilterRegister[9].FR1 = (ID_INVB_SET << 21);
+    CAN1->sFilterRegister[9].FR2 = (ID_INVB_ERR_1 << 21);
+    CAN1->FA1R |= (1 << 10);    // configure bank 10
+    CAN1->sFilterRegister[10].FR1 = (ID_INVB_ERR_2 << 21);
+    CAN1->sFilterRegister[10].FR2 = (ID_FAULT_SYNC_PDU << 3) | 4;
+    CAN1->FA1R |= (1 << 11);    // configure bank 11
+    CAN1->sFilterRegister[11].FR1 = (ID_FAULT_SYNC_DASHBOARD << 3) | 4;
+    CAN1->sFilterRegister[11].FR2 = (ID_FAULT_SYNC_A_BOX << 3) | 4;
+    CAN1->FA1R |= (1 << 12);    // configure bank 12
+    CAN1->sFilterRegister[12].FR1 = (ID_FAULT_SYNC_TORQUE_VECTOR << 3) | 4;
+    CAN1->sFilterRegister[12].FR2 = (ID_FAULT_SYNC_TEST_NODE << 3) | 4;
+    CAN1->FA1R |= (1 << 13);    // configure bank 13
+    CAN1->sFilterRegister[13].FR1 = (ID_SET_FAULT << 3) | 4;
+    CAN1->sFilterRegister[13].FR2 = (ID_RETURN_FAULT_CONTROL << 3) | 4;
+    CAN1->FA1R |= (1 << 14);    // configure bank 14
+    CAN1->sFilterRegister[14].FR1 = (ID_DAQ_COMMAND_MAIN_MODULE << 3) | 4;
     /* END AUTO FILTER */
 
     CAN1->FMR  &= ~CAN_FMR_FINIT;             // Enable Filters (exit filter init mode)
