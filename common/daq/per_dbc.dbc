@@ -499,8 +499,8 @@ BO_ 2217793084 daq_bl_resp: 5 bootloader
  SG_ cmd : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 2147484290 INVA_CRIT: 8 InverterA
- SG_ AMK_DisplayOverloadMotor : 48|16@1+ (1,0) [0|0] "" Vector__XXX
- SG_ AMK_DisplayOverloadInverter : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ AMK_DisplayOverloadMotor : 48|16@1+ (0.1,0) [0|0] "" Vector__XXX
+ SG_ AMK_DisplayOverloadInverter : 32|16@1+ (0.1,0) [0|0] "" Vector__XXX
  SG_ AMK_ActualTorque : 16|16@1- (0.1,0) [0|0] "Nm" Vector__XXX
  SG_ AMK_ActualSpeed : 0|16@1- (1,0) [0|0] "rpm" Vector__XXX
 
@@ -638,7 +638,7 @@ BO_ 2483028274 daq_command_A_BOX: 8 DAQ
 BO_ 2483030002 daq_command_PDU: 8 DAQ
  SG_ daq_command : 0|64@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 2348816641 main_hb_amk: 2 Main_Module
+BO_ 2348816705 main_hb_amk: 2 Main_Module
  SG_ precharge_state : 8|1@1+ (1,0) [0|0] "" Vector__XXX
  SG_ car_state : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
@@ -1231,9 +1231,9 @@ CM_ BO_ 2483028274 "daq command for node A_BOX";
 CM_ SG_ 2483028274 daq_command "";
 CM_ BO_ 2483030002 "daq command for node PDU";
 CM_ SG_ 2483030002 daq_command "";
-CM_ BO_ 2348816641 "Heart beat message for main module";
-CM_ SG_ 2348816641 precharge_state "";
-CM_ SG_ 2348816641 car_state "Main car state";
+CM_ BO_ 2348816705 "Heart beat message for main module";
+CM_ SG_ 2348816705 precharge_state "";
+CM_ SG_ 2348816705 car_state "Main car state";
 CM_ BO_ 2483029759 "Pack current + voltage";
 CM_ SG_ 2483029759 pack_voltage "";
 CM_ SG_ 2483029759 pack_current "";

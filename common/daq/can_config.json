@@ -1064,8 +1064,8 @@
                             "signals": [
                                 {"sig_name": "AMK_ActualSpeed", "sig_desc": "Actual speed value", "type":"int16_t", "unit": "rpm"},
                                 {"sig_name": "AMK_ActualTorque", "sig_desc": "Actual torque value", "type":"int16_t", "unit":"Nm", "scale":0.1},
-                                {"sig_name": "AMK_DisplayOverloadInverter", "type":"uint16_t"},
-                                {"sig_name": "AMK_DisplayOverloadMotor", "type":"uint16_t"}
+                                {"sig_name": "AMK_DisplayOverloadInverter", "type":"uint16_t", "scale":0.1},
+                                {"sig_name": "AMK_DisplayOverloadMotor", "type":"uint16_t", "scale":0.1}
                             ],
                             "msg_period": 15,
                             "msg_id_override": "0x282",
@@ -1400,7 +1400,7 @@
                       ],
                       "msg_period":500,
                       "msg_hlp":3,
-                      "msg_pgn":100
+                      "msg_pgn":101
                   }
                 ],
                 "rx": [

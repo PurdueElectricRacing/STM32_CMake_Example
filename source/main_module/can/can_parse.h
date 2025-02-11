@@ -30,7 +30,7 @@ typedef union {
 
 // Message ID definitions
 /* BEGIN AUTO ID DEFS */
-#define ID_MAIN_HB_AMK 0xc001901
+#define ID_MAIN_HB_AMK 0xc001941
 #define ID_MAIN_HB 0xc001901
 #define ID_COOLANT_TEMPS 0x10000881
 #define ID_GEARBOX 0x10000901
