@@ -203,7 +203,7 @@
                             "msg_pgn": 14
                         },
                         {
-                            "msg_name": "INVA_Setpoints",
+                            "msg_name": "INVA_SET",
                             "msg_desc": "Contains control word and setpoints",
                             "signals": [
                                 {"sig_name": "AMK_Control_bReserve", "sig_desc": "Control word: RESERVED", "type":"uint8_t", "length":8},
@@ -216,12 +216,12 @@
                                 {"sig_name": "AMK_PositiveTorqueLimit", "sig_desc": "Positive Torque Limit", "type":"int16_t", "unit":"Nm", "scale":0.1},
                                 {"sig_name": "AMK_NegativeTorqueLimit", "sig_desc": "Negative Torque Limit", "type":"int16_t", "unit":"Nm", "scale":0.1}
                             ],
-                            "msg_period": 5,
+                            "msg_period": 15,
                             "msg_id_override": "0x188",
                             "is_standard_id":true
                         },
                         {
-                            "msg_name": "INVB_Setpoints",
+                            "msg_name": "INVB_SET",
                             "msg_desc": "Contains control word and setpoints",
                             "signals": [
                                 {"sig_name": "AMK_Control_bReserve", "sig_desc": "Control word: RESERVED", "type":"uint8_t", "length":8},
@@ -234,7 +234,7 @@
                                 {"sig_name": "AMK_PositiveTorqueLimit", "sig_desc": "Positive Torque Limit", "type":"int16_t", "unit":"Nm", "scale":0.1},
                                 {"sig_name": "AMK_NegativeTorqueLimit", "sig_desc": "Negative Torque Limit", "type":"int16_t", "unit":"Nm", "scale":0.1}
                             ],
-                            "msg_period": 5,
+                            "msg_period": 15,
                             "msg_id_override": "0x189",
                             "is_standard_id":true
                         }
@@ -249,12 +249,18 @@
                         {"msg_name": "orion_currents_volts"},
                         {"msg_name": "throttle_vcu"},
                         {"msg_name": "throttle_vcu_equal"},
-                        {"msg_name": "INVA_Actual_Values_1"},
-                        {"msg_name": "INVA_Actual_Values_2"},
-                        {"msg_name": "INVA_Temperatures_1"},
-                        {"msg_name": "INVA_Temperatures_2"},
-                        {"msg_name": "INVA_Error_1"},
-                        {"msg_name": "INVA_Error_2"}
+                        {"msg_name": "INVA_CRIT"},
+                        {"msg_name": "INVA_INFO"},
+                        {"msg_name": "INVA_TEMPS"},
+                        {"msg_name": "INVA_SET"},
+                        {"msg_name": "INVA_ERR_1"},
+                        {"msg_name": "INVA_ERR_2"},
+                        {"msg_name": "INVB_CRIT"},
+                        {"msg_name": "INVB_INFO"},
+                        {"msg_name": "INVB_TEMPS"},
+                        {"msg_name": "INVB_SET"},
+                        {"msg_name": "INVB_ERR_1"},
+                        {"msg_name": "INVB_ERR_2"}
                     ]
                 },
                 {
@@ -1078,7 +1084,7 @@
                             "is_standard_id":true
                         },
                         {
-                            "msg_name": "IVNA_INFO",
+                            "msg_name": "INVA_INFO",
                             "msg_desc": "Contains the status word and actual values",
                             "signals": [
                                 {"sig_name": "AMK_Status_bReserve", "sig_desc": "Status word: RESERVED", "type":"uint8_t", "length":8},
@@ -1090,42 +1096,42 @@
                                 {"sig_name": "AMK_Status_bQuitInverterOn", "sig_desc": "Status word: Controller enable ACK", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bInverterOn", "sig_desc": "Status word: Controller enable level", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bDerating", "sig_desc": "Status word: torque limit activation", "type":"uint8_t", "length":1},
-                                {"sig_name": "AMK_DCBusVoltage", "sig_desc": "Voltage of the DC bus", "type":"uint16_t", "unit": "V"},
+                                {"sig_name": "AMK_DCBusVoltage", "sig_desc": "Voltage of the DC bus", "type":"uint16_t", "unit": "V"}
                             ],
                             "msg_period": 500,
                             "msg_id_override": "0x286",
                             "is_standard_id":true
                         },
                         {
-                            "msg_name": "INVA_Error_1",
+                            "msg_name": "INVA_ERR_1",
                             "msg_desc": "All error information",
                             "signals": [
                                 {"sig_name": "AMK_DiagnosticNumber", "sig_desc": "Error number", "type":"uint32_t"},
                                 {"sig_name": "AMK_ErrorInfo1", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
-                            "msg_period": 5,
+                            "msg_period": 2000,
                             "msg_id_override": "0x288",
                             "is_standard_id":true
                         },
                         {
-                            "msg_name": "INVA_Error_2",
+                            "msg_name": "INVA_ERR_2",
                             "msg_desc": "All error information",
                             "signals": [
                                 {"sig_name": "AMK_ErrorInfo2", "sig_desc": "Error info", "type":"uint32_t"},
                                 {"sig_name": "AMK_ErrorInfo3", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
-                            "msg_period": 5,
+                            "msg_period": 2000,
                             "msg_id_override": "0x290",
                             "is_standard_id":true
                         }
                     ],
                     "rx": [
-                        {"msg_name": "INVA_Setpoints"}
+                        {"msg_name": "INVA_SET"}
                     ]
                 },
                 {
                     "node_name": "InverterB",
-                    "node_ssa": 60,
+                    "node_ssa": 33,
                     "tx": [
                         {
                             "msg_name": "INVB_CRIT",
@@ -1153,7 +1159,7 @@
                             "is_standard_id":true
                         },
                         {
-                            "msg_name": "IVNB_INFO",
+                            "msg_name": "INVB_INFO",
                             "msg_desc": "Contains the status word and actual values",
                             "signals": [
                                 {"sig_name": "AMK_Status_bReserve", "sig_desc": "Status word: RESERVED", "type":"uint8_t", "length":8},
@@ -1165,37 +1171,37 @@
                                 {"sig_name": "AMK_Status_bQuitInverterOn", "sig_desc": "Status word: Controller enable ACK", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bInverterOn", "sig_desc": "Status word: Controller enable level", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bDerating", "sig_desc": "Status word: torque limit activation", "type":"uint8_t", "length":1},
-                                {"sig_name": "AMK_DCBusVoltage", "sig_desc": "Voltage of the DC bus", "type":"uint16_t", "unit": "V"},
+                                {"sig_name": "AMK_DCBusVoltage", "sig_desc": "Voltage of the DC bus", "type":"uint16_t", "unit": "V"}
                             ],
                             "msg_period": 500,
                             "msg_id_override": "0x287",
                             "is_standard_id":true
                         },
                         {
-                            "msg_name": "INVB_Error_1",
+                            "msg_name": "INVB_ERR_1",
                             "msg_desc": "All error information",
                             "signals": [
                                 {"sig_name": "AMK_DiagnosticNumber", "sig_desc": "Error number", "type":"uint32_t"},
                                 {"sig_name": "AMK_ErrorInfo1", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
-                            "msg_period": 5,
+                            "msg_period": 2000,
                             "msg_id_override": "0x289",
                             "is_standard_id":true
                         },
                         {
-                            "msg_name": "INVB_Error_2",
+                            "msg_name": "INVB_ERR_2",
                             "msg_desc": "All error information",
                             "signals": [
                                 {"sig_name": "AMK_ErrorInfo2", "sig_desc": "Error info", "type":"uint32_t"},
                                 {"sig_name": "AMK_ErrorInfo3", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
-                            "msg_period": 5,
+                            "msg_period": 2000,
                             "msg_id_override": "0x291",
                             "is_standard_id":true
                         }
                     ],
                     "rx": [
-                        {"msg_name": "INVB_Setpoints"}
+                        {"msg_name": "INVB_SET"}
                     ]
                 },
                 {
