@@ -1053,7 +1053,32 @@
                     "node_ssa": 63,
                     "tx": [
                         {
-                            "msg_name": "INVA_Actual_Values_1",
+                            "msg_name": "INVA_CRIT",
+                            "msg_desc": "Contains the status word and actual values",
+                            "signals": [
+                                {"sig_name": "AMK_ActualSpeed", "sig_desc": "Actual speed value", "type":"int16_t", "unit": "rpm"},
+                                {"sig_name": "AMK_ActualTorque", "sig_desc": "Actual torque value", "type":"int16_t", "unit":"Nm", "scale":0.1},
+                                {"sig_name": "AMK_DisplayOverloadInverter", "type":"uint16_t"},
+                                {"sig_name": "AMK_DisplayOverloadMotor", "type":"uint16_t"}
+                            ],
+                            "msg_period": 15,
+                            "msg_id_override": "0x282",
+                            "is_standard_id":true
+                        },
+                        {
+                            "msg_name": "INVA_TEMPS",
+                            "msg_desc": "Contains temperatures",
+                            "signals": [
+                                {"sig_name": "AMK_MotorTemp", "sig_desc": "Motor temperature", "type":"int16_t", "unit":"C", "scale":0.1},
+                                {"sig_name": "AMK_InverterTemp", "sig_desc": "Inverter cold plate temperature", "type":"int16_t", "unit":"C", "scale":0.1},
+                                {"sig_name": "AMK_IGBTTemp", "sig_desc": "IGBT temperature", "type":"int16_t", "unit":"C", "scale":0.1}
+                            ],
+                            "msg_period": 500,
+                            "msg_id_override": "0x284",
+                            "is_standard_id":true
+                        },
+                        {
+                            "msg_name": "IVNA_INFO",
                             "msg_desc": "Contains the status word and actual values",
                             "signals": [
                                 {"sig_name": "AMK_Status_bReserve", "sig_desc": "Status word: RESERVED", "type":"uint8_t", "length":8},
@@ -1065,47 +1090,10 @@
                                 {"sig_name": "AMK_Status_bQuitInverterOn", "sig_desc": "Status word: Controller enable ACK", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bInverterOn", "sig_desc": "Status word: Controller enable level", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bDerating", "sig_desc": "Status word: torque limit activation", "type":"uint8_t", "length":1},
-                                {"sig_name": "AMK_ActualTorque", "sig_desc": "Actual torque value", "type":"int16_t", "unit":"Nm", "scale":0.1},
-                                {"sig_name": "AMK_MotorSerialNumber", "sig_desc": "Serial number of the motor", "type":"uint32_t"}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x282",
-                            "is_standard_id":true
-                        },
-                        {
-                            "msg_name": "INVA_Actual_Values_2",
-                            "msg_desc": "Contains actual values",
-                            "signals": [
-                                {"sig_name": "AMK_ActualSpeed", "sig_desc": "Actual speed value", "type":"int16_t", "unit": "rpm"},
                                 {"sig_name": "AMK_DCBusVoltage", "sig_desc": "Voltage of the DC bus", "type":"uint16_t", "unit": "V"},
-                                {"sig_name": "AMK_SystemReset", "sig_desc": "System reset", "type":"uint16_t"}
                             ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x284",
-                            "is_standard_id":true
-                        },
-                        {
-                            "msg_name": "INVA_Temperatures_1",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_MotorTemp", "sig_desc": "Motor temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_InverterTemp", "sig_desc": "Inverter cold plate temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_IGBTTemp", "sig_desc": "IGBT temperature", "type":"int16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 20,
+                            "msg_period": 500,
                             "msg_id_override": "0x286",
-                            "is_standard_id":true
-                        },
-                        {
-                            "msg_name": "INVA_Temperatures_2",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_InternalTemp", "sig_desc": "Internal temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_ExternalTemp", "sig_desc": "External temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_TempSensorMotor", "sig_desc": "???", "type":"uint16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 20,
-                            "msg_id_override": "0x288",
                             "is_standard_id":true
                         },
                         {
@@ -1116,7 +1104,7 @@
                                 {"sig_name": "AMK_ErrorInfo1", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x290",
+                            "msg_id_override": "0x288",
                             "is_standard_id":true
                         },
                         {
@@ -1127,18 +1115,7 @@
                                 {"sig_name": "AMK_ErrorInfo3", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x292",
-                            "is_standard_id":true
-                        },
-                        {
-                            "msg_name": "INVA_Overload",
-                            "msg_desc": "Display overload info",
-                            "signals": [
-                                {"sig_name": "AMK_DisplayOverloadInverter", "type":"uint16_t"},
-                                {"sig_name": "AMK_DisplayOverloadMotor", "type":"uint16_t"}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x294",
+                            "msg_id_override": "0x290",
                             "is_standard_id":true
                         }
                     ],
@@ -1148,10 +1125,35 @@
                 },
                 {
                     "node_name": "InverterB",
-                    "node_ssa": 28,
+                    "node_ssa": 60,
                     "tx": [
                         {
-                            "msg_name": "INVB_Actual_Values_1",
+                            "msg_name": "INVB_CRIT",
+                            "msg_desc": "Contains the status word and actual values",
+                            "signals": [
+                                {"sig_name": "AMK_ActualSpeed", "sig_desc": "Actual speed value", "type":"int16_t", "unit": "rpm"},
+                                {"sig_name": "AMK_ActualTorque", "sig_desc": "Actual torque value", "type":"int16_t", "unit":"Nm", "scale":0.1},
+                                {"sig_name": "AMK_DisplayOverloadInverter", "type":"uint16_t"},
+                                {"sig_name": "AMK_DisplayOverloadMotor", "type":"uint16_t"}
+                            ],
+                            "msg_period": 15,
+                            "msg_id_override": "0x283",
+                            "is_standard_id":true
+                        },
+                        {
+                            "msg_name": "INVB_TEMPS",
+                            "msg_desc": "Contains temperatures",
+                            "signals": [
+                                {"sig_name": "AMK_MotorTemp", "sig_desc": "Motor temperature", "type":"int16_t", "unit":"C", "scale":0.1},
+                                {"sig_name": "AMK_InverterTemp", "sig_desc": "Inverter cold plate temperature", "type":"int16_t", "unit":"C", "scale":0.1},
+                                {"sig_name": "AMK_IGBTTemp", "sig_desc": "IGBT temperature", "type":"int16_t", "unit":"C", "scale":0.1}
+                            ],
+                            "msg_period": 500,
+                            "msg_id_override": "0x285",
+                            "is_standard_id":true
+                        },
+                        {
+                            "msg_name": "IVNB_INFO",
                             "msg_desc": "Contains the status word and actual values",
                             "signals": [
                                 {"sig_name": "AMK_Status_bReserve", "sig_desc": "Status word: RESERVED", "type":"uint8_t", "length":8},
@@ -1163,48 +1165,11 @@
                                 {"sig_name": "AMK_Status_bQuitInverterOn", "sig_desc": "Status word: Controller enable ACK", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bInverterOn", "sig_desc": "Status word: Controller enable level", "type":"uint8_t", "length":1},
                                 {"sig_name": "AMK_Status_bDerating", "sig_desc": "Status word: torque limit activation", "type":"uint8_t", "length":1},
-                                {"sig_name": "AMK_ActualTorque", "sig_desc": "Actual torque value", "type":"int16_t", "unit":"Nm", "scale":0.1},
-                                {"sig_name": "AMK_MotorSerialNumber", "sig_desc": "Serial number of the motor", "type":"uint32_t"}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x283",
-                            "is_normal":true
-                        },
-                        {
-                            "msg_name": "INVB_Actual_Values_2",
-                            "msg_desc": "Contains actual values",
-                            "signals": [
-                                {"sig_name": "AMK_ActualSpeed", "sig_desc": "Actual speed value", "type":"int16_t", "unit": "rpm"},
                                 {"sig_name": "AMK_DCBusVoltage", "sig_desc": "Voltage of the DC bus", "type":"uint16_t", "unit": "V"},
-                                {"sig_name": "AMK_SystemReset", "sig_desc": "System reset", "type":"uint16_t"}
                             ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x285",
-                            "is_normal":true
-                        },
-                        {
-                            "msg_name": "INVB_Temperatures_1",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_MotorTemp", "sig_desc": "Motor temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_InverterTemp", "sig_desc": "Inverter cold plate temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_IGBTTemp", "sig_desc": "IGBT temperature", "type":"int16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 20,
+                            "msg_period": 500,
                             "msg_id_override": "0x287",
-                            "is_normal":true
-                        },
-                        {
-                            "msg_name": "INVB_Temperatures_2",
-                            "msg_desc": "Contains temperatures",
-                            "signals": [
-                                {"sig_name": "AMK_InternalTemp", "sig_desc": "Internal temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_ExternalTemp", "sig_desc": "External temperature", "type":"int16_t", "unit":"C", "scale":0.1},
-                                {"sig_name": "AMK_TempSensorMotor", "sig_desc": "???", "type":"uint16_t", "unit":"C", "scale":0.1}
-                            ],
-                            "msg_period": 20,
-                            "msg_id_override": "0x289",
-                            "is_normal":true
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVB_Error_1",
@@ -1214,8 +1179,8 @@
                                 {"sig_name": "AMK_ErrorInfo1", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x291",
-                            "is_normal":true
+                            "msg_id_override": "0x289",
+                            "is_standard_id":true
                         },
                         {
                             "msg_name": "INVB_Error_2",
@@ -1225,19 +1190,8 @@
                                 {"sig_name": "AMK_ErrorInfo3", "sig_desc": "Error info", "type":"uint32_t"}
                             ],
                             "msg_period": 5,
-                            "msg_id_override": "0x293",
-                            "is_normal":true
-                        },
-                        {
-                            "msg_name": "INVB_Overload",
-                            "msg_desc": "Display overload info",
-                            "signals": [
-                                {"sig_name": "AMK_DisplayOverloadInverter", "type":"uint16_t"},
-                                {"sig_name": "AMK_DisplayOverloadMotor", "type":"uint16_t"}
-                            ],
-                            "msg_period": 5,
-                            "msg_id_override": "0x295",
-                            "is_normal":true
+                            "msg_id_override": "0x291",
+                            "is_standard_id":true
                         }
                     ],
                     "rx": [
