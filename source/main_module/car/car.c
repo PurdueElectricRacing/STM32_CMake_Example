@@ -58,7 +58,7 @@ bool carInit()
 void carHeartbeat()
 {
     SEND_MAIN_HB(car.state, car.pchg.pchg_complete);
-    //SEND_MAIN_HB_AMK(car.state, car.pchg.pchg_complete);
+    SEND_MAIN_HB_AMK(car.state, car.pchg.pchg_complete);
     static uint8_t n;
 }
 

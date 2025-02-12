@@ -166,6 +166,7 @@ ClockRateConfig_t clock_config = {
 /* Function Prototypes */
 void preflightAnimation(void);
 void preflightChecks(void);
+
 void heartBeatLED();
 // void usartTxUpdate(void);
 // void usartIdleIRQ(volatile usart_init_t *huart, volatile usart_rx_buf_t *rx_buf);
@@ -180,29 +181,8 @@ float voltToForce(uint16_t load_read);
 uint16_t num_failed_msgs_r;
 uint16_t num_failed_msgs_l;
 
-extern q_handle_t q_tx_can2_s[CAN_TX_MAILBOX_CNT];
-extern uint32_t can2_mbx_last_send_time[CAN_TX_MAILBOX_CNT];
-
-void can2TxUpdate(void)
-{
-    CanMsgTypeDef_t tx_msg;
-    for (uint8_t i = 0; i < CAN_TX_MAILBOX_CNT; ++i)
-    {
-        if(PHAL_txMailboxFree(CAN2, i))
-        {
-            if (qReceive(&q_tx_can2_s[i], &tx_msg) == SUCCESS_G)    // Check queue for items and take if there is one
-            {
-                PHAL_txCANMessage(&tx_msg, i);
-                can2_mbx_last_send_time[i] = sched.os_ticks;
-            }
-        }
-        else if (sched.os_ticks - can2_mbx_last_send_time[i] > CAN_TX_TIMEOUT_MS)
-        {
-            PHAL_txCANAbort(CAN2, i); // aborts tx and empties the mailbox
-            can_stats.can_peripheral_stats[CAN2_IDX].tx_fail++;
-        }
-    }
-}
+extern q_handle_t q_tx_can[NUM_CAN_PERIPHERALS][CAN_TX_MAILBOX_CNT];
+extern uint32_t can_mbx_last_send_time[NUM_CAN_PERIPHERALS][CAN_TX_MAILBOX_CNT];
 
 int main(void){
     /* Data Struct Initialization */
@@ -238,7 +218,6 @@ int main(void){
     taskCreate(daqPeriodic, DAQ_UPDATE_PERIOD);
     // taskCreate(memFg, MEM_FG_TIME);
     taskCreateBackground(canTxUpdate);
-    // taskCreateBackground(can2TxUpdate);
     taskCreateBackground(canRxUpdate);
     // taskCreateBackground(usartTxUpdate);
     // taskCreateBackground(memBg);
@@ -267,11 +246,6 @@ void preflightChecks(void) {
             NVIC_EnableIRQ(CAN1_RX0_IRQn);
             break;
         case 1:
-            if(!PHAL_initCAN(CAN2, false, VCAN_BPS))
-            {
-                HardFault_Handler();
-            }
-            NVIC_EnableIRQ(CAN1_RX0_IRQn);
             if(!PHAL_initCAN(CAN2, false, MCAN_BPS))
             {
                 HardFault_Handler();
