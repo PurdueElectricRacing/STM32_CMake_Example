@@ -33,7 +33,7 @@ NS_ :
 
 BS_:
 
-BU_: Main_Module a_box OrionBMS torque_vector Dashboard Steering PDU daq bootloader BITSTREAM Charger DAQ TEST_NODE TEST_NODE_2 DAQ
+BU_: Main_Module a_box OrionBMS torque_vector Dashboard Steering PDU daq bootloader BITSTREAM Charger DAQ Main_Module TEST_NODE TEST_NODE_2 DAQ
 
 
 BO_ 2348816641 main_hb: 2 Main_Module
@@ -50,7 +50,7 @@ BO_ 2415921409 gearbox: 2 Main_Module
  SG_ r_temp : 8|8@1- (1,0) [0|0] "" Vector__XXX
  SG_ l_temp : 0|8@1- (1,0) [0|0] "" Vector__XXX
 
-BO_ 1984 LWS_Config: 2 Main_Module
+BO_ 2147485632 LWS_Config: 2 Main_Module
  SG_ Reserved_2 : 8|8@1+ (1,0) [0|0] "" Vector__XXX
  SG_ Reserved_1 : 3|5@1+ (1,0) [0|0] "" Vector__XXX
  SG_ CCW : 0|3@1+ (1,0) [0|0] "" Vector__XXX
@@ -69,11 +69,14 @@ BO_ 2415925633 mcu_status: 4 Main_Module
  SG_ foreground_use : 8|8@1+ (1,0) [0|0] "" Vector__XXX
  SG_ sched_skips : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 2416009985 main_module_can_stats: 4 Main_Module
- SG_ can_rx_overrun : 24|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ can_rx_overflow : 16|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ can_tx_fail : 8|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ can_tx_overflow : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+BO_ 2416009985 main_module_can_stats: 7 Main_Module
+ SG_ can2_rx_overrun : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can1_rx_overrun : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can_rx_queue_overflow : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can2_tx_fail : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can1_tx_fail : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can2_tx_queue_overflow : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can1_tx_queue_overflow : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 2415926145 num_mc_skips: 4 Main_Module
  SG_ noise_l : 16|16@1+ (1,0) [0|0] "" Vector__XXX
@@ -178,11 +181,14 @@ BO_ 2483061636 raw_cell_temp_c_d: 5 a_box
  SG_ temp_C : 8|16@1- (0.1,0) [0|0] "C" Vector__XXX
  SG_ index : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 2416009988 a_box_can_stats: 4 a_box
- SG_ can_rx_overrun : 24|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ can_rx_overflow : 16|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ can_tx_fail : 8|8@1+ (1,0) [0|0] "" Vector__XXX
- SG_ can_tx_overflow : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+BO_ 2416009988 a_box_can_stats: 7 a_box
+ SG_ can2_rx_overrun : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can1_rx_overrun : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can_rx_queue_overflow : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can2_tx_fail : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can1_tx_fail : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can2_tx_queue_overflow : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ can1_tx_queue_overflow : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 2416010308 i_sense: 4 a_box
  SG_ current_channel_2 : 16|16@1- (0.01,0) [0|0] "A" Vector__XXX
@@ -381,7 +387,7 @@ BO_ 2148059845 fault_sync_dashboard: 3 Dashboard
 BO_ 2550136773 daq_response_DASHBOARD: 8 Dashboard
  SG_ daq_response : 0|64@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 688 LWS_Standard: 5 Steering
+BO_ 2147484336 LWS_Standard: 5 Steering
  SG_ Reserved_2 : 32|8@1+ (1,0) [0|0] "" Vector__XXX
  SG_ Reserved_1 : 27|5@1+ (1,0) [0|0] "" Vector__XXX
  SG_ Trim : 26|1@1+ (1,0) [0|0] "" Vector__XXX
@@ -550,6 +556,10 @@ BO_ 2483028274 daq_command_A_BOX: 8 DAQ
 BO_ 2483030002 daq_command_PDU: 8 DAQ
  SG_ daq_command : 0|64@1+ (1,0) [0|0] "" Vector__XXX
 
+BO_ 2348816641 main_hb_amk: 2 Main_Module
+ SG_ precharge_state : 8|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ car_state : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
 BO_ 2483029759 orion_currents_volts2: 4 TEST_NODE
  SG_ pack_voltage : 16|16@1+ (0.1,0) [0|0] "V" Vector__XXX
  SG_ pack_current : 0|16@1- (0.1,0) [0|0] "A" Vector__XXX
@@ -635,6 +645,7 @@ CM_ BU_ bootloader "";
 CM_ BU_ BITSTREAM "";
 CM_ BU_ Charger "";
 CM_ BU_ DAQ "";
+CM_ BU_ Main_Module "";
 CM_ BU_ TEST_NODE "";
 CM_ BU_ TEST_NODE_2 "";
 CM_ BU_ DAQ "";
@@ -649,10 +660,10 @@ CM_ SG_ 2415921281 battery_in_temp "In flow temperature of battery coolant loop"
 CM_ BO_ 2415921409 "Gearbox temps";
 CM_ SG_ 2415921409 r_temp "";
 CM_ SG_ 2415921409 l_temp "";
-CM_ BO_ 1984 "Steering sensor configuration";
-CM_ SG_ 1984 Reserved_2 "";
-CM_ SG_ 1984 Reserved_1 "";
-CM_ SG_ 1984 CCW "";
+CM_ BO_ 2147485632 "Steering sensor configuration";
+CM_ SG_ 2147485632 Reserved_2 "";
+CM_ SG_ 2147485632 Reserved_1 "";
+CM_ SG_ 2147485632 CCW "";
 CM_ BO_ 2415983105 "Load Sensor readings from left and right";
 CM_ SG_ 2415983105 right_load_sensor "";
 CM_ SG_ 2415983105 left_load_sensor "";
@@ -670,10 +681,13 @@ CM_ SG_ 2415925633 background_use "Percent of the 1ms loop time used by backgrou
 CM_ SG_ 2415925633 foreground_use "Percent of the 1ms loop time used by foreground tasks";
 CM_ SG_ 2415925633 sched_skips "Number of loop misses (execution time was skipped)";
 CM_ BO_ 2416009985 "CAN diagnostics";
-CM_ SG_ 2416009985 can_rx_overrun "CAN Rx FIFO overrun count";
-CM_ SG_ 2416009985 can_rx_overflow "CAN Rx queue overflow count";
-CM_ SG_ 2416009985 can_tx_fail "CAN Tx fail count (due to timeout in mailbox)";
-CM_ SG_ 2416009985 can_tx_overflow "CAN Tx queue overflow count";
+CM_ SG_ 2416009985 can2_rx_overrun "MCAN Rx FIFO overrun count";
+CM_ SG_ 2416009985 can1_rx_overrun "VCAN Rx FIFO overrun count";
+CM_ SG_ 2416009985 can_rx_queue_overflow "CAN Rx queue overflow count";
+CM_ SG_ 2416009985 can2_tx_fail "CAN Tx fail count for MCAN (due to timeout in mailbox)";
+CM_ SG_ 2416009985 can1_tx_fail "CAN Tx fail count for VCAN (due to timeout in mailbox)";
+CM_ SG_ 2416009985 can2_tx_queue_overflow "MCAN Tx queue overflow count";
+CM_ SG_ 2416009985 can1_tx_queue_overflow "VCAN Tx queue overflow count";
 CM_ BO_ 2415926145 "Messages ignored by MC";
 CM_ SG_ 2415926145 noise_l "Num of skipped msgs";
 CM_ SG_ 2415926145 noise_r "Num of skipped msgs";
@@ -760,10 +774,13 @@ CM_ SG_ 2483061636 temp_D "";
 CM_ SG_ 2483061636 temp_C "";
 CM_ SG_ 2483061636 index "";
 CM_ BO_ 2416009988 "CAN diagnostics";
-CM_ SG_ 2416009988 can_rx_overrun "CAN Rx FIFO overrun count";
-CM_ SG_ 2416009988 can_rx_overflow "CAN Rx queue overflow count";
-CM_ SG_ 2416009988 can_tx_fail "CAN Tx fail count (due to timeout in mailbox)";
-CM_ SG_ 2416009988 can_tx_overflow "CAN Tx queue overflow count";
+CM_ SG_ 2416009988 can2_rx_overrun "CCAN (Charger CAN) Rx FIFO overrun count";
+CM_ SG_ 2416009988 can1_rx_overrun "VCAN Rx FIFO overrun count";
+CM_ SG_ 2416009988 can_rx_queue_overflow "CAN Rx queue overflow count";
+CM_ SG_ 2416009988 can2_tx_fail "CAN Tx fail count for CCAN (Charger CAN) (due to timeout in mailbox)";
+CM_ SG_ 2416009988 can1_tx_fail "CAN Tx fail count for VCAN (due to timeout in mailbox)";
+CM_ SG_ 2416009988 can2_tx_queue_overflow "CCAN (Charger CAN) Tx queue overflow count";
+CM_ SG_ 2416009988 can1_tx_queue_overflow "VCAN Tx queue overflow count";
 CM_ BO_ 2416010308 "Current sense value for channel 1 and channel 2 of current sensor";
 CM_ SG_ 2416010308 current_channel_2 "";
 CM_ SG_ 2416010308 current_channel_1 "";
@@ -873,10 +890,10 @@ CM_ SG_ 2214602807 equal_k_rl "";
 CM_ BO_ 2348820023 "Maximum Allowed Throttle";
 CM_ SG_ 2348820023 vcu_max_r "";
 CM_ BO_ 2416010039 "CAN diagnostics";
-CM_ SG_ 2416010039 can_rx_overrun "CAN Rx FIFO overrun count";
-CM_ SG_ 2416010039 can_rx_overflow "CAN Rx queue overflow count";
-CM_ SG_ 2416010039 can_tx_fail "CAN Tx fail count (due to timeout in mailbox)";
-CM_ SG_ 2416010039 can_tx_overflow "CAN Tx queue overflow count";
+CM_ SG_ 2416010039 can_rx_overrun "VCAN Rx FIFO overrun count";
+CM_ SG_ 2416010039 can_rx_overflow "VCAN Rx queue overflow count";
+CM_ SG_ 2416010039 can_tx_fail "VCAN Tx fail count (due to timeout in mailbox)";
+CM_ SG_ 2416010039 can_tx_overflow "VCAN Tx queue overflow count";
 CM_ BO_ 2148059831 "Fault status message";
 CM_ SG_ 2148059831 latched "";
 CM_ SG_ 2148059831 idx "";
@@ -927,14 +944,14 @@ CM_ SG_ 2148059845 latched "";
 CM_ SG_ 2148059845 idx "";
 CM_ BO_ 2550136773 "daq response from node DASHBOARD";
 CM_ SG_ 2550136773 daq_response "";
-CM_ BO_ 688 "Standard steering angle and speed";
-CM_ SG_ 688 Reserved_2 "";
-CM_ SG_ 688 Reserved_1 "";
-CM_ SG_ 688 Trim "";
-CM_ SG_ 688 Cal "";
-CM_ SG_ 688 Ok "";
-CM_ SG_ 688 LWS_SPEED "";
-CM_ SG_ 688 LWS_ANGLE "";
+CM_ BO_ 2147484336 "Standard steering angle and speed";
+CM_ SG_ 2147484336 Reserved_2 "";
+CM_ SG_ 2147484336 Reserved_1 "";
+CM_ SG_ 2147484336 Trim "";
+CM_ SG_ 2147484336 Cal "";
+CM_ SG_ 2147484336 Ok "";
+CM_ SG_ 2147484336 LWS_SPEED "";
+CM_ SG_ 2147484336 LWS_ANGLE "";
 CM_ BO_ 2415985759 "PDU voltage rail readings";
 CM_ SG_ 2415985759 out_3v3 "";
 CM_ SG_ 2415985759 out_5v "";
@@ -1059,6 +1076,9 @@ CM_ BO_ 2483028274 "daq command for node A_BOX";
 CM_ SG_ 2483028274 daq_command "";
 CM_ BO_ 2483030002 "daq command for node PDU";
 CM_ SG_ 2483030002 daq_command "";
+CM_ BO_ 2348816641 "Heart beat message for main module";
+CM_ SG_ 2348816641 precharge_state "";
+CM_ SG_ 2348816641 car_state "Main car state";
 CM_ BO_ 2483029759 "Pack current + voltage";
 CM_ SG_ 2483029759 pack_voltage "";
 CM_ SG_ 2483029759 pack_current "";
