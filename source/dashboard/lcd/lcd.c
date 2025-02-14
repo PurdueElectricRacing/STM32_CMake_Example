@@ -434,10 +434,10 @@ void updateAppsTelemetry() {
     NXT_setValue(BRK_BAR, 0); // todo brake bar
     NXT_setValue(THROT_BAR, (int) ((filtered_pedals / 4095.0) * 100));
 
-    NXT_setTextf(APPS_BRAKE1_VAL, "%d",raw_adc_values.b1);
-    NXT_setTextf(APPS_BRAKE2_VAL, "%d",raw_adc_values.b2);
-    NXT_setTextf(APPS_THROTTLE1_VAL, "%d",raw_adc_values.t1);
-    NXT_setTextf(APPS_THROTTLE2_VAL, "%d",raw_adc_values.t2);
+    NXT_setTextFormatted(APPS_BRAKE1_VAL, "%d",raw_adc_values.b1);
+    NXT_setTextFormatted(APPS_BRAKE2_VAL, "%d",raw_adc_values.b2);
+    NXT_setTextFormatted(APPS_THROTTLE1_VAL, "%d",raw_adc_values.t1);
+    NXT_setTextFormatted(APPS_THROTTLE2_VAL, "%d",raw_adc_values.t2);
 
     uint16_t brake_diff = ABS(raw_adc_values.b1 - raw_adc_values.b2);
     uint16_t brake_dev = (brake_diff * 1000) / 4095.0;
@@ -957,7 +957,7 @@ void raceTelemetryUpdate() {
         // Vehicle Speed [m/s] = Wheel Speed [RPM] * 16 [in] * PI * 0.0254 / 60
         // set_text(SPEED, NXT_TEXT, int_to_char((uint16_t)((float)MAX(can_data.rear_wheel_speeds.left_speed_sensor, can_data.rear_wheel_speeds.right_speed_sensor) * 0.01 * 0.4474), parsed_value));
         uint16_t speed = ((float)can_data.gps_speed.gps_speed * 0.02237); // TODO macro this magic number
-        NXT_setTextf(SPEED, "%d", speed);
+        NXT_setTextFormatted(SPEED, "%d", speed);
     }
 
     // Update the voltage and current
@@ -966,10 +966,10 @@ void raceTelemetryUpdate() {
         NXT_setText(BATT_CURR, "S");
     } else {
         uint16_t voltage = (can_data.orion_currents_volts.pack_voltage / 10);
-        NXT_setTextf(BATT_VOLT, "%dV", voltage);
+        NXT_setTextFormatted(BATT_VOLT, "%dV", voltage);
 
         uint16_t current = (can_data.orion_currents_volts.pack_current / 10);
-        NXT_setTextf(BATT_CURR, "%dA", current);  // Note: Changed 'V' to 'A' for current
+        NXT_setTextFormatted(BATT_CURR, "%dA", current);  // Note: Changed 'V' to 'A' for current
     }
 
     // Update the motor temperature
@@ -977,7 +977,7 @@ void raceTelemetryUpdate() {
         NXT_setText(MOT_TEMP, "S");
     } else {
         uint8_t motor_temp = MAX(can_data.rear_motor_temps.left_mot_temp, can_data.rear_motor_temps.right_mot_temp);
-        NXT_setTextf(MOT_TEMP, "%dC", motor_temp);
+        NXT_setTextFormatted(MOT_TEMP, "%dC", motor_temp);
     }
 
     // TODO update motor controller temp
@@ -987,7 +987,7 @@ void raceTelemetryUpdate() {
         NXT_setText(BATT_TEMP, "S");
     } else {
         uint16_t batt_temp = can_data.max_cell_temp.max_temp / 10;
-        NXT_setTextf(BATT_TEMP, "%dC", batt_temp);
+        NXT_setTextFormatted(BATT_TEMP, "%dC", batt_temp);
     }
 
     // Update the state of charge

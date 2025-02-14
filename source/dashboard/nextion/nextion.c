@@ -107,7 +107,7 @@ void NXT_setText(char* obj_name, char* text)
  * @param format Printf-style format string.
  * @param ... Variable arguments for format string.
  */
-void NXT_setTextf(char* obj_name, const char* format, ...)
+void NXT_setTextFormatted(char* obj_name, const char* format, ...)
 {
   char formatted[NXT_STR_SIZE];
   va_list args;

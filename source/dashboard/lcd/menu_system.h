@@ -16,7 +16,7 @@
 
 // Element types
 typedef enum {
-    ELEMENT_VAL,    // Numeric value
+    ELEMENT_VAL = 0,    // Numeric value
     ELEMENT_FLT,    // Float value
     ELEMENT_BAR,    // (not supported but easy to implement)
     ELEMENT_BUTTON, // Button type
@@ -26,7 +26,7 @@ typedef enum {
 
 // Element states
 typedef enum {
-    STATE_NORMAL,
+    STATE_NORMAL = 0,
     STATE_HOVER,
     STATE_SELECTED
 } element_state_t;

@@ -52,7 +52,7 @@ void NXT_setBackground(char* obj_name, uint16_t val);
 void NXT_setFontColor(char* obj_name, uint16_t val);
 void NXT_setBorderWidth(char* obj_name, uint16_t val);
 void NXT_setText(char* obj_name, char* text);
-void NXT_setTextf(char* obj_name, const char* format, ...);
+void NXT_setTextFormatted(char* obj_name, const char* format, ...);
 void NXT_setPage(char* page_name);
 
 // Configuration Functions

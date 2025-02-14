@@ -142,7 +142,7 @@ extern uint32_t PLLClockRateHz;
 
 // LCD Variables
 extern page_t curr_page;
-dashboard_input_state_t input_state = {0}; // Clear all input states
+volatile dashboard_input_state_t input_state = {0}; // Clear all input states
 
 /* Function Prototypes */
 void preflightChecks(void);
@@ -592,8 +592,12 @@ void enableInterrupts()
     NVIC_EnableIRQ(EXTI15_10_IRQn);                  // Enable EXTI15_10 IRQ: START_FLT, ENC_A_FLT, B3_FLT, B2_FLT, B1_FLT
 }
 
-// LCD USART Communication
-uint8_t cmd[NXT_STR_SIZE] = {'\0'};
+/**
+ * @brief Called periodically to send commands to the Nextion LCD display via USART
+ * 
+ * @note The queue holds a max of 10 commands. Design your LCD page updates with this in mind.
+ */
+uint8_t cmd[NXT_STR_SIZE] = {'\0'}; // Buffer for Nextion LCD commands
 void usartTxUpdate()
 {
     if ((false == PHAL_usartTxBusy(&lcd)) && (SUCCESS_G == qReceive(&q_tx_usart, cmd)))

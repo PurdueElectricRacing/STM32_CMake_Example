@@ -41,8 +41,6 @@
 #define VREF 3.3F
 #define RESISTOR_T1 3300
 #define RESISTOR_T2 1000
-#define MAX_RESISTANCE 2500
-#define MAX_VALUE 4095
 
 #define PROFILES_START_SECTOR    3
 #define NUM_PROFILES             4

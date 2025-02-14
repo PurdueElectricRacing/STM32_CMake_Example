@@ -53,24 +53,6 @@ void MS_styleSelected(menu_element_t *element) {
 }
 
 /**
- * @brief Applies visual styling to a menu element based on hover state
- *
- * @param element Pointer to the menu element to be styled
- * @param is_hover Boolean indicating whether the element is being hovered
- */
-void MS_applyElementStyle(menu_element_t *element, bool is_hover) {
-    if (element->type == ELEMENT_LIST && element->current_value == 1) {
-        return; // Skip styling for special list element case
-    }
-    
-    if (is_hover) {
-        MS_styleHover(element);
-    } else {
-        MS_styleNormal(element);
-    }
-}
-
-/**
  * @brief Moves menu selection up or increments selected element value
  *
  * @param page Pointer to the menu page structure
@@ -82,17 +64,13 @@ void MS_moveUp(menu_page_t *page) {
     }
 
     // Clear current element styling
-    MS_applyElementStyle(&page->elements[page->current_index], false);
+    MS_styleNormal(&page->elements[page->current_index]);
 
     // Move to previous element
-    if (page->current_index == 0) {
-        page->current_index = page->num_elements - 1;
-    } else {
-        page->current_index--;
-    }
+    page->current_index = (page->current_index - 1 + page->num_elements) % page->num_elements;
 
-    // Style new element
-    MS_applyElementStyle(&page->elements[page->current_index], true);
+    // Style new element as hovered
+    MS_styleHover(&page->elements[page->current_index]);
 }
 
 /**
@@ -107,13 +85,13 @@ void MS_moveDown(menu_page_t *page) {
     }
 
     // Clear current element styling
-    MS_applyElementStyle(&page->elements[page->current_index], false);
+    MS_styleNormal(&page->elements[page->current_index]);
 
     // Move to next element
     page->current_index = (page->current_index + 1) % page->num_elements;
 
-    // Style new element
-    MS_applyElementStyle(&page->elements[page->current_index], true);
+    // Style new element as hovered
+    MS_styleNormal(&page->elements[page->current_index]);
 }
 
 /**
@@ -194,7 +172,7 @@ void MS_incrementValue(menu_element_t *element) {
             NXT_setValue(element->object_name, element->current_value);
             break;
         case ELEMENT_VAL:
-            NXT_setTextf(element->object_name, "%d", element->current_value);
+            NXT_setTextFormatted(element->object_name, "%d", element->current_value);
             break;
         default:
             break;
@@ -221,7 +199,7 @@ void MS_decrementValue(menu_element_t *element) {
             NXT_setValue(element->object_name, element->current_value);
             break;
         case ELEMENT_VAL:
-            NXT_setTextf(element->object_name, "%d", element->current_value);
+            NXT_setTextFormatted(element->object_name, "%d", element->current_value);
             break;
         default:
             break;
@@ -246,7 +224,7 @@ void MS_refreshPage(menu_page_t *page) {
                 }
                 break;
             case ELEMENT_VAL:
-                NXT_setTextf(curr_element->object_name, "%d", curr_element->current_value);
+                NXT_setTextFormatted(curr_element->object_name, "%d", curr_element->current_value);
                 break;
             case ELEMENT_FLT: // Fall through
             case ELEMENT_OPTION:

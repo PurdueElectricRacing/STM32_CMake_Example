@@ -118,7 +118,7 @@
 typedef enum {
   // Pages selectable with the rot encoder
   // Should corresspond with the page count in main.h
-  PAGE_RACE,
+  PAGE_RACE = 0,
   PAGE_COOLING,
   PAGE_TVSETTINGS,
   PAGE_FAULTS,
