@@ -49,17 +49,15 @@ typedef struct __attribute__((packed))
 
 volatile extern raw_adc_values_t raw_adc_values;
 
-typedef enum
-{
-    DASH_INPUT_NONE,
-    DASH_INPUT_ROT_ENC,
-    DASH_INPUT_UP_BUTTON,
-    DASH_INPUT_DOWN_BUTTON,
-    DASH_INPUT_SELECT_BUTTON,
-    DASH_INPUT_START_BUTTON,
-    DASH_INPUT_COUNT,
-    DASH_INPUT_INVALID,
-} dashboard_input_t;
+typedef struct {
+  volatile int8_t encoder_position;
+  volatile int8_t prev_encoder_position;
+  volatile uint8_t update_page;
+  volatile uint8_t up_button;
+  volatile uint8_t down_button;
+  volatile uint8_t select_button;
+  volatile uint8_t start_button;
+} dashboard_input_state_t;
 
 // Status LED Indicators
 #define CONN_LED_GPIO_Port          (GPIOE)
@@ -124,10 +122,10 @@ typedef enum
 
 
 // Aux Button inputs
-#define B_OK_GPIO_Port              (GPIOD)
-#define B_OK_Pin                    (13)
+#define B_SELECT_GPIO_Port          (GPIOD)
+#define B_SELECT_Pin                (12)
 #define B_DOWN_GPIO_Port            (GPIOD)
-#define B_DOWN_Pin                  (12)
+#define B_DOWN_Pin                  (13)
 #define B_UP_GPIO_Port              (GPIOD)
 #define B_UP_Pin                    (14)
 
@@ -161,7 +159,7 @@ typedef enum
 #define LCD_UART_TX_Pin             (9)
 #define LCD_UART_RX_GPIO_Port       (GPIOA)
 #define LCD_UART_RX_Pin             (10)
-#define LCD_NUM_PAGES               (8) // Number encoder selectable pages
+#define LCD_NUM_PAGES               (9) // Number encoder selectable pages
 
 // LV Status
 #define LV_5V_V_SENSE_GPIO_Port     (GPIOC)
@@ -179,6 +177,18 @@ typedef enum
 #define LV_24_V_FAULT_GPIO_Port     (GPIOC)
 #define LV_24_V_FAULT_Pin           (8)
 #define LV_5V_SCALE                 (0.413F)
+
+// Voltage Sensing Resistors (in kOhms)
+#define LV_3V3_PULLUP               (4.3F)
+#define LV_3V3_PULLDOWN             (10.0F)
+#define LV_5V_PULLUP                (4.3F)
+#define LV_5V_PULLDOWN              (3.3F)
+#define LV_12V_PULLUP               (15.8F)
+#define LV_12V_PULLDOWN             (3.3F)
+#define LV_24V_PULLUP               (47.0F)
+#define LV_24V_PULLDOWN             (3.3F)
+#define ADC_MAX_VALUE               (4095)
+#define ADC_REF_VOLTAGE             (3.3F)
 
 void canTxSendToBack(CanMsgTypeDef_t *msg);
 

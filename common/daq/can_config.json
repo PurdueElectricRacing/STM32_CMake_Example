@@ -698,16 +698,27 @@
                             "msg_pgn":0
                         },
                         {
-                            "msg_name":"dashboard_volts_temp",
+                            "msg_name":"dashboard_mcu_temp",
                             "msg_desc":"periodic dashboard MCU temp",
                             "signals":[
-                                {"sig_name": "mcu_temp", "type":"int16_t"},
-                                {"sig_name": "volts_5v", "type":"uint16_t"},
-                                {"sig_name": "volts_3v3", "type":"uint16_t"}
+                                {"sig_name": "mcu_temp", "type":"int16_t"}
                             ],
-                            "msg_period":500,
+                            "msg_period":4000,
                             "msg_hlp":4,
                             "msg_pgn":101
+                        },
+                        {
+                            "msg_name":"dashboard_voltage",
+                            "msg_desc":"periodic dashboard MCU temp",
+                            "signals":[
+                                {"sig_name": "volts_3v3", "type":"uint16_t", "scale": 0.01, "unit": "V"},
+                                {"sig_name": "volts_5v", "type":"uint16_t", "scale": 0.01, "unit": "V"},
+                                {"sig_name": "volts_12v", "type":"uint16_t", "scale": 0.01, "unit": "V"},
+                                {"sig_name": "volts_24v", "type":"uint16_t", "scale": 0.01, "unit": "V"}
+                            ],
+                            "msg_period":5000,
+                            "msg_hlp":4,
+                            "msg_pgn":102
                         },
                         {
                             "msg_name":"dashboard_tv_parameters",
@@ -718,7 +729,7 @@
                                 {"sig_name": "tv_intensity_val", "type":"uint16_t"},
                                 {"sig_name": "tv_p_val", "type":"uint16_t"}
                             ],
-                            "msg_period":500,
+                            "msg_period":2000,
                             "msg_hlp":1,
                             "msg_pgn":55
                         },

@@ -19,6 +19,7 @@
 
 /* Module Includes */
 #include "can_parse.h"
+#include <stdint.h>
 
 #define MAX_PEDAL_MEAS (4095)
 
@@ -40,8 +41,11 @@
 #define VREF 3.3F
 #define RESISTOR_T1 3300
 #define RESISTOR_T2 1000
-#define MAX_RESISTANCE 2500
-#define MAX_VALUE 4095
+
+#define PROFILES_START_SECTOR    3
+#define NUM_PROFILES             4
+#define PROFILE_WRITE_SUCCESS 0
+#define PROFILE_WRITE_FAIL -1
 
 typedef struct
 {
@@ -65,17 +69,23 @@ typedef struct {
     uint16_t b1min;
     uint16_t b2max;
     uint16_t b2min;
-    uint16_t b3max;
-    uint16_t b3min;
 } pedal_calibration_t;
 
-extern pedal_calibration_t pedal_calibration;
+typedef struct {
+    uint8_t id;
+    uint8_t brake_travel_threshold;
+    uint8_t throttle_travel_threshold;
+    uint8_t reserved;
+} driver_pedal_profile_t;
 
+extern pedal_calibration_t pedal_calibration;
 extern uint16_t filtered_pedals;
 extern uint16_t thtl_limit;
+extern driver_pedal_profile_t driver_pedal_profiles[4];
 
 /* Function Prototypes */
 void pedalsPeriodic(void);
-
+int writePedalProfiles(void);
+void readPedalProfiles(void);
 
 #endif

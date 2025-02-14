@@ -1,41 +1,49 @@
 #ifndef __LCD_H__
 #define __LCD_H__
-#include "common/phal_F4_F7/spi/spi.h"
-#include "nextion.h"
-#include "pedals.h"
-#include "can_parse.h"
-#include "main.h"
 
-//Page Strings / info
+#include "nextion.h"
+#include "menu_system.h"
+#include <stdint.h>
+
+// Page Strings (must match Nextion page names)
 #define RACE_STRING "race"
-#define SETTINGS_STRING "settings"
-#define DATA_STRING "data"
+#define COOLING_STRING "cooling"
+#define APPS_STRING "apps"
 #define ERR_STRING "error"
 #define WARN_STRING "warning"
 #define FATAL_STRING "critical"
 #define FAULT_STRING "faults"
 #define TVSETTINGS_STRING "tvsettings"
 #define DRIVER_STRING "driver"
+#define DRIVER_CONFIG_STRING "profile"
 #define SDCINFO_STRING "sdcinfo"
 #define LOGGING_STRING "logging"
-#define GEAR_RATIO ((49.0F * 111.0F / 27.0F / 26.0F) + 1U)
 
+// Info
+#define GEAR_RATIO ((49.0F * 111.0F / 27.0F / 26.0F) + 1U) // TODO remove?
 
 // Driver Configuration Page
-#define DRIVER_DEFAULT_OP "r0"
-#define DRIVER_TYLER_OP "r1"
-#define DRIVER_RUHAAN_OP "r2"
-#define DRIVER_LUKE_OP "r3"
-#define DRIVER_DEFAULT_TXT "t1"
-#define DRIVER_TYLER_TXT "t2"
-#define DRIVER_RUHAAN_TXT "t3"
-#define DRIVER_LUKE_TXT "t4"
+#define DRIVER1_LIST "t1"
+#define DRIVER2_LIST "t2"
+#define DRIVER3_LIST "t3"
+#define DRIVER4_LIST "t4"
+#define DRIVER1_NAME "Default"
+#define DRIVER2_NAME "Tyler"
+#define DRIVER3_NAME "Luca"
+#define DRIVER4_NAME "Luke"
+
+// Profile Page
+#define PROFILE_CURRENT_TXT "curr"
+#define PROFILE_BRAKE_FLT "brake"
+#define PROFILE_THROTTLE_FLT "throt"
+#define PROFILE_SAVE_BUTTON "save"
+#define PROFILE_STATUS_TXT "stat"
 
 //Error/Knob page values
-#define TIME_BAR "j0"
+#define TIME_BAR "j0" // todo
 #define ERR_TXT "t1"
 
-// SDC Info Page Values
+// SDC Info Page
 #define SDC_IMD_STAT_TXT "t2"
 #define SDC_BMS_STAT_TXT "t8"
 #define SDC_BSPD_STAT_TXT "t14"
@@ -51,83 +59,74 @@
 #define SDC_PCHG_STAT_TXT "t24"
 #define SDC_FIRST_TRIP_TXT "t28"
 
-
-//Fault Page Values
-#define FAULT_1_TXT "t1"
-#define FAULT_2_TXT "t2"
-#define FAULT_3_TXT "t3"
-#define FAULT_4_TXT "t4"
-#define FAULT_5_TXT "t5"
-#define FLT_STAT_1_TXT "t6"
-#define FLT_STAT_2_TXT "t7"
-#define FLT_STAT_3_TXT "t8"
-#define FLT_STAT_4_TXT "t9"
-#define FLT_STAT_5_TXT "t10"
+// Fault Page
+#define FAULT1_BUTTON "t1"
+#define FAULT2_BUTTON "t2"
+#define FAULT3_BUTTON "t3"
+#define FAULT4_BUTTON "t4"
+#define FAULT5_BUTTON "t5"
+#define FAULT1_TXT "fault1"
+#define FAULT2_TXT "fault2"
+#define FAULT3_TXT "fault3"
+#define FAULT4_TXT "fault4"
+#define FAULT5_TXT "fault5"
+#define CLEAR_BUTTON "clear"
 #define FAULT_NONE_STRING "NONE\0"
 
-//TV Settings Page Values
-#define TV_INTENSITY_FLT "x0"
-#define TV_PROPORTION_FLT "x1"
-#define TV_DEAD_TXT "t6"
-#define TV_ENABLE_OP "c0"
+// TV Settings Page Values
+#define TV_INTENSITY_FLT "inten"
+#define TV_PROPORTION_FLT "pval"
+#define TV_DEAD_TXT "dead"
+#define TV_ENABLE_OP "tv"
 
-//Setings page values
-#define DT_FAN_TXT "t2"
-#define DT_PUMP_TXT "t3"
-#define B_FAN1_TXT "t5"
-#define B_FAN2_TXT "t6"
-#define B_PUMP_TXT "t7"
-#define DT_FAN_BAR "j0"
-#define DT_FAN_VAL "t8"
-#define DT_PUMP_OP "c1"
-#define B_FAN1_BAR "j1"
-#define B_FAN1_VAL "t9"
-#define B_FAN2_OP "c3"
-#define B_PUMP_OP "c4"
+// Cooling Page
+#define DT_FAN_VAL "DFan"
+#define DT_FAN_BAR "DBar"
+#define DT_PUMP_OP "DPump"
+#define B_FAN_VAL "BFan"
+#define B_FAN_BAR "BBar"
+#define B_PUMP_OP "BPump"
+#define BAR_INTERVAL 25
 
-//Colors
-#define TV_BG 38066
-#define TV_HOVER_BG 52857
-#define SETTINGS_HOVER_BG 28223
-#define SETTINGS_BAR_BG 48631
-#define SETTINGS_BAR_FG 495
-#define SETTINGS_BG 1214
-#define SETTINGS_FG BLACK
-#define INFO_GRAY 48631
-#define SETTINGS_UV_SELECT 31727
-#define ORANGE 64512
+// Race Page
+#define THROT_BAR "throt"
+#define BRK_BAR "brake"
+#define BATT_TEMP "BTemp"
+#define BATT_VOLT "volt"
+#define BATT_CURR "amp"
+#define MOT_TEMP "MTemp"
+#define MC_TEMP "MCTemp"
+#define CAR_STAT "stat"
+#define SPEED "speed"
+#define RACE_TV_ON "tv"
 
-//Race/Data pages
-#define THROT_BAR "j1"
-#define POW_LIM_BAR "j0"
-#define BRAKE_BIAS_FLT "x0"
-#define TV_RL_FLT "x1"
-#define TV_RR_FLT "x2"
-#define FLT_TO_DISPLAY_INT_2_DEC (100U)
-#define FLT_TO_PERCENTAGE (100U)
+// Logging Page
+#define LOG_OP "log"
+#define LOGGING_STATUS_TXT "stat"
 
-//Race specific Values
-#define BATT_TEMP "t8"
-#define BATT_VOLT "t10"
-#define BATT_CURR "t13"
-#define MOT_TEMP "t20"
-#define GEAR_TEMP "t21"
-#define CAR_STAT "t22"
-#define SPEED "t0"
-
+// Apps Page
+#define APPS_BRAKE1_VAL "B1"
+#define APPS_BRAKE2_VAL "B2"
+#define APPS_THROTTLE1_VAL "T1"
+#define APPS_THROTTLE2_VAL "T2"
+#define APPS_BRAKE_DEV_VAL "BDev"
+#define APPS_THROTTLE_DEV_VAL "TDev"
+#define APPS_BRAKE_BAR "brake"
+#define APPS_THROTTLE_BAR "throt"
+#define APPS_STATUS "stat"
 
 typedef enum {
-
   // Pages selectable with the rot encoder
   // Should corresspond with the page count in main.h
-  PAGE_RACE,
-  PAGE_SETTINGS,
-  PAGE_DATA,
-  PAGE_FAULTS,
+  PAGE_RACE = 0,
+  PAGE_COOLING,
   PAGE_TVSETTINGS,
-  PAGE_SDCINFO,    
+  PAGE_FAULTS,
+  PAGE_SDCINFO,
   PAGE_DRIVER,
+  PAGE_PROFILES,
   PAGE_LOGGING,
+  PAGE_APPS,
 
   // Pages that can be displayed but not selected with the encoder
   PAGE_PREFLIGHT,
@@ -136,83 +135,24 @@ typedef enum {
   PAGE_FATAL,
 } page_t;
 
-typedef enum {
-  DT_FAN_HOVER,
-  DT_PUMP_HOVER,
-  FAN1_HOVER,
-  FAN2_HOVER,
-  PUMP_HOVER,
-  DT_FAN_SELECT,
-  FAN1_SELECT
-} hover_state_t;
-
-typedef enum {
-  TV_INTENSITY_HOVER,
-  TV_P_HOVER,
-  TV_DEADBAND_HOVER,
-  TV_ENABLE_HOVER,
-  TV_INTENSITY_SELECTED,
-  TV_P_SELECTED,
-  TV_DEADBAND_SELECTED,
-  TV_NONE_SELECTED,
-
-} tv_hover_state_t;
-
 typedef struct {
-  bool tv_enable_selected;
-  tv_hover_state_t curr_hover;
-  uint8_t  tv_deadband_val;
-  
-  // intensity and p are 10x the float equivalent
-  uint16_t tv_intensity_val;
-  uint16_t tv_p_val;
+  void (*update)(void);
+  void (*move_up)(void);
+  void (*move_down)(void);
+  void (*select)(void);
+} page_handler_t;
 
-} tv_settings_t;
+void initLCD();                     // Initialize LCD data structures and configuration
+void updatePage();                  // Change the current page of the LCD
+void moveUp();                      // Upward UI input detected (up button or in some cases encoder)
+void moveDown();                    // Downward UI input detected (down button or in some cases encoder)
+void selectItem();                  // Selection UI input detected
+void updateFaultDisplay();          // Periodically poll recent faults and update the fault buffer and page as needed
+void updateTelemetryPages();        // Periodically poll recent telemetry and update the race/apps page as needd
+void sendTVParameters();            // Periodically send updates to the TV configuration to TV board
+void sendCoolingParameters();       // Periodically send updates to the cooling configuration to the cooling board
+void sendLoggingParameters();       // Periodically send updates to the logging configuration to the daq board
+void updateFaultPageIndicators();   // Update the fault page indicators
+void updateSDCDashboard();          // Update the SDC info page
 
-typedef struct {
-  uint16_t brake_bias_adj;  // 0 to 10000 for the page
-} race_page_t;
-
-typedef enum {
-  DRIVER_DEFAULT_SELECT,
-  DRIVER_TYLER_SELECT,
-  DRIVER_RUHAAN_SELECT,
-  DRIVER_LUKE_SELECT,
-
-} driver_select_state_t;
-
-typedef struct {
-  driver_select_state_t curr_hover;
-  driver_select_state_t curr_select;
-} driver_config_t;
-
-typedef struct {
-  bool d_fan_selected;
-  bool d_pump_selected;
-  bool b_fan1_selected;
-  bool b_fan2_selected;
-  bool b_pump_selected;
-  uint8_t d_fan_val;
-  uint8_t b_fan_val;
-  hover_state_t curr_hover;
-} settings_t;
-
-typedef struct {
-  volatile int8_t encoder_position;
-
-} lcd_t;
-
-void initLCD();                                     // Initialize LCD data structures and configuration
-void updatePage();                                  // Change the current page of the LCD
-void moveUp();                                      // Upward UI input detected (up button or in some cases encoder)
-void moveDown();                                    // Downward UI input detected (down button or in some cases encoder)
-void selectItem();                                  // Selection UI input detected
-void updateFaultDisplay();                          // Periodically poll recent faults and update the fault buffer and page as needed
-void update_data_pages();                           // Periodically poll recent telemetry and update the data page as needd
-char *int_to_char(int16_t val, char *val_to_send);  // Convert integer value to character for the nextion interface
-bool zeroEncoder(volatile int8_t* start_pos);       // Zero the encoder position for page selection
-void sendTVParameters();                            // Periodically send updates to the TV configuration to TV board
-void updateFaultPageIndicators();
-void updateSDCDashboard();
-
-#endif
+#endif // __LCD_H__
