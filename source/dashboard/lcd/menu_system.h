@@ -52,11 +52,6 @@ typedef struct {
     bool saved;                 // Generic saved state flag
 } menu_page_t;
 
-// Style functions
-void MS_styleNormal(menu_element_t* element);
-void MS_styleHover(menu_element_t* element);
-void MS_styleSelected(menu_element_t* element);
-
 // Navigation functions
 void MS_moveUp(menu_page_t* page);
 void MS_moveDown(menu_page_t* page);

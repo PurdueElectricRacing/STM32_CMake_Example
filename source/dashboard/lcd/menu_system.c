@@ -25,7 +25,7 @@
  * @brief Applies normal (default) styling to a menu element
  * @param element Pointer to the menu element to be styled
  */
-void MS_styleNormal(menu_element_t *element) {
+void MS_setStyleNormal(menu_element_t *element) {
     NXT_setBackground(element->object_name, STEEL);
     NXT_setFontColor(element->object_name, WHITE);
     // change to set border to indicate selected? (requires intelligent series)
@@ -36,7 +36,7 @@ void MS_styleNormal(menu_element_t *element) {
  * @brief Applies hover styling effect to a menu element
  * @param element Pointer to the menu element to be styled
  */
-void MS_styleHover(menu_element_t *element) {
+void MS_setStyleHover(menu_element_t *element) {
     NXT_setBackground(element->object_name, STEAM);
     NXT_setFontColor(element->object_name, BLACK);
     // change to set border to indicate selected? (requires intelligent series)
@@ -47,7 +47,7 @@ void MS_styleHover(menu_element_t *element) {
  * @brief Applies selected state styling to a menu element
  * @param element Pointer to the menu element to be styled
  */
-void MS_styleSelected(menu_element_t *element) {
+void MS_setStyleSelected(menu_element_t *element) {
     NXT_setBackground(element->object_name, RUSH);
     NXT_setFontColor(element->object_name, WHITE);
 }
@@ -64,13 +64,13 @@ void MS_moveUp(menu_page_t *page) {
     }
 
     // Clear current element styling
-    MS_styleNormal(&page->elements[page->current_index]);
+    MS_setStyleNormal(&page->elements[page->current_index]);
 
     // Move to previous element
     page->current_index = (page->current_index - 1 + page->num_elements) % page->num_elements;
 
     // Style new element as hovered
-    MS_styleHover(&page->elements[page->current_index]);
+    MS_setStyleHover(&page->elements[page->current_index]);
 }
 
 /**
@@ -85,13 +85,13 @@ void MS_moveDown(menu_page_t *page) {
     }
 
     // Clear current element styling
-    MS_styleNormal(&page->elements[page->current_index]);
+    MS_setStyleNormal(&page->elements[page->current_index]);
 
     // Move to next element
     page->current_index = (page->current_index + 1) % page->num_elements;
 
     // Style new element as hovered
-    MS_styleNormal(&page->elements[page->current_index]);
+    MS_setStyleNormal(&page->elements[page->current_index]);
 }
 
 /**
@@ -105,7 +105,7 @@ void MS_select(menu_page_t *page) {
     if (page->is_element_selected) {
         // Deselect element
         page->is_element_selected = false;
-        MS_styleHover(current);
+        MS_setStyleHover(current);
         
         // Call onChange if defined
         if (current->on_change != NULL) {
@@ -126,14 +126,14 @@ void MS_select(menu_page_t *page) {
             for (uint8_t i = 0; i < page->num_elements; i++) {
                 if (page->elements[i].type == ELEMENT_LIST) {
                     page->elements[i].current_value = 0;
-                    MS_styleNormal(&page->elements[i]);
+                    MS_setStyleNormal(&page->elements[i]);
                 }
             }
             current->current_value = 1;
             if (current->on_change != NULL) {
                 current->on_change();
             }
-            MS_styleSelected(current);
+            MS_setStyleSelected(current);
             break;
         case ELEMENT_OPTION:
             current->current_value ^= 1;
@@ -145,7 +145,7 @@ void MS_select(menu_page_t *page) {
         case ELEMENT_FLT: // Fall through
         case ELEMENT_VAL:
             page->is_element_selected = true;
-            MS_styleSelected(current);
+            MS_setStyleSelected(current);
             break;
         default:
             break;
@@ -220,7 +220,7 @@ void MS_refreshPage(menu_page_t *page) {
         switch (curr_element->type) {
             case ELEMENT_LIST:
                 if (i == list_index) {  // nothing happens if -1
-                    MS_styleSelected(curr_element);
+                    MS_setStyleSelected(curr_element);
                 }
                 break;
             case ELEMENT_VAL:
